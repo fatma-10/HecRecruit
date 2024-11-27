@@ -1,0 +1,47 @@
+body {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+.custom-block {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+.custom-block:hover {
+    transform: scale(1.05);
+}
+.custom-block-image-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.custom-block-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.custom-block-overlay-info {
+    padding: 15px;
+    background: rgba(255,255,255,0.9);
+}
+.search-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+.form-control {
+    border-radius: 5px;
+}
+.btn-primary {
+    background-color: #0b5ed7;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--title-font-family);
+}
+.btn-primary:hover {
+    background-color: #0a4abf;
+    transform: scale(1.01);
+}
