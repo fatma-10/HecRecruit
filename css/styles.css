@@ -1,82 +1,11 @@
 /* BODY */
 body {
-    background: linear-gradient(180deg, #003366 0%, #FFFFFF 50%, #003366 100%);
+    background: linear-gradient(135deg, #007cc7, #00d4ff);
     background-size: cover;
     background-attachment: fixed;
     margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
-    color: #333;
-}
-
-/* NAVBAR */
-.custom-nav-bar {
-    background-color: #003366;
-    padding: 12px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.custom-nav-bar .navbar-brand img {
-    max-height: 40px;
-    width: auto;
-}
-
-.custom-nav-bar .navbar-nav {
-    display: flex;
-    justify-content: center;
-    margin-left: auto;
-}
-
-.custom-nav-bar .navbar-nav .nav-item {
-    padding: 0 15px;
-}
-
-.custom-nav-bar .navbar-nav .nav-link {
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.custom-nav-bar .navbar-nav .nav-link:hover {
-    color: #FFD700;
-}
-
-.custom-nav-bar .navbar-toggler {
-    background-color: #FFD700;
-    padding: 5px 10px; /* Réduction des marges */
-    font-size: 14px;  /* Taille du texte réduite */
-    border-radius: 5px; /* Ajout de bordures pour mieux intégrer le bouton */
-}
-
-.custom-nav-bar .navbar-toggler:hover {
-    background-color: #FFC107;
-}
-
-/* HEADER */
-.custom-site-header {
-    background-color: #003366;
-    color: white;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.custom-site-header h2 {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-/* SECTION - About */
-.about-section {
-    padding: 60px 20px;
-}
-
-.about-section .section-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    text-align: center;
     color: #333;
 }
 
@@ -139,73 +68,6 @@ body {
     }
 }
 
-/* FOOTER */
-.custom-site-footer {
-    background-color: #003366;
-    color: white;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.custom-site-footer .site-footer-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-/* Centrer les liens du footer */
-.site-footer-links {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: center; /* Alignement horizontal */
-    align-items: center; /* Alignement vertical */
-    gap: 20px; /* Espacement entre les liens */
-    flex-wrap: wrap; /* Permet de s'ajuster sur petits écrans */
-    margin: 0; /* Supprime les marges par défaut */
-}
-
-.site-footer-link-item {
-    margin: 0;
-}
-
-.site-footer-link {
-    color: white;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-.site-footer-link:hover {
-    color: #FFD700;
-}
-
-/* Formulaire d'abonnement */
-.subscribe-form-wrap h6 {
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-.subscribe-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 2px solid #003366;
-    border-radius: 5px;
-}
-
-.subscribe-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #003366;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.subscribe-form button:hover {
-    background-color: #004080;
-}
 
 
 
