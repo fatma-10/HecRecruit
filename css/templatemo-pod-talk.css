@@ -990,7 +990,7 @@ main {
   background: var(--secondary-color);
   border-color: var(--secondary-color);
   max-width: 50px;
-  height: 40px;
+  height: 100%;
   padding-left: 15px;
 }
 
