@@ -79,9 +79,22 @@ https://templatemo.com/tm-584-pod-talk
         
                     <div class="ms-4">
                         <a href="#section_3" class="btn custom-btn custom-border-btn smoothscroll">Sign Up</a>
-                    </div>
+                    </div><div id="notifyBtn" class="notify-btn">
+                <span class="icon">&#128276;</span> <!-- Notification Bell Icon -->
+                <span id="notificationCount" class="count">3</span> <!-- Notification Count -->
+            </div>
+        
+            <!-- Notification List --> 
+            <div id="notificationList" class="notification-list">
+                <ul>
+                    <li>New message received</li>
+                    <li>Task completed</li>
+                    <li>System update available</li>
+                </ul>
+            </div>
                 </div>
             </div>
+            
         </nav>
         
         
@@ -655,6 +668,14 @@ document.addEventListener('click', (event) => {
     if (!searchBarContainer.contains(event.target) && searchOptions.style.display === "block") {
         searchOptions.style.display = "none";
     }
+});
+// Get the notification button, notification list, and other elements
+const notifyBtn = document.getElementById('notifyBtn');
+const notificationList = document.getElementById('notificationList');
+
+// Toggle the visibility of the notification list when the button is clicked
+notifyBtn.addEventListener('click', () => {
+    notificationList.classList.toggle('show');
 });
 
         </script>
