@@ -1,2 +1,0 @@
-Projet Fin d'Etudes|PFE Application Mobile|Dev mobile React Native|ey@gmail.com|2026-04-12|null|App e-commerce|React, Node, MongoDB
-Stage|Développer java senior|niveau débutant|ey@gmail.com|2026-04-12|null|2|Informatique
