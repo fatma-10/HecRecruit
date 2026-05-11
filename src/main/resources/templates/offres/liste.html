@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offres - HecRecruit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        nav { background: #2c3e50; color: white; padding: 1rem; display: flex; justify-content: space-between; }
+        nav a { color: white; text-decoration: none; margin: 0 1rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        h1 { color: #2c3e50; margin: 2rem 0; }
+        .filter { margin: 2rem 0; }
+        .filter a { display: inline-block; padding: 0.5rem 1rem; margin: 0.5rem; background: #3498db; color: white; text-decoration: none; border-radius: 4px; }
+        .filter a.active { background: #e74c3c; }
+        .offres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
+        .offre-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #3498db; }
+        .offre-card h3 { color: #2c3e50; margin-bottom: 0.5rem; }
+        .offre-card .type { display: inline-block; background: #ecf0f1; padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; margin: 0.5rem 0; }
+        .offre-card .entreprise { color: #7f8c8d; font-weight: bold; }
+        .offre-card .description { color: #555; line-height: 1.5; margin: 1rem 0; }
+        .offre-card .dates { font-size: 0.9rem; color: #95a5a6; margin: 1rem 0; }
+        .btn { display: inline-block; padding: 0.6rem 1.2rem; background: #3498db; color: white; text-decoration: none; border-radius: 4px; }
+        .btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div><strong>HecRecruit</strong></div>
+        <div>
+            <a href="/api/">Accueil</a>
+            <a href="/api/offres">Offres</a>
+            <a href="/api/candidats">Candidats</a>
+            <a href="/api/entreprises">Entreprises</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Offres d'emploi</h1>
+        
+        <div class="filter">
+            <a th:href="@{/api/offres}" th:classappend="${typeFilter == null ? 'active' : ''}">Toutes les offres</a>
+            <a th:href="@{/api/offres(type='Stage')}" th:classappend="${typeFilter == 'Stage' ? 'active' : ''}">Stages</a>
+            <a th:href="@{/api/offres(type='Alternance')}" th:classappend="${typeFilter == 'Alternance' ? 'active' : ''}">Alternances</a>
+            <a th:href="@{/api/offres(type='ProjetFinEtudes')}" th:classappend="${typeFilter == 'ProjetFinEtudes' ? 'active' : ''}">Projets Fin d'Études</a>
+        </div>
+
+        <div class="offres-grid" th:if="${!offres.isEmpty()}">
+            <div class="offre-card" th:each="offre : ${offres}">
+                <div class="type" th:text="${offre.typeOffre}">Type</div>
+                <h3 th:text="${offre.titre}">Titre</h3>
+                <div class="entreprise" th:text="${offre.entreprise.nom}">Entreprise</div>
+                <p class="description" th:text="${offre.description}">Description</p>
+                <div class="dates">
+                    <span th:text="'Publié: ' + ${offre.datePublication}">Publié</span><br>
+                    <span th:if="${offre.dateExpiration != null}" th:text="'Expire: ' + ${offre.dateExpiration}">Expires</span>
+                </div>
+                <a th:href="@{/api/offres/{id}(id=${offre.id})}" class="btn">Voir détails</a>
+            </div>
+        </div>
+        <p th:if="${offres.isEmpty()}">Aucune offre disponible actuellement.</p>
+    </div>
+</body>
+</html>
