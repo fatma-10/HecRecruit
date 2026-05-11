@@ -10,5 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ForumRepository extends JpaRepository<Forum, UUID> {
     List<Forum> findByCandidatId(Integer candidatId);
-    List<Forum> orderByDateCreationDesc();
+
+    // Corrected name:
+    List<Forum> findAllByOrderByDateCreationDesc();
 }
