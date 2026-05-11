@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--HECRECRUIT - LISTE DES OFFRES
+ Page de recherche et consultation des offres d'emploi
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controllers.OffresListController"
+            styleClass="root-pane">
+    
+    <!--  HEADER - En-tête de la page -->
+    <top>
+        <HBox styleClass="content-container" alignment="CENTER_LEFT" spacing="18" 
+              style="-fx-background-color: linear-gradient(to right, #3498DB, #2980B9); 
+                     -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+            
+            <!-- Bouton retour -->
+            <Button text="←  Retour" 
+                    styleClass="btn-outline"
+                    style="-fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2px;"
+                    onAction="#handleRetour"
+                    prefHeight="38"/>
+            
+            <!-- Icône -->
+            <Text text="🔍" style="-fx-font-size: 36px;"/>
+            
+            <!-- Titre -->
+            <Label text="Rechercher des offres" 
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+    
+    <!-- CONTENU CENTRAL -->
+    <center>
+        <VBox spacing="25" styleClass="padding-large">
+            
+            <!--  BARRE DE RECHERCHE-->
+            <HBox spacing="15" alignment="CENTER_LEFT" styleClass="content-container"
+                  style="-fx-padding: 20px;">
+                
+                <!-- Label recherche -->
+                <Label text="Rechercher :" 
+                       style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                
+                <!-- Champ de recherche -->
+                <TextField fx:id="txtRecherche" 
+                           promptText="Titre, entreprise, type..."
+                           prefWidth="360"
+                           prefHeight="40"
+                           style="-fx-font-size: 13px;"/>
+                
+                <!-- ComboBox de critères -->
+                <ComboBox fx:id="comboCritere" 
+                          promptText="Critère de recherche"
+                          prefWidth="180"
+                          prefHeight="40"/>
+                
+                <!-- Bouton rechercher -->
+                <Button text="🔍  Rechercher" 
+                        styleClass="btn-primary"
+                        onAction="#handleRecherche"
+                        prefHeight="40"
+                        prefWidth="150"
+                        style="-fx-font-size: 13px;"/>
+                
+                <!-- Bouton réinitialiser -->
+                <Button text="🔄  Réinitialiser" 
+                        styleClass="btn-outline"
+                        onAction="#handleReset"
+                        prefHeight="40"
+                        prefWidth="140"
+                        style="-fx-font-size: 13px;"/>
+            </HBox>
+            
+            <!-- MESSAGE D'INFORMATION-->
+            <Label fx:id="lblInfo" 
+                   text="" 
+                   styleClass="label-info"
+                   visible="false"
+                   style="-fx-background-color: rgba(52,152,219,0.1); 
+                          -fx-padding: 12px 18px; 
+                          -fx-background-radius: 8px;"/>
+            
+            <!-- TABLEAU DES OFFRES -->
+            <TableView fx:id="tableOffres" 
+                       styleClass="table-view"
+                       VBox.vgrow="ALWAYS"
+                       prefHeight="400">
+                <columns>
+                    <TableColumn text="Titre" prefWidth="210" fx:id="colTitre"/>
+                    <TableColumn text="Type" prefWidth="130" fx:id="colType"/>
+                    <TableColumn text="Entreprise" prefWidth="170" fx:id="colEntreprise"/>
+                    <TableColumn text="Date publication" prefWidth="130" fx:id="colDate"/>
+                    <TableColumn text="Date expiration" prefWidth="130" fx:id="colExpiration"/>
+                    <TableColumn text="Candidatures" prefWidth="110" fx:id="colCandidatures"/>
+                </columns>
+            </TableView>
+            
+            <!--ACTIONS ET STATISTIQUES-->
+            <HBox spacing="15" alignment="CENTER_LEFT" styleClass="content-container"
+                  style="-fx-padding: 18px;">
+                
+                <!-- Bouton voir détails -->
+                <Button fx:id="btnVoirDetails" 
+                        text="👁️  Voir détails" 
+                        styleClass="btn-outline"
+                        onAction="#handleVoirDetails"
+                        disable="true"
+                        prefHeight="42"
+                        prefWidth="140"
+                        style="-fx-font-size: 13px;"/>
+                
+                <!-- Bouton postuler -->
+                <Button fx:id="btnPostuler" 
+                        text="✉️  Postuler" 
+                        styleClass="btn-success"
+                        onAction="#handlePostuler"
+                        disable="true"
+                        prefHeight="42"
+                        prefWidth="140"
+                        style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                
+                <!-- Espaceur -->
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <!-- Compteur d'offres -->
+                <Label fx:id="lblNbOffres" 
+                       text="0 offre(s) disponible(s)" 
+                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2C3E50;"/>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

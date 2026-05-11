@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--HECRECRUIT - CRÉER UNE OFFRE
+ Formulaire de création d'offre d'emploi pour entreprises
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controllers.CreerOffreController"
+            styleClass="root-pane">
+    
+    <!-- HEADER -->
+    <top>
+        <HBox styleClass="content-container" alignment="CENTER_LEFT" spacing="18" 
+              style="-fx-background-color: linear-gradient(to right, #27AE60, #229954); 
+                     -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+            <Button text="←  Retour" 
+                    styleClass="btn-outline"
+                    style="-fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2px;"
+                    onAction="#handleRetour"
+                    prefHeight="38"/>
+            <Text text="➕" style="-fx-font-size: 36px;"/>
+            <Label text="Créer une nouvelle offre" 
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+    
+    <!-- CONTENU -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="root-pane">
+            <VBox spacing="28" styleClass="padding-large">
+                
+                <!-- Section informations générales -->
+                <VBox spacing="20" styleClass="content-container" maxWidth="750" style="-fx-padding: 30px;">
+                    <Label text="Informations générales" 
+                           styleClass="title-small"
+                           style="-fx-font-size: 19px;"/>
+                    
+                    <GridPane hgap="20" vgap="18">
+                        <Label text="Titre de l'offre *" 
+                               style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtTitre" 
+                                   promptText="Ex: Développeur Java Senior" 
+                                   prefWidth="450" prefHeight="42"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Type d'offre *" 
+                               style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <ComboBox fx:id="comboType" 
+                                  promptText="Sélectionnez le type d'offre" 
+                                  prefWidth="450" prefHeight="42"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Description *" 
+                               style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextArea fx:id="txtDescription" 
+                                  promptText="Décrivez l'offre en détail (missions, profil recherché...)" 
+                                  prefWidth="450" prefHeight="120" 
+                                  wrapText="true"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    </GridPane>
+                </VBox>
+                
+                <!-- Section informations spécifiques -->
+                <VBox fx:id="containerSpecific" spacing="20" styleClass="content-container" maxWidth="750" style="-fx-padding: 30px;">
+                    <Label text="Informations spécifiques" 
+                           styleClass="title-small"
+                           style="-fx-font-size: 19px;"/>
+                    
+                    <GridPane hgap="20" vgap="18">
+                        <Label fx:id="lblField1" 
+                               text="Champ 1" 
+                               style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtField1" 
+                                   prefWidth="450" prefHeight="42"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label fx:id="lblField2" 
+                               text="Champ 2" 
+                               style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtField2" 
+                                   prefWidth="450" prefHeight="42"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </GridPane>
+                </VBox>
+                
+                <!-- Message d'erreur -->
+                <Label fx:id="lblError" 
+                       text="" 
+                       styleClass="label-danger" 
+                       visible="false"
+                       maxWidth="750"/>
+                
+                <!-- Boutons d'action -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Button text="✅  Publier l'offre" 
+                            styleClass="btn-success"
+                            onAction="#handlePublier"
+                            prefWidth="200" prefHeight="45"
+                            style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Button text="🔄  Réinitialiser" 
+                            styleClass="btn-outline"
+                            onAction="#handleReset"
+                            prefHeight="45"
+                            style="-fx-font-size: 14px;"/>
+                </HBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--HECRECRUIT - TABLEAU DE BORD ENTREPRISE
+ Interface principale pour les entreprises/recruteurs
+ Contient : statistiques, gestion des offres et candidatures
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controllers.EntrepriseDashboardController"
+            styleClass="root-pane">
+    
+    <!-- HEADER - En-tête avec informations entreprise-->
+    <top>
+        <HBox styleClass="content-container" alignment="CENTER_LEFT" spacing="20" 
+              style="-fx-background-color: linear-gradient(to right, #27AE60, #229954); 
+                     -fx-padding: 22px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+            
+            <!-- Icône entreprise -->
+            <Text text="🏢" style="-fx-font-size: 38px;"/>
+            
+            <!-- Informations entreprise -->
+            <VBox spacing="3">
+                <Label fx:id="lblNomEntreprise" 
+                       text="Bienvenue, [Entreprise]" 
+                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label fx:id="lblSecteur" 
+                       text="[Secteur]" 
+                       style="-fx-text-fill: white; -fx-font-size: 14px; -fx-opacity: 0.9;"/>
+            </VBox>
+            
+            <!-- Espaceur flexible -->
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <!-- Bouton déconnexion -->
+            <Button fx:id="btnDeconnexion" 
+                    text="🚪  Déconnexion" 
+                    styleClass="btn-danger"
+                    onAction="#handleDeconnexion"
+                    style="-fx-font-size: 14px; -fx-padding: 10px 20px;"/>
+        </HBox>
+    </top>
+    
+    <!--MENU LATÉRAL - Navigation principale-->
+    <left>
+        <VBox spacing="8" styleClass="content-container" 
+              style="-fx-min-width: 260; -fx-background-color: linear-gradient(to bottom, #FFFFFF, #F8F9FA); 
+                     -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 2, 0);">
+            
+            <!-- Titre navigation -->
+            <Label text="NAVIGATION" 
+                   style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #7F8C8D; 
+                          -fx-padding: 8px 0;">
+                <VBox.margin>
+                    <Insets bottom="5"/>
+                </VBox.margin>
+            </Label>
+            
+            <Separator style="-fx-background-color: #ECF0F1;"/>
+            
+            <!-- Boutons de navigation -->
+            <Button text="📊  Tableau de bord" 
+                    styleClass="btn-outline"
+                    onAction="#handleDashboard"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button text="📋  Mes offres" 
+                    styleClass="btn-outline"
+                    onAction="#handleOffres"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button text="➕  Créer une offre" 
+                    styleClass="btn-outline"
+                    onAction="#handleCreerOffre"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button text="⭐  Ma wishlist" 
+                    styleClass="btn-outline"
+                    onAction="#handleWishlist"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button text="💬  Forum" 
+                    styleClass="btn-outline"
+                    onAction="#handleForum"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <!-- Séparateur -->
+            <Region prefHeight="10"/>
+            
+            <Button text="⚙️  Mon profil" 
+                    styleClass="btn-outline"
+                    onAction="#handleProfil"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+        </VBox>
+    </left>
+    
+    <!-- CONTENU CENTRAL - Tableau de bord-->
+    <center>
+        <VBox spacing="35" styleClass="padding-large">
+            
+            <!-- TITRE SECTION -->
+            <Label text="📊  Vue d'ensemble" 
+                   styleClass="title-medium"
+                   style="-fx-font-size: 26px;"/>
+            
+            <!-- STATISTIQUES - Cards -->
+            <HBox spacing="25" alignment="CENTER">
+                
+                <!-- Card 1 : Offres publiées -->
+                <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="230" prefHeight="150">
+                    <Label text="Offres publiées" 
+                           styleClass="title"
+                           style="-fx-font-size: 13px;"/>
+                    <Label fx:id="lblNbOffres" 
+                           text="0" 
+                           styleClass="value"
+                           style="-fx-font-size: 42px;"/>
+                </VBox>
+                
+                <!-- Card 2 : Candidatures reçues -->
+                <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="230" prefHeight="150">
+                    <Label text="Candidatures reçues" 
+                           styleClass="title"
+                           style="-fx-font-size: 13px;"/>
+                    <Label fx:id="lblNbCandidatures" 
+                           text="0" 
+                           styleClass="value"
+                           style="-fx-font-size: 42px;"/>
+                </VBox>
+                
+                <!-- Card 3 : Wishlist -->
+                <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="230" prefHeight="150">
+                    <Label text="Candidats en wishlist" 
+                           styleClass="title"
+                           style="-fx-font-size: 13px;"/>
+                    <Label fx:id="lblNbWishlist" 
+                           text="0" 
+                           styleClass="value"
+                           style="-fx-font-size: 42px;"/>
+                </VBox>
+                
+            </HBox>
+            
+            <!-- ACTIONS RAPIDES -->
+            <VBox spacing="18">
+                <Label text="⚡  Actions rapides" 
+                       styleClass="title-small"
+                       style="-fx-font-size: 20px;"/>
+                
+                <HBox spacing="20">
+                    <Button text="➕  Créer une nouvelle offre" 
+                            styleClass="btn-success"
+                            onAction="#handleCreerOffre"
+                            prefWidth="280"
+                            prefHeight="45"
+                            style="-fx-font-size: 14px;"/>
+                    
+                    <Button text="📋  Gérer mes offres" 
+                            styleClass="btn-secondary"
+                            onAction="#handleOffres"
+                            prefWidth="280"
+                            prefHeight="45"
+                            style="-fx-font-size: 14px;"/>
+                </HBox>
+            </VBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>
