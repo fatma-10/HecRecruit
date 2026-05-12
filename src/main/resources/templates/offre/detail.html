@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title th:text="${offre.titre}">Offre</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div style="margin-bottom: 1.5rem;">
+        <a th:href="@{/offres}" style="font-size: 13px; color: var(--muted);">&larr; Toutes les offres</a>
+    </div>
+
+    <div class="detail-layout">
+        <div class="detail-main">
+            <span class="eyebrow" th:text="${offre.typeOffre}">type</span>
+            <h1 th:text="${offre.titre}">Titre</h1>
+
+            <p class="lede" style="margin: 1rem 0 0; font-size: 1.2rem;"
+               th:text="|Publiée par ${offre.entreprise.nom}|">Entreprise</p>
+
+            <div class="description" th:text="${offre.description}">Description</div>
+
+            <ul class="detail-meta-list">
+                <li th:if="${stage != null}">
+                    <span class="label">Domaine</span>
+                    <span th:text="${stage.domaine}">domaine</span>
+                </li>
+                <li th:if="${stage != null}">
+                    <span class="label">Durée</span>
+                    <span th:text="|${stage.dureeEnMois} mois|">durée</span>
+                </li>
+
+                <li th:if="${alternance != null}">
+                    <span class="label">Rythme</span>
+                    <span th:text="${alternance.rythme}">rythme</span>
+                </li>
+                <li th:if="${alternance != null}">
+                    <span class="label">Durée</span>
+                    <span th:text="|${alternance.dureeEnMois} mois|">durée</span>
+                </li>
+
+                <li th:if="${pfe != null}">
+                    <span class="label">Sujet</span>
+                    <span th:text="${pfe.sujet}">sujet</span>
+                </li>
+                <li th:if="${pfe != null}">
+                    <span class="label">Technologies</span>
+                    <span th:text="${pfe.technologies}">technos</span>
+                </li>
+
+                <li>
+                    <span class="label">Date de publication</span>
+                    <span th:text="${#temporals.format(offre.datePublication, 'd MMMM yyyy')}">date</span>
+                </li>
+                <li>
+                    <span class="label">Date d'expiration</span>
+                    <span th:if="${offre.dateExpiration != null}"
+                          th:text="${#temporals.format(offre.dateExpiration, 'd MMMM yyyy')}">date</span>
+                    <em th:if="${offre.dateExpiration == null}" style="color: var(--muted);">non définie</em>
+                </li>
+                <li>
+                    <span class="label">Candidatures</span>
+                    <span th:text="${offre.nombreCandidatures}">0</span>
+                </li>
+            </ul>
+
+            <!-- Actions Candidat -->
+            <div th:if="${currentUser.isCandidat()}" style="margin-top: 2rem;">
+                <form th:if="${!dejaPostule and !offre.estExpiree()}"
+                      th:action="@{'/offres/' + ${offre.id} + '/postuler'}" method="post">
+                    <button type="submit" class="btn btn-accent">Postuler à cette offre</button>
+                </form>
+                <p th:if="${dejaPostule}" class="alert alert-success" style="margin: 0;">
+                    Vous avez déjà postulé à cette offre.
+                </p>
+                <p th:if="${offre.estExpiree()}" class="alert alert-error" style="margin: 0;">
+                    Cette offre est expirée.
+                </p>
+            </div>
+
+            <!-- Actions Entreprise (proprietaire) -->
+            <div th:if="${currentUser.isEntreprise() and currentUser.entreprise.id == offre.entreprise.id}"
+                 style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--cream-soft);">
+                <p class="eyebrow" style="margin-bottom: 1rem;">Actions propriétaire</p>
+
+                <form th:action="@{'/entreprise/offres/' + ${offre.id} + '/expiration'}"
+                      method="post"
+                      style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label>Date d'expiration</label>
+                        <input type="date" name="dateExpiration"
+                               th:value="${offre.dateExpiration != null} ? ${#temporals.format(offre.dateExpiration, 'yyyy-MM-dd')} : ''">
+                    </div>
+                    <button type="submit" class="btn btn-sm">Mettre à jour</button>
+                </form>
+
+                <a th:href="@{'/entreprise/mes-offres/' + ${offre.id} + '/candidats'}" class="btn btn-ghost">
+                    Voir les candidats (<span th:text="${offre.nombreCandidatures}">0</span>)
+                </a>
+                <form th:action="@{'/entreprise/offres/' + ${offre.id} + '/supprimer'}"
+                      method="post" style="display:inline; margin:0;"
+                      onsubmit="return confirm('Supprimer cette offre définitivement ?');">
+                    <button type="submit" class="btn btn-danger">Supprimer l'offre</button>
+                </form>
+            </div>
+        </div>
+
+        <aside class="detail-side">
+            <div class="detail-aside-card">
+                <div class="label">Entreprise</div>
+                <div class="value" th:text="${offre.entreprise.nom}">Entreprise</div>
+
+                <div class="label">Secteur</div>
+                <div class="value" th:text="${offre.entreprise.secteur}">secteur</div>
+
+                <div class="label">Contact</div>
+                <div class="value" style="font-size: 1rem;" th:text="${offre.entreprise.email}">email</div>
+            </div>
+        </aside>
+    </div>
+
+</div>
+</body>
+</html>

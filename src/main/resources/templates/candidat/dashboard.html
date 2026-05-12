@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Tableau de bord</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Tableau de bord</span>
+            <h1 style="margin-top: 0.5rem;">Bonjour, <em th:text="${candidat.prenom}">prenom</em>.</h1>
+            <p class="subtitle">Voici votre activité et nos suggestions du jour.</p>
+        </div>
+        <a th:href="@{/offres}" class="btn btn-primary">Parcourir les offres</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <span class="label">Candidatures</span>
+            <div class="value" th:text="${nbCandidatures}">0</div>
+            <span class="delta">en cours</span>
+        </div>
+        <div class="stat-card">
+            <span class="label">Recommandations</span>
+            <div class="value" th:text="${recommandations != null ? recommandations.size() : 0}">0</div>
+            <span class="delta">basées sur votre profil</span>
+        </div>
+        <div class="stat-card">
+            <span class="label">Profil</span>
+            <div class="value" style="font-size:1.5rem; padding-top: 1rem;" th:text="${candidat.email}">email</div>
+        </div>
+    </div>
+
+    <section th:if="${recommandations != null and !recommandations.isEmpty()}">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 3rem 0 1.5rem;">
+            <h2>Recommandations pour vous</h2>
+            <span class="eyebrow">Suggérées</span>
+        </div>
+
+        <div class="offre-grid">
+            <a th:each="reco : ${recommandations}"
+               th:href="@{'/offres/' + ${reco.offre.id}}"
+               class="offre-card">
+                <span class="type-badge" th:text="${reco.offre.typeOffre}">type</span>
+                <h3 th:text="${reco.offre.titre}">Titre</h3>
+                <p class="company" th:text="${reco.offre.entreprise.nom}">Entreprise</p>
+                <p class="desc" th:text="${reco.offre.description}">Description</p>
+                <div class="meta">
+                    <span th:text="${#temporals.format(reco.offre.datePublication, 'd MMM yyyy')}">date</span>
+                    <span class="score" th:text="${reco.scoreFormate}">--</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section th:if="${recommandations == null or recommandations.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Aucune recommandation pour le moment</h3>
+        <p>Les offres apparaîtront ici quand les entreprises en publieront.</p>
+        <a th:href="@{/offres}" class="btn">Voir toutes les offres</a>
+    </section>
+
+</div>
+</body>
+</html>

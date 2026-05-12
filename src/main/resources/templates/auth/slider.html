@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${userType == 'candidat'} ? 'Espace Candidat — HecRecruit' : 'Espace Entreprise — HecRecruit'">Auth</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/auth-slider.css}">
+</head>
+<body style="background: var(--bg);">
+
+<header class="auth-header">
+    <a th:href="@{/}" class="brand">HecRecruit<span class="dot"></span></a>
+    <a th:href="@{/}" class="back-link">← Retour à l'accueil</a>
+</header>
+
+<div class="auth-page">
+
+    <div class="auth-slider" th:classappend="${initialMode == 'register'} ? 'show-register' : ''" id="authSlider">
+
+        <span class="auth-type-badge" th:text="${userType == 'candidat'} ? 'Candidat' : 'Entreprise'">Type</span>
+
+        <!-- ============= PANEL LOGIN ============= -->
+        <div class="panel panel-login">
+            <h1>Connexion</h1>
+            <p class="subtitle" th:text="${userType == 'candidat'} ? 'Accédez à votre espace candidat' : 'Accédez à votre espace entreprise'">Bienvenue</p>
+
+            <form th:action="@{'/login/' + ${userType}}" th:object="${loginForm}" method="post" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-field">
+                    <input type="email" th:field="*{email}"
+                           th:placeholder="${userType == 'candidat'} ? 'prenom.nom@ihec.ucar.tn' : 'contact@entreprise.com'">
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-field">
+                    <input type="password" th:field="*{mdp}" placeholder="Mot de passe">
+                    <div class="field-error" th:if="${#fields.hasErrors('mdp')}" th:errors="*{mdp}"></div>
+                </div>
+
+                <div class="form-extra">
+                    <a href="#">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Se connecter</button>
+            </form>
+        </div>
+
+        <!-- ============= PANEL REGISTER ============= -->
+        <div class="panel panel-register">
+            <h1>Inscription</h1>
+            <p class="subtitle" th:text="${userType == 'candidat'} ? 'Créez votre compte candidat' : 'Créez votre compte entreprise'">Inscrivez-vous</p>
+
+            <!-- CANDIDAT -->
+            <form th:if="${userType == 'candidat'}"
+                  th:action="@{/register/candidat}" th:object="${registerForm}" method="post"
+                  style="width:100%; display:flex; flex-direction:column; align-items:center;">
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-field">
+                    <select th:field="*{typeCandidat}" id="typeCandidatSelect">
+                        <option value="">— Je suis… —</option>
+                        <option value="etudiant">Étudiant</option>
+                        <option value="alumni">Alumni</option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('typeCandidat')}" th:errors="*{typeCandidat}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="text" th:field="*{nom}" placeholder="Nom">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" th:field="*{prenom}" placeholder="Prénom">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <input type="text" th:field="*{id}" placeholder="CIN (8 chiffres)" pattern="\d{8}" maxlength="8" inputmode="numeric">
+                    <div class="field-error" th:if="${#fields.hasErrors('id')}" th:errors="*{id}"></div>
+                </div>
+
+                <div class="form-field">
+                    <input type="email" th:field="*{email}" placeholder="Email @ihec.ucar.tn">
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="tel" th:field="*{telephone}" placeholder="Téléphone">
+                    </div>
+                    <div class="form-field">
+                        <input type="password" th:field="*{mdp}" placeholder="Mot de passe">
+                    </div>
+                </div>
+
+                <!-- Champs Étudiant -->
+                <div class="candidat-extra-fields" id="etudiantFields">
+                    <div class="form-field">
+                        <select th:field="*{niveau}">
+                            <option value="">Niveau</option>
+                            <option value="Licence 1">Licence 1</option>
+                            <option value="Licence 2">Licence 2</option>
+                            <option value="Licence 3">Licence 3</option>
+                            <option value="Master 1">Master 1</option>
+                            <option value="Master 2">Master 2</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <input type="text" th:field="*{filiere}" placeholder="Filière">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" th:field="*{etablissement}" placeholder="Établissement">
+                    </div>
+                </div>
+
+                <!-- Champs Alumni -->
+                <div class="candidat-extra-fields" id="alumniFields">
+                    <div class="form-field">
+                        <input type="number" th:field="*{anneeDiplome}" placeholder="Année de diplôme" min="1950" max="2026">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <input type="text" th:field="*{posteActuel}" placeholder="Poste actuel">
+                        </div>
+                        <div class="form-field">
+                            <input type="text" th:field="*{entrepriseActuelle}" placeholder="Entreprise">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">S'inscrire</button>
+            </form>
+
+            <!-- ENTREPRISE -->
+            <form th:if="${userType == 'entreprise'}"
+                  th:action="@{/register/entreprise}" th:object="${registerForm}" method="post"
+                  style="width:100%; display:flex; flex-direction:column; align-items:center;">
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-field">
+                    <input type="text" th:field="*{nom}" placeholder="Nom de l'entreprise">
+                    <div class="field-error" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="text" th:field="*{secteur}" placeholder="Secteur">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" th:field="*{adresse}" placeholder="Adresse">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <input type="email" th:field="*{email}" placeholder="Email professionnel">
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <input type="tel" th:field="*{telephone}" placeholder="Téléphone">
+                    </div>
+                    <div class="form-field">
+                        <input type="password" th:field="*{mdp}" placeholder="Mot de passe">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">S'inscrire</button>
+            </form>
+        </div>
+
+        <!-- ============= SLIDING BLUE PANEL ============= -->
+        <div class="slide-circle">
+            <div class="slide-circle-content slide-message-login">
+                <h2>Nouveau ici ?</h2>
+                <p>Créez votre compte en quelques secondes et accédez à toutes les offres.</p>
+                <button type="button" class="switch-btn" id="switchToRegister">S'inscrire</button>
+            </div>
+            <div class="slide-circle-content slide-message-register">
+                <h2>Déjà inscrit ?</h2>
+                <p>Connectez-vous pour retrouver votre tableau de bord.</p>
+                <button type="button" class="switch-btn" id="switchToLogin">Se connecter</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script th:inline="javascript">
+(function() {
+    const slider = document.getElementById('authSlider');
+    const toRegister = document.getElementById('switchToRegister');
+    const toLogin = document.getElementById('switchToLogin');
+
+    toRegister.addEventListener('click', () => {
+        slider.classList.add('show-register');
+        history.replaceState(null, '', '#register');
+    });
+
+    toLogin.addEventListener('click', () => {
+        slider.classList.remove('show-register');
+        history.replaceState(null, '', '#login');
+    });
+
+    if (window.location.hash === '#register') {
+        slider.classList.add('show-register');
+    }
+
+    const typeSelect = document.getElementById('typeCandidatSelect');
+    if (typeSelect) {
+        const etu = document.getElementById('etudiantFields');
+        const alu = document.getElementById('alumniFields');
+        const toggle = () => {
+            const v = typeSelect.value;
+            etu.classList.toggle('active', v === 'etudiant');
+            alu.classList.toggle('active', v === 'alumni');
+        };
+        typeSelect.addEventListener('change', toggle);
+        toggle();
+    }
+})();
+</script>
+
+</body>
+</html>

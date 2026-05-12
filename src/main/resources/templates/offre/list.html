@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Offres</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Catalogue</span>
+            <h1 style="margin-top: 0.5rem;">Toutes les offres</h1>
+            <p class="subtitle">Stages, alternances et projets de fin d'études.</p>
+        </div>
+    </div>
+
+    <form class="filter-bar" method="get" th:action="@{/offres}">
+        <div class="form-group">
+            <label for="q">Recherche</label>
+            <input type="text" id="q" name="q" th:value="${q}" placeholder="Mot-clé dans le titre…">
+        </div>
+        <div class="form-group" style="max-width: 200px;">
+            <label for="type">Type</label>
+            <select id="type" name="type">
+                <option value="" th:selected="${type == ''}">Tous</option>
+                <option value="stage" th:selected="${type == 'stage'}">Stage</option>
+                <option value="alternance" th:selected="${type == 'alternance'}">Alternance</option>
+                <option value="pfe" th:selected="${type == 'pfe'}">PFE</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Rechercher</button>
+        <a th:href="@{/offres}" class="btn btn-ghost">Réinitialiser</a>
+    </form>
+
+    <div th:if="${!offres.isEmpty()}" class="offre-grid">
+        <a th:each="offre : ${offres}"
+           th:href="@{'/offres/' + ${offre.id}}"
+           class="offre-card">
+            <span class="type-badge" th:text="${offre.typeOffre}">type</span>
+            <h3 th:text="${offre.titre}">Titre</h3>
+            <p class="company" th:text="${offre.entreprise.nom}">Entreprise</p>
+            <p class="desc" th:text="${offre.description}">Description</p>
+            <div class="meta">
+                <span th:text="${#temporals.format(offre.datePublication, 'd MMM yyyy')}">date</span>
+                <span class="score" th:text="|${offre.nombreCandidatures} candidat(s)|">0</span>
+            </div>
+        </a>
+    </div>
+
+    <div th:if="${offres.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Aucune offre trouvée</h3>
+        <p th:if="${!#strings.isEmpty(q)}">Essayez d'élargir vos critères de recherche.</p>
+        <p th:if="${#strings.isEmpty(q)}">Aucune offre n'est disponible pour le moment.</p>
+    </div>
+
+</div>
+</body>
+</html>

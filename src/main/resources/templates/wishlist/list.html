@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Wishlist</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Suivi des talents</span>
+            <h1 style="margin-top: 0.5rem;">Ma wishlist</h1>
+            <p class="subtitle">Candidats que vous souhaitez suivre.</p>
+        </div>
+    </div>
+
+    <div th:if="${!candidats.isEmpty()}">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>CIN</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cand : ${candidats}">
+                <td style="font-weight: 600;" th:text="|${cand.prenom} ${cand.nom}|">Nom</td>
+                <td th:text="${cand.id}">cin</td>
+                <td th:text="${cand.email}">email</td>
+                <td th:text="${cand.telephone}">tel</td>
+                <td class="actions">
+                    <form th:action="@{'/entreprise/wishlist/' + ${cand.id} + '/retirer'}"
+                          method="post" style="display:inline; margin:0;">
+                        <button type="submit" class="btn btn-sm btn-danger">Retirer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${candidats.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Wishlist vide</h3>
+        <p>Ajoutez des candidats à votre wishlist depuis la page des candidats d'une offre.</p>
+        <a th:href="@{/entreprise/mes-offres}" class="btn">Voir mes offres</a>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Forum</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Communauté</span>
+            <h1 style="margin-top: 0.5rem;">Forum</h1>
+            <p class="subtitle">
+                <span th:text="${stats.total}">0</span> messages —
+                <span th:text="${stats.etudiants}">0</span> étudiants /
+                <span th:text="${stats.entreprises}">0</span> entreprises
+            </p>
+        </div>
+    </div>
+
+    <!-- Compose -->
+    <div class="forum-compose">
+        <h3>Publier un message</h3>
+        <form th:action="@{/forum/messages}" th:object="${messageForm}" method="post">
+            <div class="form-group">
+                <textarea th:field="*{message}" rows="4"
+                          placeholder="Posez une question, partagez une info…"></textarea>
+                <div class="field-error" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Publier</button>
+        </form>
+    </div>
+
+    <!-- Filter -->
+    <form class="filter-bar" method="get" th:action="@{/forum}">
+        <div class="form-group">
+            <label>Rechercher</label>
+            <input type="text" name="q" th:value="${q}" placeholder="Mot-clé…">
+        </div>
+        <div class="form-group" style="max-width: 200px;">
+            <label>Filtrer par</label>
+            <select name="critere">
+                <option value="" th:selected="${critere == ''}">Tous</option>
+                <option value="auteur" th:selected="${critere == 'auteur'}">Auteur</option>
+                <option value="message" th:selected="${critere == 'message'}">Message</option>
+                <option value="etudiant" th:selected="${critere == 'etudiant'}">Étudiants uniquement</option>
+                <option value="entreprise" th:selected="${critere == 'entreprise'}">Entreprises uniquement</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        <a th:href="@{/forum}" class="btn btn-ghost">Réinitialiser</a>
+    </form>
+
+    <!-- Messages -->
+    <div th:if="${!messages.isEmpty()}">
+        <div th:each="msg : ${messages}"
+             th:classappend="${msg.estEtudiant} ? 'etudiant' : 'entreprise'"
+             class="forum-message">
+            <div class="meta">
+                <div>
+                    <span class="auteur" th:text="${msg.auteur}">Auteur</span>
+                    <span class="role" th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'">Rôle</span>
+                </div>
+                <span class="date" th:text="${#temporals.format(msg.datePublication, 'd MMM yyyy à HH:mm')}">date</span>
+            </div>
+            <p class="body" th:text="${msg.message}">message</p>
+        </div>
+    </div>
+
+    <div th:if="${messages.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Aucun message</h3>
+        <p>Soyez le premier à publier dans le forum.</p>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,397 @@
+/* =====================================================
+   Auth slider — SaaS blue, coherent with main app
+   ===================================================== */
+
+.auth-page {
+    min-height: calc(100vh - 130px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle radial accent to give depth */
+.auth-page::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(79, 110, 247, 0.10) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* ============ SIMPLIFIED HEADER (logo only) ============ */
+
+.auth-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+    background: transparent;
+}
+
+.auth-header .brand {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+.auth-header .brand .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gradient);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.auth-header .back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    transition: all .2s;
+}
+.auth-header .back-link:hover {
+    background: var(--bg-soft);
+    color: var(--text);
+}
+
+/* ============ CONTAINER ============ */
+
+.auth-slider {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    min-height: 560px;
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(20, 30, 60, 0.15), 0 0 0 1px var(--border-soft);
+    z-index: 1;
+}
+
+/* ============ PANELS ============ */
+
+.panel {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    transition: opacity .5s ease-in-out;
+    overflow-y: auto;
+}
+
+.panel-login    { left: 0; }
+.panel-register { right: 0; opacity: 0; pointer-events: none; }
+
+.auth-slider.show-register .panel-login    { opacity: 0; pointer-events: none; }
+.auth-slider.show-register .panel-register { opacity: 1; pointer-events: auto; }
+
+/* ============ FORM CONTENT ============ */
+
+.panel h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.panel .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 1.75rem;
+}
+
+.panel .form-field {
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.panel input,
+.panel select {
+    width: 100%;
+    padding: 0.85rem 1.125rem;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg-soft);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    outline: none;
+    transition: all .15s;
+}
+
+.panel input::placeholder, .panel select { color: var(--text-muted); }
+.panel input { color: var(--text); }
+.panel input:hover,
+.panel select:hover {
+    background: white;
+    border-color: var(--border);
+}
+.panel input:focus,
+.panel select:focus {
+    background: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.12);
+}
+
+.panel .field-error {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+    padding-left: 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.panel .form-row {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 320px;
+}
+.panel .form-row .form-field { flex: 1; }
+
+.panel .form-extra {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    text-align: right;
+    padding-right: 1rem;
+}
+
+.panel .form-extra a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+.panel .form-extra a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.panel .btn-submit {
+    min-width: 160px;
+    padding: 0.85rem 2rem;
+    background: var(--gradient);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: all .2s;
+    box-shadow: var(--shadow-primary);
+}
+.panel .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(79, 110, 247, 0.4);
+}
+
+.panel .alert-error {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.7rem 1rem;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+.panel .alert-error::before { display: none; }
+
+/* ============ SLIDING BLUE PANEL ============ */
+
+.slide-circle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--gradient);
+    border-radius: 0;
+    z-index: 10;
+    transition: transform .8s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+.slide-circle::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 280px; height: 280px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+}
+.slide-circle::after {
+    content: '';
+    position: absolute;
+    bottom: -120px; left: -80px;
+    width: 240px; height: 240px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
+.auth-slider.show-register .slide-circle {
+    transform: translateX(-100%);
+}
+
+.slide-circle-content {
+    max-width: 280px;
+    position: relative;
+    z-index: 1;
+}
+
+.slide-message-login    { display: block; }
+.slide-message-register { display: none; }
+
+.auth-slider.show-register .slide-message-login    { display: none; }
+.auth-slider.show-register .slide-message-register { display: block; }
+
+.slide-circle h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.slide-circle p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.slide-circle .switch-btn {
+    display: inline-block;
+    padding: 0.8rem 2.25rem;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 999px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+}
+.slide-circle .switch-btn:hover {
+    background: white;
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* ============ TYPE BADGE ============ */
+
+.auth-type-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    color: var(--primary);
+    padding: 0.35rem 0.875rem;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    z-index: 20;
+    border: 1px solid var(--border-soft);
+}
+
+/* ============ TOGGLE FIELDS (etudiant / alumni) ============ */
+
+.candidat-extra-fields {
+    width: 100%;
+    max-width: 320px;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+.candidat-extra-fields.active { display: flex; }
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 880px) {
+    .auth-slider {
+        min-height: auto;
+        max-width: 420px;
+    }
+    .panel {
+        position: relative;
+        width: 100%;
+        padding: 2.5rem 1.5rem;
+    }
+    .panel-login,
+    .panel-register {
+        opacity: 1;
+        pointer-events: auto;
+        position: relative;
+        left: auto;
+        right: auto;
+    }
+    .panel-register { display: none; }
+    .auth-slider.show-register .panel-login { display: none; }
+    .auth-slider.show-register .panel-register { display: flex; }
+
+    .slide-circle {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 2rem 1.5rem;
+        border-radius: 0;
+        transform: none !important;
+    }
+    .auth-slider.show-register .slide-circle { transform: none !important; }
+
+    .slide-circle h2 { font-size: 1.5rem; }
+}
+
+@media (max-height: 720px) {
+    .auth-page { align-items: flex-start; padding-top: 5rem; }
+}

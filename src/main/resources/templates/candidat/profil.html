@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Mon profil</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Compte</span>
+            <h1 style="margin-top: 0.5rem;">Mon profil</h1>
+        </div>
+    </div>
+
+    <div class="container-narrow" style="padding: 0;">
+        <div class="form-card">
+            <form th:action="@{/candidat/profil}" method="post">
+
+                <p class="eyebrow" style="margin-bottom: 1rem;">Informations en lecture seule</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CIN</label>
+                        <input type="text" th:value="${candidat.id}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" th:value="${candidat.email}" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" th:value="${candidat.nom}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" th:value="${candidat.prenom}" readonly>
+                    </div>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px dashed var(--ink-line);">
+                <p class="eyebrow" style="margin-bottom: 1rem;">Modifiables</p>
+
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" name="telephone" th:value="${candidat.telephone}">
+                </div>
+
+                <!-- Étudiant -->
+                <div th:if="${isEtudiant}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Niveau</label>
+                            <input type="text" name="niveau" th:value="${candidat.niveau}">
+                        </div>
+                        <div class="form-group">
+                            <label>Filière</label>
+                            <input type="text" name="filiere" th:value="${candidat.filiere}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Établissement</label>
+                        <input type="text" name="etablissement" th:value="${candidat.etablissement}">
+                    </div>
+                </div>
+
+                <!-- Alumni -->
+                <div th:if="${isAlumni}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Poste actuel</label>
+                            <input type="text" name="posteActuel" th:value="${candidat.posteActuel}">
+                        </div>
+                        <div class="form-group">
+                            <label>Entreprise actuelle</label>
+                            <input type="text" name="entrepriseActuelle" th:value="${candidat.entrepriseActuelle}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

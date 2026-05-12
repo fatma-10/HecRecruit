@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Mes candidatures</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Suivi</span>
+            <h1 style="margin-top: 0.5rem;">Mes candidatures</h1>
+            <p class="subtitle">Toutes les offres auxquelles vous avez postulé.</p>
+        </div>
+    </div>
+
+    <div th:if="${!candidatures.isEmpty()}">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Offre</th>
+                <th>Type</th>
+                <th>Entreprise</th>
+                <th>Postée le</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offre : ${candidatures}">
+                <td>
+                    <a th:href="@{'/offres/' + ${offre.id}}" style="font-weight: 600;" th:text="${offre.titre}">titre</a>
+                </td>
+                <td th:text="${offre.typeOffre}">type</td>
+                <td th:text="${offre.entreprise.nom}">entreprise</td>
+                <td th:text="${#temporals.format(offre.datePublication, 'd MMM yyyy')}">date</td>
+                <td class="actions">
+                    <a th:href="@{'/offres/' + ${offre.id}}" class="btn btn-sm btn-ghost">Détail</a>
+                    <form th:action="@{'/candidat/candidatures/' + ${offre.id} + '/retirer'}"
+                          method="post" style="display:inline; margin:0;"
+                          onsubmit="return confirm('Retirer votre candidature ?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Retirer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${candidatures.isEmpty()}" class="empty">
+        <span class="icon">⌗</span>
+        <h3>Aucune candidature pour le moment</h3>
+        <p>Postulez à une offre pour la voir apparaître ici.</p>
+        <a th:href="@{/offres}" class="btn btn-primary">Parcourir les offres</a>
+    </div>
+
+</div>
+</body>
+</html>

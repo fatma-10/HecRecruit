@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Bienvenue</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="hero">
+        <span class="eyebrow">Plateforme de recrutement IHEC</span>
+        <h1>Étudiants, alumni,<br>entreprises — tous au même endroit.</h1>
+        <p class="lede">
+            Trouvez votre stage, votre alternance ou votre projet de fin d'études.
+            Publiez des offres, découvrez des talents.
+        </p>
+        <div class="btn-group">
+            <a th:href="@{/type-selection/login}" class="btn btn-primary">Se connecter</a>
+            <a th:href="@{/type-selection/register}" class="btn">Créer un compte</a>
+        </div>
+    </section>
+</div>
+</body>
+</html>

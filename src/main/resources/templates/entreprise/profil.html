@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Profil entreprise</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Compte</span>
+            <h1 style="margin-top: 0.5rem;">Profil entreprise</h1>
+        </div>
+    </div>
+
+    <div class="container-narrow" style="padding: 0;">
+        <div class="form-card">
+            <form th:action="@{/entreprise/profil}" method="post">
+
+                <p class="eyebrow" style="margin-bottom: 1rem;">Informations en lecture seule</p>
+                <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" th:value="${entreprise.nom}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" th:value="${entreprise.email}" readonly>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px dashed var(--ink-line);">
+                <p class="eyebrow" style="margin-bottom: 1rem;">Modifiables</p>
+
+                <div class="form-group">
+                    <label>Secteur d'activité</label>
+                    <input type="text" name="secteur" th:value="${entreprise.secteur}">
+                </div>
+                <div class="form-group">
+                    <label>Adresse</label>
+                    <input type="text" name="adresse" th:value="${entreprise.adresse}">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" name="telephone" th:value="${entreprise.telephone}">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

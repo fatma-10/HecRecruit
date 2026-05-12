@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Candidats</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Offre</span>
+            <h1 style="margin-top: 0.5rem;" th:text="${offre.titre}">titre</h1>
+            <p class="subtitle" th:text="|${candidats.size()} candidat(s)|">0 candidats</p>
+        </div>
+        <a th:href="@{/entreprise/mes-offres}" class="btn btn-ghost">&larr; Retour</a>
+    </div>
+
+    <div th:if="${!candidats.isEmpty()}">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>CIN</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cand : ${candidats}">
+                <td style="font-weight: 600;" th:text="|${cand.prenom} ${cand.nom}|">Nom</td>
+                <td th:text="${cand.id}">cin</td>
+                <td th:text="${cand.email}">email</td>
+                <td th:text="${cand.telephone}">tel</td>
+                <td class="actions">
+                    <form th:action="@{'/entreprise/wishlist/' + ${cand.id} + '/ajouter'}"
+                          method="post" style="display:inline; margin:0;">
+                        <button type="submit" class="btn btn-sm btn-ghost">+ Wishlist</button>
+                    </form>
+                    <form th:action="@{'/entreprise/mes-offres/' + ${offre.id} + '/candidats/' + ${cand.id} + '/supprimer'}"
+                          method="post" style="display:inline; margin:0;"
+                          onsubmit="return confirm('Supprimer cette candidature ?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Retirer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${candidats.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Aucun candidat pour le moment</h3>
+        <p>Les candidatures apparaîtront ici dès qu'un candidat aura postulé.</p>
+    </div>
+
+</div>
+</body>
+</html>

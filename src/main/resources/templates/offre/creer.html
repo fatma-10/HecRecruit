@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Créer une offre</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container-narrow" style="padding: 2rem 0;">
+        <div class="form-card">
+            <div class="form-header">
+                <span class="eyebrow">Publication</span>
+                <h2>Nouvelle offre</h2>
+            </div>
+
+            <form th:action="@{/entreprise/creer-offre}" th:object="${offreForm}" method="post">
+
+                <div class="form-group">
+                    <label>Type d'offre</label>
+                    <select th:field="*{type}" id="type-select" onchange="toggleFields()">
+                        <option value="">— Choisir —</option>
+                        <option value="stage">Stage</option>
+                        <option value="alternance">Alternance</option>
+                        <option value="pfe">Projet Fin d'Études</option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Titre</label>
+                    <input type="text" th:field="*{titre}" placeholder="Ex. Stage Développeur Full-Stack">
+                    <div class="field-error" th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea th:field="*{description}" rows="5"
+                              placeholder="Missions, profil recherché, conditions…"></textarea>
+                    <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                </div>
+
+                <!-- Champs Stage -->
+                <div id="fields-stage" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Durée (mois)</label>
+                            <input type="number" th:field="*{duree}" min="1" max="24">
+                        </div>
+                        <div class="form-group">
+                            <label>Domaine</label>
+                            <input type="text" th:field="*{domaine}" placeholder="Informatique, Marketing…">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Champs Alternance -->
+                <div id="fields-alternance" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Rythme</label>
+                            <input type="text" th:field="*{rythme}" placeholder="3 jours entreprise / 2 jours école">
+                        </div>
+                        <div class="form-group">
+                            <label>Durée (mois)</label>
+                            <input type="number" th:field="*{duree}" min="1" max="36">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Champs PFE -->
+                <div id="fields-pfe" style="display:none;">
+                    <div class="form-group">
+                        <label>Sujet</label>
+                        <textarea th:field="*{sujet}" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Technologies</label>
+                        <input type="text" th:field="*{technologies}" placeholder="React, Node.js, MongoDB…">
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-actions">
+                    <a th:href="@{/entreprise/mes-offres}" class="btn btn-ghost">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Publier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function toggleFields() {
+            const t = document.getElementById('type-select').value;
+            document.getElementById('fields-stage').style.display = (t === 'stage') ? 'block' : 'none';
+            document.getElementById('fields-alternance').style.display = (t === 'alternance') ? 'block' : 'none';
+            document.getElementById('fields-pfe').style.display = (t === 'pfe') ? 'block' : 'none';
+        }
+        window.addEventListener('DOMContentLoaded', toggleFields);
+    </script>
+
+</div>
+</body>
+</html>
