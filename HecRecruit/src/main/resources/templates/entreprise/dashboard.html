@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Tableau de bord</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Espace entreprise</span>
+            <h1 style="margin-top: 0.5rem;" th:text="${entreprise.nom}">Entreprise</h1>
+            <p class="subtitle" th:text="${entreprise.secteur}">Secteur</p>
+        </div>
+        <a th:href="@{/entreprise/creer-offre}" class="btn btn-primary">Publier une offre</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <span class="label">Offres publiées</span>
+            <div class="value" th:text="${nbOffres}">0</div>
+        </div>
+        <div class="stat-card">
+            <span class="label">Candidatures reçues</span>
+            <div class="value" th:text="${nbCandidatures}">0</div>
+        </div>
+        <div class="stat-card">
+            <span class="label">Wishlist</span>
+            <div class="value" th:text="${nbWishlist}">0</div>
+            <span class="delta">candidats suivis</span>
+        </div>
+    </div>
+
+    <section style="margin-top: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem;">
+            <h2>Offres récentes</h2>
+            <a th:href="@{/entreprise/mes-offres}" style="font-size: 13px;">Voir toutes &rarr;</a>
+        </div>
+
+        <div th:if="${!offresRecentes.isEmpty()}" class="offre-grid">
+            <a th:each="offre : ${offresRecentes}"
+               th:href="@{'/offres/' + ${offre.id}}"
+               class="offre-card">
+                <span class="type-badge" th:text="${offre.typeOffre}">type</span>
+                <h3 th:text="${offre.titre}">Titre</h3>
+                <p class="desc" th:text="${offre.description}">Description</p>
+                <div class="meta">
+                    <span th:text="${#temporals.format(offre.datePublication, 'd MMM yyyy')}">date</span>
+                    <span class="score" th:text="|${offre.nombreCandidatures} candidat(s)|">0</span>
+                </div>
+            </a>
+        </div>
+
+        <div th:if="${offresRecentes.isEmpty()}" class="empty">
+            <span class="icon">∅</span>
+            <h3>Aucune offre publiée</h3>
+            <p>Publiez votre première offre pour attirer des candidats.</p>
+            <a th:href="@{/entreprise/creer-offre}" class="btn btn-primary">Créer une offre</a>
+        </div>
+    </section>
+
+</div>
+</body>
+</html>

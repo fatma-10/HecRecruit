@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Inscription Candidat</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container-narrow" style="padding: 2rem 0;">
+        <div class="form-card">
+            <div class="form-header">
+                <span class="eyebrow">Inscription</span>
+                <h2>Créer un compte candidat</h2>
+            </div>
+
+            <form th:action="@{/register/candidat}" th:object="${registerForm}" method="post">
+
+                <div class="form-group">
+                    <label>Je suis…</label>
+                    <select th:field="*{typeCandidat}" id="typeCandidat" onchange="toggleType()">
+                        <option value="">— Choisir —</option>
+                        <option value="etudiant">Étudiant</option>
+                        <option value="alumni">Alumni</option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('typeCandidat')}" th:errors="*{typeCandidat}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" th:field="*{nom}">
+                        <div class="field-error" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Prénom</label>
+                        <input type="text" th:field="*{prenom}">
+                        <div class="field-error" th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>CIN (8 chiffres)</label>
+                    <input type="number" th:field="*{id}" min="10000000" max="99999999">
+                    <div class="field-error" th:if="${#fields.hasErrors('id')}" th:errors="*{id}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email institutionnel</label>
+                    <input type="email" th:field="*{email}" placeholder="prenom.nom@ihec.ucar.tn">
+                    <p class="form-help">L'email doit se terminer par @ihec.ucar.tn</p>
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" th:field="*{telephone}" placeholder="22 123 456">
+                        <div class="field-error" th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" th:field="*{mdp}">
+                        <div class="field-error" th:if="${#fields.hasErrors('mdp')}" th:errors="*{mdp}"></div>
+                    </div>
+                </div>
+
+                <!-- Champs Étudiant -->
+                <div id="champs-etudiant" style="display:none;">
+                    <hr style="margin: 1.5rem 0; border: none; border-top: 1px dashed var(--ink-line);">
+                    <p class="eyebrow" style="margin-bottom: 1rem;">Informations étudiant</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Niveau</label>
+                            <select th:field="*{niveau}">
+                                <option value="">— Choisir —</option>
+                                <option value="Licence 1">Licence 1</option>
+                                <option value="Licence 2">Licence 2</option>
+                                <option value="Licence 3">Licence 3</option>
+                                <option value="Master 1">Master 1</option>
+                                <option value="Master 2">Master 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Filière</label>
+                            <input type="text" th:field="*{filiere}" placeholder="Informatique, Finance, Marketing…">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Établissement</label>
+                        <input type="text" th:field="*{etablissement}" placeholder="IHEC Carthage">
+                    </div>
+                </div>
+
+                <!-- Champs Alumni -->
+                <div id="champs-alumni" style="display:none;">
+                    <hr style="margin: 1.5rem 0; border: none; border-top: 1px dashed var(--ink-line);">
+                    <p class="eyebrow" style="margin-bottom: 1rem;">Informations alumni</p>
+                    <div class="form-group">
+                        <label>Année de diplôme</label>
+                        <input type="number" th:field="*{anneeDiplome}" min="1950" max="2026" placeholder="2020">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Poste actuel</label>
+                            <input type="text" th:field="*{posteActuel}">
+                        </div>
+                        <div class="form-group">
+                            <label>Entreprise actuelle</label>
+                            <input type="text" th:field="*{entrepriseActuelle}">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-ghost">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Créer mon compte</button>
+                </div>
+
+                <p style="text-align:center; margin-top: 2rem; font-size: 13px; color: var(--muted);">
+                    Déjà inscrit ? <a th:href="@{/login/candidat}">Se connecter</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function toggleType() {
+            const t = document.getElementById('typeCandidat').value;
+            document.getElementById('champs-etudiant').style.display = (t === 'etudiant') ? 'block' : 'none';
+            document.getElementById('champs-alumni').style.display = (t === 'alumni') ? 'block' : 'none';
+        }
+        // Run on page load (in case validation errors re-rendered with a value)
+        window.addEventListener('DOMContentLoaded', toggleType);
+    </script>
+
+</div>
+</body>
+</html>

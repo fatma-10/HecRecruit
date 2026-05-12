@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Connexion</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container-narrow" style="padding: 2rem 0;">
+        <div class="form-card">
+            <div class="form-header">
+                <span class="eyebrow">Connexion</span>
+                <h2 th:text="${userType == 'candidat'} ? 'Espace Candidat' : 'Espace Entreprise'">Connexion</h2>
+            </div>
+
+            <form th:action="@{'/login/' + ${userType}}" th:object="${loginForm}" method="post">
+
+                <div class="form-group">
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" th:field="*{email}"
+                           th:placeholder="${userType == 'candidat'} ? 'prenom.nom@ihec.ucar.tn' : 'contact@entreprise.com'">
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mdp">Mot de passe</label>
+                    <input type="password" id="mdp" th:field="*{mdp}">
+                    <div class="field-error" th:if="${#fields.hasErrors('mdp')}" th:errors="*{mdp}"></div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                <div class="form-actions">
+                    <a th:href="@{/}" class="btn btn-ghost">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Se connecter</button>
+                </div>
+
+                <p style="text-align:center; margin-top: 2rem; font-size: 13px; color: var(--muted);">
+                    Pas encore de compte ?
+                    <a th:href="@{'/register/' + ${userType}}">Créer un compte</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Mes offres</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <span class="eyebrow">Gestion</span>
+            <h1 style="margin-top: 0.5rem;">Mes offres</h1>
+            <p class="subtitle">Toutes les offres que vous avez publiées.</p>
+        </div>
+        <a th:href="@{/entreprise/creer-offre}" class="btn btn-primary">Nouvelle offre</a>
+    </div>
+
+    <div th:if="${!offres.isEmpty()}">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Type</th>
+                <th>Publiée le</th>
+                <th>Expire le</th>
+                <th>Candidats</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="offre : ${offres}">
+                <td>
+                    <a th:href="@{'/offres/' + ${offre.id}}" style="font-weight: 600;" th:text="${offre.titre}">titre</a>
+                </td>
+                <td th:text="${offre.typeOffre}">type</td>
+                <td th:text="${#temporals.format(offre.datePublication, 'd MMM yyyy')}">date</td>
+                <td>
+                    <span th:if="${offre.dateExpiration != null}"
+                          th:text="${#temporals.format(offre.dateExpiration, 'd MMM yyyy')}">date</span>
+                    <em th:if="${offre.dateExpiration == null}" style="color: var(--muted);">non définie</em>
+                </td>
+                <td>
+                    <a th:href="@{'/entreprise/mes-offres/' + ${offre.id} + '/candidats'}"
+                       th:text="${offre.nombreCandidatures}">0</a>
+                </td>
+                <td class="actions">
+                    <a th:href="@{'/offres/' + ${offre.id}}" class="btn btn-sm btn-ghost">Voir</a>
+                    <form th:action="@{'/entreprise/offres/' + ${offre.id} + '/supprimer'}"
+                          method="post" style="display:inline; margin:0;"
+                          onsubmit="return confirm('Supprimer cette offre définitivement ?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${offres.isEmpty()}" class="empty">
+        <span class="icon">∅</span>
+        <h3>Aucune offre</h3>
+        <p>Créez une offre pour commencer à recevoir des candidatures.</p>
+        <a th:href="@{/entreprise/creer-offre}" class="btn btn-primary">Créer une offre</a>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Choisir un profil</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <section style="text-align:center; padding: 3rem 0;">
+        <span class="eyebrow" th:text="${mode == 'login'} ? 'Connexion' : 'Inscription'">Mode</span>
+        <h1 style="margin: 1rem 0;">Vous êtes…</h1>
+        <p class="lede">Choisissez votre type de profil pour continuer.</p>
+
+        <div class="choice-grid">
+            <a th:href="${mode == 'login'} ? @{/login/candidat} : @{/register/candidat}" class="choice-card">
+                <span class="icon">A.</span>
+                <h3>Candidat</h3>
+                <p>Étudiant ou alumni cherchant un stage, une alternance ou un PFE.</p>
+            </a>
+            <a th:href="${mode == 'login'} ? @{/login/entreprise} : @{/register/entreprise}" class="choice-card">
+                <span class="icon">B.</span>
+                <h3>Entreprise</h3>
+                <p>Publiez des offres et trouvez des candidats qualifiés.</p>
+            </a>
+        </div>
+
+        <a th:href="@{/}" style="font-size: 13px; color: var(--muted);">&larr; Retour</a>
+    </section>
+
+</div>
+</body>
+</html>

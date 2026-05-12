@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE — HecRecruit">HecRecruit</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <a th:href="@{/}" class="brand">HecRecruit<span class="dot">.</span></a>
+
+        <nav>
+            <ul class="nav-links">
+                <li th:if="${currentUser.isCandidat()}"><a th:href="@{/candidat/dashboard}">Tableau de bord</a></li>
+                <li th:if="${currentUser.isCandidat()}"><a th:href="@{/offres}">Offres</a></li>
+                <li th:if="${currentUser.isCandidat()}"><a th:href="@{/candidat/mes-candidatures}">Mes candidatures</a></li>
+
+                <li th:if="${currentUser.isEntreprise()}"><a th:href="@{/entreprise/dashboard}">Tableau de bord</a></li>
+                <li th:if="${currentUser.isEntreprise()}"><a th:href="@{/entreprise/mes-offres}">Mes offres</a></li>
+                <li th:if="${currentUser.isEntreprise()}"><a th:href="@{/entreprise/creer-offre}">Créer une offre</a></li>
+                <li th:if="${currentUser.isEntreprise()}"><a th:href="@{/entreprise/wishlist}">Wishlist</a></li>
+
+                <li th:if="${currentUser.isLogged()}"><a th:href="@{/forum}">Forum</a></li>
+                <li th:if="${currentUser.isCandidat()}"><a th:href="@{/candidat/profil}">Profil</a></li>
+                <li th:if="${currentUser.isEntreprise()}"><a th:href="@{/entreprise/profil}">Profil</a></li>
+            </ul>
+        </nav>
+
+        <div class="nav-user" th:if="${currentUser.isLogged()}">
+            <span class="who" th:text="${currentUser.displayName}">Utilisateur</span>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <button type="submit" class="logout-btn">Déconnexion</button>
+            </form>
+        </div>
+
+        <div class="nav-user" th:unless="${currentUser.isLogged()}">
+            <a th:href="@{/type-selection/login}" class="logout-btn" style="text-decoration:none;">Connexion</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
+
+        <div layout:fragment="content">
+            <p>Contenu par défaut.</p>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <span>&copy; 2026 HecRecruit — <em>Institut des Hautes Études Commerciales de Carthage</em></span>
+        <span>Plateforme académique</span>
+    </div>
+</footer>
+
+</body>
+</html>
