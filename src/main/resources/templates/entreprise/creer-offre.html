@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer une offre</title>
+</head>
+<body>
+<h1>Nouvelle offre</h1>
+<form method="post" action="/entreprise/offres/creer">
+    <input type="text" name="titre" placeholder="Titre" required /><br/>
+    <textarea name="description" placeholder="Description" required></textarea><br/>
+    <select name="type" required>
+        <option value="stage">Stage</option>
+        <option value="alternance">Alternance</option>
+        <option value="projet fin d'etudes">Projet Fin d'Études</option>
+    </select><br/>
+    <!-- Stage -->
+    <div id="stage">
+        <input type="text" name="domaine" placeholder="Domaine" />
+        <input type="number" name="duree" placeholder="Durée (mois)" />
+    </div>
+    <!-- Alternance -->
+    <div id="alternance" style="display:none;">
+        <input type="text" name="rythme" placeholder="Rythme" />
+        <input type="number" name="duree" placeholder="Durée (mois)" />
+    </div>
+    <!-- PFE -->
+    <div id="pfe" style="display:none;">
+        <input type="text" name="sujet" placeholder="Sujet" />
+        <input type="text" name="technologies" placeholder="Technologies" />
+    </div>
+    <button type="submit">Publier</button>
+</form>
+<script>
+    const typeSelect = document.querySelector('select[name="type"]');
+    const stageDiv = document.getElementById('stage');
+    const alternanceDiv = document.getElementById('alternance');
+    const pfeDiv = document.getElementById('pfe');
+    typeSelect.addEventListener('change', function() {
+        stageDiv.style.display = 'none';
+        alternanceDiv.style.display = 'none';
+        pfeDiv.style.display = 'none';
+        if (this.value === 'stage') stageDiv.style.display = 'block';
+        else if (this.value === 'alternance') alternanceDiv.style.display = 'block';
+        else if (this.value === 'projet fin d\'etudes') pfeDiv.style.display = 'block';
+    });
+    typeSelect.dispatchEvent(new Event('change'));
+</script>
+<a href="/entreprise/offres">← Retour</a>
+</body>
+</html>

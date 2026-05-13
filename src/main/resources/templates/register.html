@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - HecRecruit</title>
+    <style>
+        body { font-family: Arial; margin: 50px; text-align: center; }
+        .form { width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        input, select, button { width: 100%; margin: 8px 0; padding: 8px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<h1>Inscription <span th:text="${type == 'candidat' ? 'Candidat' : 'Entreprise'}"></span></h1>
+<div class="form">
+    <!-- Formulaire candidat -->
+    <div th:if="${type == 'candidat'}">
+        <form method="post" action="/register/candidat">
+            <input type="text" name="nom" placeholder="Nom" required />
+            <input type="text" name="prenom" placeholder="Prénom" required />
+            <input type="email" name="email" placeholder="Email (doit finir par @ihec.ucar.tn)" required />
+            <input type="tel" name="telephone" placeholder="Téléphone" required />
+            <input type="password" name="password" placeholder="Mot de passe" required />
+            <input type="text" name="cin" placeholder="CIN (8 chiffres)" required />
+            <select name="candidatType" required>
+                <option value="etudiant">Étudiant</option>
+                <option value="alumni">Alumni</option>
+            </select>
+            <!-- Champs Étudiant -->
+            <div id="etudiant-fields">
+                <input type="text" name="niveau" placeholder="Niveau (ex: Licence 3)" />
+                <input type="text" name="filiere" placeholder="Filière" />
+                <input type="text" name="etablissement" placeholder="Établissement" />
+            </div>
+            <!-- Champs Alumni -->
+            <div id="alumni-fields" style="display:none;">
+                <input type="text" name="anneeDiplome" placeholder="Année de diplôme" />
+                <input type="text" name="posteActuel" placeholder="Poste actuel" />
+                <input type="text" name="entrepriseActuelle" placeholder="Entreprise actuelle" />
+            </div>
+            <button type="submit">S'inscrire</button>
+            <div th:if="${error}" class="error" th:text="${error}"></div>
+        </form>
+    </div>
+
+    <!-- Formulaire entreprise -->
+    <div th:if="${type == 'entreprise'}">
+        <form method="post" action="/register/entreprise">
+            <input type="text" name="nom" placeholder="Nom de l'entreprise" required />
+            <input type="text" name="secteur" placeholder="Secteur d'activité" />
+            <input type="text" name="adresse" placeholder="Adresse" />
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="tel" name="telephone" placeholder="Téléphone" required />
+            <input type="password" name="password" placeholder="Mot de passe" required />
+            <button type="submit">S'inscrire</button>
+            <div th:if="${error}" class="error" th:text="${error}"></div>
+        </form>
+    </div>
+
+    <a href="/">← Retour à l'accueil</a>
+</div>
+
+<script>
+    document.querySelector('select[name="candidatType"]').addEventListener('change', function() {
+        let isEtudiant = this.value === 'etudiant';
+        document.getElementById('etudiant-fields').style.display = isEtudiant ? 'block' : 'none';
+        document.getElementById('alumni-fields').style.display = isEtudiant ? 'none' : 'block';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommandations</title>
+    <style>
+        .offre { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .score { background: #27ae60; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; }
+        .btn { background: #3498db; color: white; padding: 5px 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Recommandations personnalisées</h1>
+<p>Bonjour <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></p>
+<div th:if="${recommandations.empty}">Aucune recommandation pour le moment.</div>
+<div th:each="rec : ${recommandations}">
+    <div class="offre">
+        <h3 th:text="${rec.offre.titre}"></h3>
+        <p th:text="${rec.offre.description}"></p>
+        <p><strong>Entreprise :</strong> <span th:text="${rec.offre.entreprise.nom}"></span></p>
+        <p><strong>Type :</strong> <span th:text="${rec.offre.typeOffre}"></span></p>
+        <p class="score" th:text="${rec.scoreFormate}"></p>
+        <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
+            <button type="submit" class="btn">Postuler</button>
+        </form>
+    </div>
+</div>
+<a href="/candidat/dashboard">← Retour</a>
+</body>
+</html>

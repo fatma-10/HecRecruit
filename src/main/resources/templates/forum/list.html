@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum - HecRecruit</title>
+    <style>
+        .message { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding: 5px; }
+        .author { font-weight: bold; }
+        .date { font-size: 0.8em; color: gray; }
+    </style>
+</head>
+<body>
+<h1>Forum de discussion</h1>
+<form method="get" action="/forum/recherche">
+    <select name="critere">
+        <option value="auteur">Auteur</option>
+        <option value="message">Contenu</option>
+        <option value="etudiant">Messages étudiants</option>
+        <option value="entreprise">Messages entreprises</option>
+    </select>
+    <input type="text" name="valeur" placeholder="Rechercher..." />
+    <button type="submit">Filtrer</button>
+</form>
+<div th:each="msg : ${messages}">
+    <div class="message">
+        <div class="author"><span th:text="${msg.auteur}"></span> (<span th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'"></span>)</div>
+        <div class="date" th:text="${msg.datePublication}"></div>
+        <p th:text="${msg.message}"></p>
+    </div>
+</div>
+<hr/>
+<h3>Poster un nouveau message</h3>
+<form method="post" action="/forum/poster">
+    <input type="text" name="auteur" th:value="${userNom}" required /><br/>
+    <input type="email" name="emailAuteur" th:value="${userEmail}" required /><br/>
+    <textarea name="message" rows="4" cols="50" required></textarea><br/>
+    <input type="hidden" name="estEtudiant" th:value="${estEtudiant}" />
+    <button type="submit">Publier</button>
+</form>
+<p><a href="/candidat/dashboard">Retour au tableau de bord candidat</a> | <a href="/entreprise/dashboard">Retour entreprise</a></p>
+</body>
+</html>

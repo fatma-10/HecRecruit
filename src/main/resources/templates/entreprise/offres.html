@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes offres</title>
+</head>
+<body>
+<h1>Mes offres</h1>
+<a href="/entreprise/offres/creer">➕ Créer une nouvelle offre</a>
+<div th:each="offre : ${offres}">
+    <div>
+        <strong th:text="${offre.titre}"></strong> (<span th:text="${offre.typeOffre}"></span>)
+        <form method="post" th:action="'/entreprise/offres/supprimer/' + ${offre.id}" style="display:inline;">
+            <button type="submit">Supprimer</button>
+        </form>
+        <a th:href="'/entreprise/offres/' + ${offre.id} + '/candidats'">Voir les candidats</a>
+    </div>
+</div>
+<a href="/entreprise/dashboard">← Retour</a>
+</body>
+</html>

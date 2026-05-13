@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil entreprise</title>
+</head>
+<body>
+<h1>Profil de <span th:text="${entreprise.nom}"></span></h1>
+<p>Secteur : <span th:text="${entreprise.secteur}"></span></p>
+<p>Adresse : <span th:text="${entreprise.adresse}"></span></p>
+<p>Email : <span th:text="${entreprise.email}"></span></p>
+<p>Téléphone : <span th:text="${entreprise.telephone}"></span></p>
+<form method="post" action="/entreprise/profil/modifier">
+    <input type="text" name="secteur" placeholder="Secteur" th:value="${entreprise.secteur}" /><br/>
+    <input type="text" name="adresse" placeholder="Adresse" th:value="${entreprise.adresse}" /><br/>
+    <input type="tel" name="telephone" placeholder="Téléphone" th:value="${entreprise.telephone}" /><br/>
+    <button type="submit">Mettre à jour</button>
+</form>
+<a href="/entreprise/dashboard">← Retour</a>
+</body>
+</html>

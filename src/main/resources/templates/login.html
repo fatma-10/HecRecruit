@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - HecRecruit</title>
+    <style>
+        body { font-family: Arial; margin: 50px; text-align: center; }
+        .form { width: 300px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        input, button { width: 100%; margin: 8px 0; padding: 8px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<h1>Connexion <span th:text="${type == 'candidat' ? 'Candidat' : 'Entreprise'}"></span></h1>
+<div class="form">
+    <form method="post" action="/login">
+        <input type="hidden" name="type" th:value="${type}" />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Mot de passe" required />
+        <button type="submit">Se connecter</button>
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+    </form>
+    <p>Pas encore inscrit ? <a th:href="'/register?type=' + ${type}">Créer un compte</a></p>
+    <a href="/">← Retour à l'accueil</a>
+</div>
+</body>
+</html>

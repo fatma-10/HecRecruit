@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon profil</title>
+</head>
+<body>
+<h1>Mon profil</h1>
+<p>Nom : <span th:text="${candidat.nom}"></span></p>
+<p>Prénom : <span th:text="${candidat.prenom}"></span></p>
+<p>Email : <span th:text="${candidat.email}"></span></p>
+<p>Téléphone : <span th:text="${candidat.telephone}"></span></p>
+<a href="/candidat/dashboard">← Retour</a>
+</body>
+</html>

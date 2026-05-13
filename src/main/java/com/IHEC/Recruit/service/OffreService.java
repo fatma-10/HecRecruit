@@ -151,7 +151,33 @@ public class OffreService {
         offre.setDateExpiration(date);
         return offreRepository.save(offre);
     }
+    public List<Offre> rechercherOffres(String critere, String valeur) {
+        if (valeur == null || valeur.isBlank()) {
+            return getOffresDisponibles();
+        }
 
+        // On utilise un switch moderne qui retourne la liste
+        return switch (critere.toLowerCase()) {
+            case "titre" ->
+                    offreRepository.findByTitreContainingIgnoreCase(valeur);
+
+            case "type" ->
+                    offreRepository.findByTypeOffre(valeur);
+
+            case "domaine" ->
+                // On convertit List<Stage> en List<Offre> proprement
+                    new java.util.ArrayList<>(stageRepository.findByDomaineContainingIgnoreCase(valeur));
+
+            case "rhythm" ->
+                    new java.util.ArrayList<>(alternanceRepository.findByRythmeContainingIgnoreCase(valeur));
+
+            case "technologies" ->
+                    new java.util.ArrayList<>(projetRepository.findByTechnologiesContainingIgnoreCase(valeur));
+
+            default ->
+                    getOffresDisponibles();
+        };
+    }
     // ========== STATISTIQUES ==========
 
     public Map<String, Long> getStatistiques() {

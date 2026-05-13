@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidats pour une offre</title>
+</head>
+<body>
+<h1>Candidats pour : <span th:text="${offre.titre}"></span></h1>
+<div th:each="candidat : ${candidats}">
+    <div>
+        <span th:text="${candidat.nom} + ' ' + ${candidat.prenom}"></span>
+        <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/supprimer/' + ${candidat.id}" style="display:inline;">
+            <button type="submit">Retirer candidature</button>
+        </form>
+        <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/wishlist/' + ${candidat.id}" style="display:inline;">
+            <button type="submit">Ajouter à la wishlist</button>
+        </form>
+    </div>
+</div>
+<a th:href="'/entreprise/offres'">← Retour</a>
+</body>
+</html>

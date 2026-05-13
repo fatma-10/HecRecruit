@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Wishlist</title>
+</head>
+<body>
+<h1>Wishlist</h1>
+<div th:each="candidat : ${wishlist}">
+    <div>
+        <span th:text="${candidat.nom} + ' ' + ${candidat.prenom}"></span>
+        <form method="post" th:action="'/entreprise/wishlist/retirer/' + ${candidat.id}" style="display:inline;">
+            <button type="submit">Retirer</button>
+        </form>
+    </div>
+</div>
+<a href="/entreprise/dashboard">← Retour</a>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Offres - HecRecruit</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .offre { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .btn { background: #27ae60; color: white; padding: 5px 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Offres disponibles</h1>
+<form method="get">
+    <select name="critere">
+        <option value="titre">Titre</option>
+        <option value="type">Type</option>
+        <option value="domaine">Domaine (stage)</option>
+        <option value="rythme">Rythme (alternance)</option>
+        <option value="technologies">Technologies (PFE)</option>
+    </select>
+    <input type="text" name="valeur" placeholder="Rechercher..." />
+    <button type="submit">Filtrer</button>
+</form>
+<div th:each="offre : ${offres}">
+    <div class="offre">
+        <h3 th:text="${offre.titre}"></h3>
+        <p th:text="${offre.description}"></p>
+        <p>Entreprise : <span th:text="${offre.entreprise.nom}"></span> | Type : <span th:text="${offre.typeOffre}"></span></p>
+        <form method="post" th:action="'/candidat/offres/postuler/' + ${offre.id}">
+            <button type="submit" class="btn">Postuler</button>
+        </form>
+    </div>
+</div>
+<a href="/candidat/dashboard">← Retour</a>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord - Candidat</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; margin: 10px; display: inline-block; width: 200px; }
+        .btn { background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<h1>Bienvenue, <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span> !</h1>
+<div>
+    <div class="card">📄 Candidatures : <strong th:text="${nbCandidatures}"></strong></div>
+    <div class="card">🎯 Offres disponibles : <strong th:text="${nbOffresDisponibles}"></strong></div>
+</div>
+<h2>Dernières offres</h2>
+<ul>
+    <li th:each="offre : ${dernieresOffres}">
+        <span th:text="${offre.titre}"></span> - <span th:text="${offre.entreprise.nom}"></span>
+    </li>
+</ul>
+<h2>Recommandations (top 5)</h2>
+<div th:each="rec : ${recommandations}">
+    <div class="card">
+        <strong th:text="${rec.offre.titre}"></strong><br/>
+        Score : <span th:text="${rec.scoreFormate}"></span><br/>
+        <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
+            <button type="submit" class="btn">Postuler</button>
+        </form>
+    </div>
+</div>
+<p><a href="/candidat/offres">Voir toutes les offres</a> | <a href="/candidat/candidatures">Mes candidatures</a> | <a href="/candidat/profil">Mon profil</a> | <a href="/forum">Forum</a> | <a href="/recommandations">Recommandations détaillées</a> | <a href="/logout">Déconnexion</a></p>
+</body>
+</html>
