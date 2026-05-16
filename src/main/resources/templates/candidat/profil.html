@@ -2,14 +2,358 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Mon profil</title>
+    <title>Mon profil - HecRecruit</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f4f4f4; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #2c3e50; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px; 
+            margin-bottom: 30px; 
+        }
+        h2 { 
+            color: #34495e; 
+            font-size: 1.3em; 
+            margin-top: 30px; 
+            border-left: 4px solid #3498db; 
+            padding-left: 10px; 
+        }
+        
+        /* Section informations non modifiables */
+        .info-section { 
+            background: #ecf0f1; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin-bottom: 30px; 
+        }
+        .info-row { 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: center; 
+        }
+        .info-label { 
+            font-weight: bold; 
+            color: #2c3e50; 
+            width: 150px; 
+            flex-shrink: 0; 
+        }
+        .info-value { 
+            color: #34495e; 
+        }
+        .badge { 
+            display: inline-block; 
+            padding: 4px 12px; 
+            border-radius: 12px; 
+            font-size: 0.85em; 
+            font-weight: bold; 
+            margin-left: 10px; 
+        }
+        .badge-etudiant { 
+            background: #3498db; 
+            color: white; 
+        }
+        .badge-alumni { 
+            background: #e74c3c; 
+            color: white; 
+        }
+        
+        /* Formulaire de modification */
+        .form-section { 
+            background: #e8f4f8; 
+            padding: 25px; 
+            border-radius: 8px; 
+            border: 2px solid #3498db; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        .form-group label { 
+            display: block; 
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 5px; 
+        }
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"] { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #bdc3c7; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-size: 14px; 
+        }
+        .form-group input:focus { 
+            outline: none; 
+            border-color: #3498db; 
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); 
+        }
+        .form-group small { 
+            display: block; 
+            color: #7f8c8d; 
+            margin-top: 5px; 
+            font-size: 0.85em; 
+        }
+        
+        /* Boutons */
+        .btn { 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            transition: background 0.3s; 
+        }
+        .btn-primary { 
+            background: #27ae60; 
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background: #229954; 
+        }
+        .btn-secondary { 
+            background: #95a5a6; 
+            color: white; 
+            text-decoration: none; 
+            display: inline-block; 
+            margin-left: 10px; 
+        }
+        .btn-secondary:hover { 
+            background: #7f8c8d; 
+        }
+        
+        /* Messages flash */
+        .alert { 
+            padding: 12px 20px; 
+            margin-bottom: 25px; 
+            border-radius: 4px; 
+            font-weight: 500; 
+        }
+        .alert-success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .alert-error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        
+        /* Navigation */
+        .nav-links { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #ddd; 
+        }
+        .nav-links a { 
+            color: #3498db; 
+            text-decoration: none; 
+            margin-right: 15px; 
+        }
+        .nav-links a:hover { 
+            text-decoration: underline; 
+        }
+        
+        /* Zone conditionnelle */
+        .conditional-section { 
+            margin-top: 20px; 
+            padding-top: 20px; 
+            border-top: 2px dashed #bdc3c7; 
+        }
+    </style>
 </head>
 <body>
-<h1>Mon profil</h1>
-<p>Nom : <span th:text="${candidat.nom}"></span></p>
-<p>Prénom : <span th:text="${candidat.prenom}"></span></p>
-<p>Email : <span th:text="${candidat.email}"></span></p>
-<p>Téléphone : <span th:text="${candidat.telephone}"></span></p>
-<a href="/candidat/dashboard">← Retour</a>
+<div class="container">
+    <h1>👤 Mon profil</h1>
+    
+    <!-- Messages flash -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    
+    <!-- ============================================ -->
+    <!--  INFORMATIONS NON MODIFIABLES               -->
+    <!-- ============================================ -->
+    <div class="info-section">
+        <div class="info-row">
+            <span class="info-label">Type de compte:</span>
+            <span class="info-value">
+                <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}" 
+                      class="badge badge-etudiant">👨‍🎓 Étudiant</span>
+                <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}" 
+                      class="badge badge-alumni">🎓 Alumni</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">CIN:</span>
+            <span class="info-value" th:text="${candidat.id}"></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Nom:</span>
+            <span class="info-value" th:text="${candidat.nom}"></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Prénom:</span>
+            <span class="info-value" th:text="${candidat.prenom}"></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span class="info-value" th:text="${candidat.email}"></span>
+        </div>
+        
+        <!-- Informations spécifiques non modifiables pour Etudiant -->
+        <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">
+            <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bdc3c7;">
+                <span class="info-label">Niveau actuel:</span>
+                <span class="info-value" th:text="${candidat.niveau}"></span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Filière:</span>
+                <span class="info-value" th:text="${candidat.filiere}"></span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Établissement:</span>
+                <span class="info-value" th:text="${candidat.etablissement}"></span>
+            </div>
+        </div>
+        
+        <!-- Informations spécifiques non modifiables pour Alumni -->
+        <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">
+            <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bdc3c7;">
+                <span class="info-label">Année de diplôme:</span>
+                <span class="info-value" th:text="${candidat.anneeDiplome}"></span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Poste actuel:</span>
+                <span class="info-value" th:text="${candidat.posteActuel != null && !candidat.posteActuel.isEmpty()} ? ${candidat.posteActuel} : 'Non spécifié'"></span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Entreprise actuelle:</span>
+                <span class="info-value" th:text="${candidat.entrepriseActuelle != null && !candidat.entrepriseActuelle.isEmpty()} ? ${candidat.entrepriseActuelle} : 'Non spécifiée'"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!--  FORMULAIRE DE MODIFICATION                 -->
+    <!-- ============================================ -->
+    <h2>✏️ Modifier mes informations</h2>
+    
+    <div class="form-section">
+        <form method="post" action="/candidat/profil/modifier">
+            
+            <!-- ========== CHAMP COMMUN À TOUS ========== -->
+            <div class="form-group">
+                <label for="telephone">Téléphone *</label>
+                <input type="tel" 
+                       id="telephone" 
+                       name="telephone" 
+                       th:value="${candidat.telephone}" 
+                       required 
+                       placeholder="Ex: +216 12 345 678" />
+                <small>Numéro de téléphone pour vous contacter</small>
+            </div>
+            
+            <!-- ========== CHAMPS SPÉCIFIQUES ÉTUDIANT ========== -->
+            <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}" 
+                 class="conditional-section">
+                <h3 style="color: #3498db; margin-bottom: 15px;">📚 Informations académiques</h3>
+                
+                <div class="form-group">
+                    <label for="niveau">Niveau d'études *</label>
+                    <input type="text" 
+                           id="niveau" 
+                           name="niveau" 
+                           th:value="${candidat.niveau}" 
+                           required 
+                           placeholder="Ex: Licence 3, Master 1" />
+                    <small>Votre niveau d'études actuel</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="filiere">Filière *</label>
+                    <input type="text" 
+                           id="filiere" 
+                           name="filiere" 
+                           th:value="${candidat.filiere}" 
+                           required 
+                           placeholder="Ex: Informatique, Finance, Marketing" />
+                    <small>Votre domaine d'études</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="etablissement">Établissement *</label>
+                    <input type="text" 
+                           id="etablissement" 
+                           name="etablissement" 
+                           th:value="${candidat.etablissement}" 
+                           required 
+                           placeholder="Ex: IHEC Carthage" />
+                    <small>Votre établissement d'enseignement</small>
+                </div>
+            </div>
+            
+            <!-- ========== CHAMPS SPÉCIFIQUES ALUMNI ========== -->
+            <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}" 
+                 class="conditional-section">
+                <h3 style="color: #e74c3c; margin-bottom: 15px;">💼 Informations professionnelles</h3>
+                
+                <div class="form-group">
+                    <label for="posteActuel">Poste actuel</label>
+                    <input type="text" 
+                           id="posteActuel" 
+                           name="posteActuel" 
+                           th:value="${candidat.posteActuel}" 
+                           placeholder="Ex: Développeur Full-Stack, Chef de projet" />
+                    <small>Votre fonction actuelle (optionnel)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="entrepriseActuelle">Entreprise actuelle</label>
+                    <input type="text" 
+                           id="entrepriseActuelle" 
+                           name="entrepriseActuelle" 
+                           th:value="${candidat.entrepriseActuelle}" 
+                           placeholder="Ex: Google, Tunisie Telecom" />
+                    <small>Votre employeur actuel (optionnel)</small>
+                </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                <a href="/candidat/dashboard" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="nav-links">
+        <a href="/candidat/dashboard">← Retour au tableau de bord</a>
+        <a href="/candidat/offres">Voir les offres</a>
+        <a href="/candidat/candidatures">Mes candidatures</a>
+        <a href="/logout" style="color: #e74c3c;">Déconnexion</a>
+    </div>
+</div>
 </body>
 </html>

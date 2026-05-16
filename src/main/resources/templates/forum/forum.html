@@ -1,33 +1,199 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:temporals="http://www.thymeleaf.org/extras/java-time">
 <head>
     <meta charset="UTF-8">
-    <title>Offres recommandées</title>
+    <title>Forum - HecRecruit</title>
     <style>
-        .offre { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        .score { background: #27ae60; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f4f4f4;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* Messages du forum */
+        .message {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 5px;
+        }
+        .message:hover {
+            background: #f0f0f0;
+        }
+        .author {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 5px;
+        }
+        .badge-etudiant {
+            background: #3498db;
+            color: white;
+        }
+        .badge-entreprise {
+            background: #e74c3c;
+            color: white;
+        }
+        .date {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-left: 10px;
+        }
+        .message-content {
+            margin-top: 10px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        /* Formulaire */
+        .post-form {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 2px solid #3498db;
+        }
+        .post-form h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .post-form .user-info {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .post-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        .post-form button {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .post-form button:hover {
+            background: #229954;
+        }
+
+        /* Messages flash */
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Navigation */
+        .nav-links {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .nav-links a.danger {
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
-<h1>Recommandations personnalisées</h1>
-<p>Bonjour <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></p>
+<div class="container">
+    <h1>💬 Forum de discussion</h1>
 
-<div th:if="${recommandations.empty}">
-    Aucune recommandation pour le moment.
-</div>
-<div th:each="rec : ${recommandations}">
-    <div class="offre">
-        <h3 th:text="${rec.offre.titre}"></h3>
-        <p th:text="${rec.offre.description}"></p>
-        <p><strong>Entreprise :</strong> <span th:text="${rec.offre.entreprise.nom}"></span></p>
-        <p><strong>Type :</strong> <span th:text="${rec.offre.typeOffre}"></span></p>
-        <p class="score" th:text="${rec.scoreFormate}"></p>
-        <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
-            <button type="submit" class="btn">Postuler</button>
+    <!-- Messages flash -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <!-- Liste des messages -->
+    <div th:if="${messages == null or messages.empty}"
+         style="text-align: center; color: #7f8c8d; padding: 30px;">
+        Aucun message pour le moment. Soyez le premier à poster !
+    </div>
+
+    <div th:each="msg : ${messages}">
+        <div class="message">
+            <div>
+                <span class="author" th:text="${msg.auteur}"></span>
+                <span class="badge"
+                      th:classappend="${msg.estEtudiant} ? 'badge-etudiant' : 'badge-entreprise'"
+                      th:text="${msg.estEtudiant} ? '👨‍🎓 Étudiant' : '🏢 Entreprise'">
+                </span>
+                <span class="date"
+                      th:text="${#temporals.format(msg.datePublication, 'dd/MM/yyyy HH:mm')}">
+                </span>
+            </div>
+            <div class="message-content" th:text="${msg.message}"></div>
+        </div>
+    </div>
+
+    <hr style="margin: 30px 0; border: none; border-top: 2px solid #ecf0f1;"/>
+
+    <!-- Formulaire de publication
+         BUG 1 CORRIGÉ : pas de champs auteur/emailAuteur.
+         L'identité est lue depuis la session dans ForumController.posterMessage(). -->
+    <div class="post-form">
+        <h3>✍️ Poster un nouveau message</h3>
+        <form method="post" action="/forum/poster">
+            <div class="user-info">
+                Vous postez en tant que :
+                <strong th:text="${userNom}"></strong>
+                (<span th:text="${userEmail}"></span>)
+            </div>
+            <textarea name="message" rows="5" placeholder="Votre message..." required></textarea>
+            <button type="submit">📤 Publier</button>
         </form>
     </div>
-</div>
 
-<a href="/candidat/dashboard">← Retour</a>
+    <!-- Navigation conditionnelle
+         BUG 2 CORRIGÉ : un seul lien retour selon userType. -->
+    <div class="nav-links">
+        <a th:if="${userType == 'candidat'}"   href="/candidat/dashboard">← Retour au tableau de bord candidat</a>
+        <a th:if="${userType == 'entreprise'}" href="/entreprise/dashboard">← Retour au tableau de bord entreprise</a>
+        <a href="/logout" class="danger">Déconnexion</a>
+    </div>
+</div>
 </body>
 </html>

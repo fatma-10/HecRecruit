@@ -1,42 +1,238 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:temporals="http://www.thymeleaf.org/extras/java-time">
 <head>
     <meta charset="UTF-8">
     <title>Forum - HecRecruit</title>
     <style>
-        .message { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding: 5px; }
-        .author { font-weight: bold; }
-        .date { font-size: 0.8em; color: gray; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f4f4f4;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* Barre de recherche */
+        .search-form {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .search-form select,
+        .search-form input[type="text"],
+        .search-form button {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        .search-form button {
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background: #2980b9;
+        }
+
+        /* Messages du forum */
+        .message {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 5px;
+        }
+        .message:hover {
+            background: #f0f0f0;
+        }
+        .author {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 5px;
+        }
+        .badge-etudiant {
+            background: #3498db;
+            color: white;
+        }
+        .badge-entreprise {
+            background: #e74c3c;
+            color: white;
+        }
+        .date {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-left: 10px;
+        }
+        .message-content {
+            margin-top: 10px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        /* Formulaire de publication */
+        .post-form {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 2px solid #3498db;
+        }
+        .post-form h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .post-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        .post-form .user-info {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .post-form button {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .post-form button:hover {
+            background: #229954;
+        }
+
+        /* Messages flash */
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Navigation */
+        .nav-links {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .nav-links a.danger {
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
-<h1>Forum de discussion</h1>
-<form method="get" action="/forum/recherche">
-    <select name="critere">
-        <option value="auteur">Auteur</option>
-        <option value="message">Contenu</option>
-        <option value="etudiant">Messages étudiants</option>
-        <option value="entreprise">Messages entreprises</option>
-    </select>
-    <input type="text" name="valeur" placeholder="Rechercher..." />
-    <button type="submit">Filtrer</button>
-</form>
-<div th:each="msg : ${messages}">
-    <div class="message">
-        <div class="author"><span th:text="${msg.auteur}"></span> (<span th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'"></span>)</div>
-        <div class="date" th:text="${msg.datePublication}"></div>
-        <p th:text="${msg.message}"></p>
+<div class="container">
+    <h1>💬 Forum de discussion</h1>
+
+    <!-- Messages flash -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <!-- Barre de recherche / filtrage -->
+    <form method="get" action="/forum/recherche" class="search-form">
+        <select name="critere">
+            <option value="auteur"    th:selected="${critere == 'auteur'}">Auteur</option>
+            <option value="message"   th:selected="${critere == 'message'}">Contenu</option>
+            <option value="etudiant"  th:selected="${critere == 'etudiant'}">Messages étudiants</option>
+            <option value="entreprise" th:selected="${critere == 'entreprise'}">Messages entreprises</option>
+        </select>
+        <input type="text" name="valeur" placeholder="Rechercher..." th:value="${valeur}" />
+        <button type="submit">🔍 Filtrer</button>
+        <a href="/forum" style="margin-left: 10px;">Réinitialiser</a>
+    </form>
+
+    <!-- Liste des messages -->
+    <div th:if="${messages.empty}" style="text-align: center; color: #7f8c8d; padding: 30px;">
+        Aucun message pour le moment. Soyez le premier à poster !
+    </div>
+
+    <div th:each="msg : ${messages}">
+        <div class="message">
+            <div>
+                <span class="author" th:text="${msg.auteur}"></span>
+                <span class="badge"
+                      th:classappend="${msg.estEtudiant} ? 'badge-etudiant' : 'badge-entreprise'"
+                      th:text="${msg.estEtudiant} ? '👨‍🎓 Étudiant' : '🏢 Entreprise'">
+                </span>
+                <span class="date"
+                      th:text="${#temporals.format(msg.datePublication, 'dd/MM/yyyy HH:mm')}">
+                </span>
+            </div>
+            <div class="message-content" th:text="${msg.message}"></div>
+        </div>
+    </div>
+
+    <hr style="margin: 30px 0; border: none; border-top: 2px solid #ecf0f1;"/>
+
+    <!-- Formulaire de publication -->
+    <!-- BUG 1 CORRIGÉ : aucun champ auteur/emailAuteur dans le formulaire.
+         L'identité est lue exclusivement depuis la session côté serveur
+         (ForumController.posterMessage). -->
+    <div class="post-form">
+        <h3>✍️ Poster un nouveau message</h3>
+        <form method="post" action="/forum/poster">
+            <div class="user-info">
+                Vous postez en tant que :
+                <strong th:text="${userNom}"></strong>
+                (<span th:text="${userEmail}"></span>)
+            </div>
+            <textarea name="message" rows="5" placeholder="Votre message..." required></textarea>
+            <button type="submit">📤 Publier</button>
+        </form>
+    </div>
+
+    <!-- Navigation conditionnelle — BUG 2 CORRIGÉ :
+         on affiche uniquement le lien correspondant au type d'utilisateur
+         connecté grâce à userType injecté par le controller. -->
+    <div class="nav-links">
+        <a th:if="${userType == 'candidat'}"   href="/candidat/dashboard">← Retour au tableau de bord candidat</a>
+        <a th:if="${userType == 'entreprise'}" href="/entreprise/dashboard">← Retour au tableau de bord entreprise</a>
+        <a href="/logout" class="danger">Déconnexion</a>
     </div>
 </div>
-<hr/>
-<h3>Poster un nouveau message</h3>
-<form method="post" action="/forum/poster">
-    <input type="text" name="auteur" th:value="${userNom}" required /><br/>
-    <input type="email" name="emailAuteur" th:value="${userEmail}" required /><br/>
-    <textarea name="message" rows="4" cols="50" required></textarea><br/>
-    <input type="hidden" name="estEtudiant" th:value="${estEtudiant}" />
-    <button type="submit">Publier</button>
-</form>
-<p><a href="/candidat/dashboard">Retour au tableau de bord candidat</a> | <a href="/entreprise/dashboard">Retour entreprise</a></p>
 </body>
 </html>
