@@ -31,23 +31,6 @@ public class Alternance extends OffreSpecialisee {
     public int getDureeEnMois() { return dureeEnMois; }
     public void setDureeEnMois(int dureeEnMois) { this.dureeEnMois = dureeEnMois; }
 
-    // ---- getInfosPrincipales ----
-
-    @Override
-    public String[] getInfosPrincipales() {
-        return new String[] {
-            getId() != null ? getId().toString() : "",
-            getTitre(),
-            "Alternance",
-            rythme,
-            dureeEnMois + " mois",
-            getDatePublication() != null ? getDatePublication().toString() : "",
-            getDateExpiration() != null ? getDateExpiration().toString() : "Non définie",
-            getEntreprise() != null ? getEntreprise().getNom() : "",
-            String.valueOf(getCandidatures().size())
-        };
-    }
-
     @Override
     public String getTypeOffre() { return "Alternance"; }
 }

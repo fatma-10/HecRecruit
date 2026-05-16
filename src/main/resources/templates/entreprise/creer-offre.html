@@ -2,50 +2,324 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Créer une offre</title>
+    <title>Créer une offre — HecRecruit</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        :root {
+            --ink:    #1a1a2e;
+            --slate:  #374151;
+            --muted:  #6b7280;
+            --border: #e5e7eb;
+            --surface:#f9fafb;
+            --white:  #ffffff;
+            --blue:   #2563eb;
+            --green:  #16a34a;
+            --red:    #dc2626;
+            --red-lt: #fef2f2;
+            --radius: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.06);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
+        }
+
+        .page {
+            max-width: 680px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        /* ── Alert ───────────────────────────────────────────── */
+        .alert {
+            padding: .85rem 1.1rem;
+            border-radius: var(--radius);
+            font-size: .88rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            border: 1px solid #fecaca;
+            background: var(--red-lt);
+            color: #991b1b;
+        }
+
+        /* ── Card ────────────────────────────────────────────── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1rem 1.4rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: .88rem;
+            color: var(--slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .card-body { padding: 1.5rem; }
+
+        /* ── Form elements ───────────────────────────────────── */
+        .form-group { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1.1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+        label {
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--slate);
+        }
+        label span.req { color: var(--red); margin-left: 2px; }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: .6rem .9rem;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: .88rem;
+            color: var(--ink);
+            background: var(--white);
+            transition: border-color .18s, box-shadow .18s;
+        }
+        textarea { min-height: 90px; resize: vertical; }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+        }
+        .hint { font-size: .75rem; color: var(--muted); }
+
+        /* ── Section divider ─────────────────────────────────── */
+        .section-title {
+            font-size: .78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            margin: 1.4rem 0 .9rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Conditional panels ──────────────────────────────── */
+        .type-panel { display: none; }
+        .type-panel.active { display: block; }
+
+        /* ── Buttons ─────────────────────────────────────────── */
+        .btn-row {
+            display: flex;
+            gap: .75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .65rem 1.5rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: background .15s, box-shadow .15s, transform .1s;
+        }
+        .btn:active { transform: scale(.97); }
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+        .btn-primary:hover { background: #1d4ed8; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
+        .btn-secondary {
+            background: var(--white);
+            color: var(--slate);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover { background: var(--surface); }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        .nav-links { font-size: .85rem; }
+        .nav-links a { color: var(--blue); text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<h1>Nouvelle offre</h1>
-<form method="post" action="/entreprise/offres/creer">
-    <input type="text" name="titre" placeholder="Titre" required /><br/>
-    <textarea name="description" placeholder="Description" required></textarea><br/>
-    <select name="type" required>
-        <option value="stage">Stage</option>
-        <option value="alternance">Alternance</option>
-        <option value="projet fin d'etudes">Projet Fin d'Études</option>
-    </select><br/>
-    <!-- Stage -->
-    <div id="stage">
-        <input type="text" name="domaine" placeholder="Domaine" />
-        <input type="number" name="duree" placeholder="Durée (mois)" />
+<div class="page">
+
+    <!-- ─── Flash error ───────────────────────────────────────── -->
+    <div th:if="${error}" class="alert">
+        <span>✕</span>
+        <span th:text="${error}"></span>
     </div>
-    <!-- Alternance -->
-    <div id="alternance" style="display:none;">
-        <input type="text" name="rythme" placeholder="Rythme" />
-        <input type="number" name="duree" placeholder="Durée (mois)" />
+
+    <!-- ─── Page header ──────────────────────────────────────── -->
+    <div class="page-header">
+        <span style="font-size:1.6rem;">➕</span>
+        <h1>Nouvelle offre</h1>
     </div>
-    <!-- PFE -->
-    <div id="pfe" style="display:none;">
-        <input type="text" name="sujet" placeholder="Sujet" />
-        <input type="text" name="technologies" placeholder="Technologies" />
+
+    <!-- ─── Formulaire ───────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-header">Informations de l'offre</div>
+        <div class="card-body">
+            <form method="post" action="/entreprise/offres/creer">
+
+                <!-- ── Champs communs ── -->
+                <div class="form-group">
+                    <label for="titre">Titre <span class="req">*</span></label>
+                    <input type="text" id="titre" name="titre"
+                           placeholder="Ex : Stage développement web" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description <span class="req">*</span></label>
+                    <textarea id="description" name="description"
+                              placeholder="Décrivez les missions, l'environnement de travail…" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="type">Type d'offre <span class="req">*</span></label>
+                        <select id="type" name="type" required>
+                            <option value="stage">Stage</option>
+                            <option value="alternance">Alternance</option>
+                            <option value="projet fin d'etudes">Projet Fin d'Études</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateExpiration">Date d'expiration</label>
+                        <input type="date" id="dateExpiration" name="dateExpiration" />
+                        <span class="hint">Laissez vide pour une offre sans limite</span>
+                    </div>
+                </div>
+
+                <!-- ── Panel Stage ── -->
+                <div class="type-panel active" id="panel-stage">
+                    <p class="section-title">Détails — Stage</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="domaine">Domaine</label>
+                            <input type="text" id="domaine" name="domaine"
+                                   placeholder="Ex : Développement web" />
+                        </div>
+                        <div class="form-group">
+                            <label for="duree">Durée (mois) <span class="req">*</span></label>
+                            <input type="number" id="duree" name="duree"
+                                   min="1" placeholder="Ex : 3" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Panel Alternance ── -->
+                <div class="type-panel" id="panel-alternance">
+                    <p class="section-title">Détails — Alternance</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rythme">Rythme</label>
+                            <input type="text" id="rythme" name="rythme"
+                                   placeholder="Ex : 3 jours entreprise / 2 jours école" />
+                        </div>
+                        <div class="form-group">
+                            <label for="duree-alt">Durée (mois) <span class="req">*</span></label>
+                            <!--
+                                Le controller lit le paramètre "duree" pour les deux types.
+                                On utilise le même name="duree" mais un id différent pour éviter
+                                le conflit HTML ; seul le panel visible sera soumis (pas de
+                                required dynamique pour simplifier).
+                            -->
+                            <input type="number" id="duree-alt" name="duree"
+                                   min="1" placeholder="Ex : 12" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Panel PFE ── -->
+                <div class="type-panel" id="panel-pfe">
+                    <p class="section-title">Détails — Projet Fin d'Études</p>
+                    <div class="form-group">
+                        <label for="sujet">Sujet</label>
+                        <input type="text" id="sujet" name="sujet"
+                               placeholder="Ex : Développement d'une application mobile IoT" />
+                    </div>
+                    <div class="form-group">
+                        <label for="technologies">Technologies</label>
+                        <input type="text" id="technologies" name="technologies"
+                               placeholder="Ex : React Native, Spring Boot, MySQL" />
+                    </div>
+                </div>
+
+                <!-- ── Actions ── -->
+                <div class="btn-row">
+                    <button type="submit" class="btn btn-primary">🚀 Publier l'offre</button>
+                    <a href="/entreprise/offres" class="btn btn-secondary">Annuler</a>
+                </div>
+
+            </form>
+        </div>
     </div>
-    <button type="submit">Publier</button>
-</form>
+
+    <!-- ─── Navigation ───────────────────────────────────────── -->
+    <div class="nav-links">
+        <a href="/entreprise/offres">← Retour à mes offres</a>
+    </div>
+
+</div>
+
 <script>
-    const typeSelect = document.querySelector('select[name="type"]');
-    const stageDiv = document.getElementById('stage');
-    const alternanceDiv = document.getElementById('alternance');
-    const pfeDiv = document.getElementById('pfe');
-    typeSelect.addEventListener('change', function() {
-        stageDiv.style.display = 'none';
-        alternanceDiv.style.display = 'none';
-        pfeDiv.style.display = 'none';
-        if (this.value === 'stage') stageDiv.style.display = 'block';
-        else if (this.value === 'alternance') alternanceDiv.style.display = 'block';
-        else if (this.value === 'projet fin d\'etudes') pfeDiv.style.display = 'block';
-    });
-    typeSelect.dispatchEvent(new Event('change'));
+    const typeSelect  = document.getElementById('type');
+    const panels = {
+        'stage':              document.getElementById('panel-stage'),
+        'alternance':         document.getElementById('panel-alternance'),
+        "projet fin d'etudes": document.getElementById('panel-pfe'),
+    };
+
+    function switchPanel(val) {
+        Object.values(panels).forEach(p => p.classList.remove('active'));
+        if (panels[val]) panels[val].classList.add('active');
+    }
+
+    typeSelect.addEventListener('change', () => switchPanel(typeSelect.value));
+    switchPanel(typeSelect.value); // init au chargement
 </script>
-<a href="/entreprise/offres">← Retour</a>
 </body>
 </html>

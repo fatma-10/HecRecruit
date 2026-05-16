@@ -2,358 +2,417 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Mon profil - HecRecruit</title>
+    <title>Mon profil — HecRecruit</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            background: #f4f4f4; 
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        :root {
+            --ink:     #1a1a2e;
+            --slate:   #374151;
+            --muted:   #6b7280;
+            --border:  #e5e7eb;
+            --surface: #f9fafb;
+            --white:   #ffffff;
+            --blue:    #2563eb;
+            --blue-lt: #eff6ff;
+            --green:   #16a34a;
+            --green-lt:#f0fdf4;
+            --red:     #dc2626;
+            --red-lt:  #fef2f2;
+            --amber:   #d97706;
+            --amber-lt:#fffbeb;
+            --radius:  10px;
+            --shadow:  0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.06);
         }
-        .container { 
-            max-width: 800px; 
-            margin: auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
         }
-        h1 { 
-            color: #2c3e50; 
-            border-bottom: 3px solid #3498db; 
-            padding-bottom: 10px; 
-            margin-bottom: 30px; 
+
+        /* ── Layout ─────────────────────────────────────────── */
+        .page {
+            max-width: 760px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.5rem;
         }
-        h2 { 
-            color: #34495e; 
-            font-size: 1.3em; 
-            margin-top: 30px; 
-            border-left: 4px solid #3498db; 
-            padding-left: 10px; 
+
+        /* ── Page header ─────────────────────────────────────── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 2px solid var(--border);
         }
-        
-        /* Section informations non modifiables */
-        .info-section { 
-            background: #ecf0f1; 
-            padding: 20px; 
-            border-radius: 5px; 
-            margin-bottom: 30px; 
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.9rem;
+            font-weight: 400;
+            color: var(--ink);
         }
-        .info-row { 
-            margin-bottom: 12px; 
-            display: flex; 
-            align-items: center; 
+        .page-header .avatar {
+            width: 52px; height: 52px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            flex-shrink: 0;
         }
-        .info-label { 
-            font-weight: bold; 
-            color: #2c3e50; 
-            width: 150px; 
-            flex-shrink: 0; 
+
+        /* ── Badges ──────────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            padding: .3rem .8rem;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .02em;
+            text-transform: uppercase;
         }
-        .info-value { 
-            color: #34495e; 
+        .badge-etudiant { background: var(--blue-lt);  color: var(--blue); }
+        .badge-alumni   { background: var(--amber-lt); color: var(--amber); }
+
+        /* ── Card ────────────────────────────────────────────── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
-        .badge { 
-            display: inline-block; 
-            padding: 4px 12px; 
-            border-radius: 12px; 
-            font-size: 0.85em; 
-            font-weight: bold; 
-            margin-left: 10px; 
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: 1rem 1.4rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: .9rem;
+            color: var(--slate);
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
-        .badge-etudiant { 
-            background: #3498db; 
-            color: white; 
+        .card-body { padding: 1.4rem; }
+
+        /* ── Info grid ───────────────────────────────────────── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: .65rem 1rem;
         }
-        .badge-alumni { 
-            background: #e74c3c; 
-            color: white; 
+        .info-label {
+            font-size: .85rem;
+            font-weight: 500;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
         }
-        
-        /* Formulaire de modification */
-        .form-section { 
-            background: #e8f4f8; 
-            padding: 25px; 
-            border-radius: 8px; 
-            border: 2px solid #3498db; 
+        .info-value {
+            font-size: .9rem;
+            color: var(--ink);
         }
-        .form-group { 
-            margin-bottom: 20px; 
+        .divider { grid-column: 1 / -1; height: 1px; background: var(--border); margin: .5rem 0; }
+
+        /* ── Form ────────────────────────────────────────────── */
+        .form-section-title {
+            font-size: .82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            margin: 1.4rem 0 .8rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
         }
-        .form-group label { 
-            display: block; 
-            font-weight: bold; 
-            color: #2c3e50; 
-            margin-bottom: 5px; 
+        .form-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
-        .form-group input[type="text"],
-        .form-group input[type="tel"],
-        .form-group input[type="number"] { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid #bdc3c7; 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-            font-size: 14px; 
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
-        .form-group input:focus { 
-            outline: none; 
-            border-color: #3498db; 
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); 
+        @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+
+        .form-group { display: flex; flex-direction: column; gap: .35rem; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--slate);
         }
-        .form-group small { 
-            display: block; 
-            color: #7f8c8d; 
-            margin-top: 5px; 
-            font-size: 0.85em; 
+        label span.req { color: var(--red); margin-left: 2px; }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"] {
+            height: 42px;
+            padding: 0 .9rem;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: .88rem;
+            color: var(--ink);
+            background: var(--white);
+            transition: border-color .18s, box-shadow .18s;
+            width: 100%;
         }
-        
-        /* Boutons */
-        .btn { 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 15px; 
-            transition: background 0.3s; 
+        input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
         }
-        .btn-primary { 
-            background: #27ae60; 
-            color: white; 
+        .hint {
+            font-size: .75rem;
+            color: var(--muted);
         }
-        .btn-primary:hover { 
-            background: #229954; 
+
+        /* ── Buttons ─────────────────────────────────────────── */
+        .btn-row {
+            display: flex;
+            gap: .75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
-        .btn-secondary { 
-            background: #95a5a6; 
-            color: white; 
-            text-decoration: none; 
-            display: inline-block; 
-            margin-left: 10px; 
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .6rem 1.4rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: background .16s, box-shadow .16s, transform .12s;
         }
-        .btn-secondary:hover { 
-            background: #7f8c8d; 
+        .btn:active { transform: scale(.97); }
+        .btn-save {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
         }
-        
-        /* Messages flash */
-        .alert { 
-            padding: 12px 20px; 
-            margin-bottom: 25px; 
-            border-radius: 4px; 
-            font-weight: 500; 
+        .btn-save:hover { background: #15803d; box-shadow: 0 2px 8px rgba(22,163,74,.25); }
+        .btn-cancel {
+            background: var(--white);
+            color: var(--slate);
+            border-color: var(--border);
         }
-        .alert-success { 
-            background: #d4edda; 
-            color: #155724; 
-            border: 1px solid #c3e6cb; 
+        .btn-cancel:hover { background: var(--surface); }
+
+        /* ── Alerts ──────────────────────────────────────────── */
+        .alert {
+            padding: .85rem 1.1rem;
+            border-radius: var(--radius);
+            font-size: .88rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            border: 1px solid;
         }
-        .alert-error { 
-            background: #f8d7da; 
-            color: #721c24; 
-            border: 1px solid #f5c6cb; 
+        .alert-success { background: var(--green-lt); color: #166534; border-color: #bbf7d0; }
+        .alert-error   { background: var(--red-lt);   color: #991b1b; border-color: #fecaca; }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem 1.4rem;
+            padding-top: .5rem;
+            font-size: .85rem;
         }
-        
-        /* Navigation */
-        .nav-links { 
-            margin-top: 30px; 
-            padding-top: 20px; 
-            border-top: 1px solid #ddd; 
-        }
-        .nav-links a { 
-            color: #3498db; 
-            text-decoration: none; 
-            margin-right: 15px; 
-        }
-        .nav-links a:hover { 
-            text-decoration: underline; 
-        }
-        
-        /* Zone conditionnelle */
-        .conditional-section { 
-            margin-top: 20px; 
-            padding-top: 20px; 
-            border-top: 2px dashed #bdc3c7; 
-        }
+        .nav-links a { color: var(--blue); text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+        .nav-links a.danger { color: var(--red); }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>👤 Mon profil</h1>
-    
-    <!-- Messages flash -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    
-    <!-- ============================================ -->
-    <!--  INFORMATIONS NON MODIFIABLES               -->
-    <!-- ============================================ -->
-    <div class="info-section">
-        <div class="info-row">
-            <span class="info-label">Type de compte:</span>
-            <span class="info-value">
-                <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}" 
-                      class="badge badge-etudiant">👨‍🎓 Étudiant</span>
-                <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}" 
-                      class="badge badge-alumni">🎓 Alumni</span>
-            </span>
+<div class="page">
+
+    <!-- ─── Flash messages ───────────────────────────────────── -->
+    <div th:if="${success}" class="alert alert-success">
+        <span>✓</span>
+        <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-error">
+        <span>✕</span>
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- ─── Page header ──────────────────────────────────────── -->
+    <div class="page-header">
+        <div class="avatar">👤</div>
+        <div>
+            <h1 th:text="${candidat.prenom} + ' ' + ${candidat.nom}">Prénom Nom</h1>
+            <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}"
+                  class="badge badge-etudiant">👨‍🎓 Étudiant</span>
+            <span th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}"
+                  class="badge badge-alumni">🎓 Alumni</span>
         </div>
-        
-        <div class="info-row">
-            <span class="info-label">CIN:</span>
-            <span class="info-value" th:text="${candidat.id}"></span>
-        </div>
-        
-        <div class="info-row">
-            <span class="info-label">Nom:</span>
-            <span class="info-value" th:text="${candidat.nom}"></span>
-        </div>
-        
-        <div class="info-row">
-            <span class="info-label">Prénom:</span>
-            <span class="info-value" th:text="${candidat.prenom}"></span>
-        </div>
-        
-        <div class="info-row">
-            <span class="info-label">Email:</span>
-            <span class="info-value" th:text="${candidat.email}"></span>
-        </div>
-        
-        <!-- Informations spécifiques non modifiables pour Etudiant -->
-        <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">
-            <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bdc3c7;">
-                <span class="info-label">Niveau actuel:</span>
-                <span class="info-value" th:text="${candidat.niveau}"></span>
-            </div>
-            
-            <div class="info-row">
-                <span class="info-label">Filière:</span>
-                <span class="info-value" th:text="${candidat.filiere}"></span>
-            </div>
-            
-            <div class="info-row">
-                <span class="info-label">Établissement:</span>
-                <span class="info-value" th:text="${candidat.etablissement}"></span>
-            </div>
-        </div>
-        
-        <!-- Informations spécifiques non modifiables pour Alumni -->
-        <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">
-            <div class="info-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bdc3c7;">
-                <span class="info-label">Année de diplôme:</span>
-                <span class="info-value" th:text="${candidat.anneeDiplome}"></span>
-            </div>
-            
-            <div class="info-row">
-                <span class="info-label">Poste actuel:</span>
-                <span class="info-value" th:text="${candidat.posteActuel != null && !candidat.posteActuel.isEmpty()} ? ${candidat.posteActuel} : 'Non spécifié'"></span>
-            </div>
-            
-            <div class="info-row">
-                <span class="info-label">Entreprise actuelle:</span>
-                <span class="info-value" th:text="${candidat.entrepriseActuelle != null && !candidat.entrepriseActuelle.isEmpty()} ? ${candidat.entrepriseActuelle} : 'Non spécifiée'"></span>
+    </div>
+
+    <!-- ─── Informations non modifiables ─────────────────────── -->
+    <div class="card">
+        <div class="card-header">🪪 Informations du compte</div>
+        <div class="card-body">
+            <div class="info-grid">
+                <span class="info-label">CIN</span>
+                <span class="info-value" th:text="${candidat.id}"></span>
+
+                <span class="info-label">Email</span>
+                <span class="info-value" th:text="${candidat.email}"></span>
+
+                <!-- Etudiant uniquement -->
+                <th:block th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">
+                    <div class="divider"></div>
+                    <span class="info-label">Niveau</span>
+                    <span class="info-value" th:text="${candidat.niveau}"></span>
+
+                    <span class="info-label">Filière</span>
+                    <span class="info-value" th:text="${candidat.filiere}"></span>
+
+                    <span class="info-label">Établissement</span>
+                    <span class="info-value" th:text="${candidat.etablissement}"></span>
+                </th:block>
+
+                <!-- Alumni uniquement -->
+                <th:block th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">
+                    <div class="divider"></div>
+                    <span class="info-label">Année diplôme</span>
+                    <span class="info-value" th:text="${candidat.anneeDiplome}"></span>
+
+                    <span class="info-label">Poste actuel</span>
+                    <span class="info-value"
+                          th:text="${candidat.posteActuel != null && !candidat.posteActuel.isEmpty()} ? ${candidat.posteActuel} : 'Non spécifié'">
+                    </span>
+
+                    <span class="info-label">Entreprise</span>
+                    <span class="info-value"
+                          th:text="${candidat.entrepriseActuelle != null && !candidat.entrepriseActuelle.isEmpty()} ? ${candidat.entrepriseActuelle} : 'Non spécifiée'">
+                    </span>
+                </th:block>
             </div>
         </div>
     </div>
-    
-    <!-- ============================================ -->
-    <!--  FORMULAIRE DE MODIFICATION                 -->
-    <!-- ============================================ -->
-    <h2>✏️ Modifier mes informations</h2>
-    
-    <div class="form-section">
-        <form method="post" action="/candidat/profil/modifier">
-            
-            <!-- ========== CHAMP COMMUN À TOUS ========== -->
-            <div class="form-group">
-                <label for="telephone">Téléphone *</label>
-                <input type="tel" 
-                       id="telephone" 
-                       name="telephone" 
-                       th:value="${candidat.telephone}" 
-                       required 
-                       placeholder="Ex: +216 12 345 678" />
-                <small>Numéro de téléphone pour vous contacter</small>
-            </div>
-            
-            <!-- ========== CHAMPS SPÉCIFIQUES ÉTUDIANT ========== -->
-            <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}" 
-                 class="conditional-section">
-                <h3 style="color: #3498db; margin-bottom: 15px;">📚 Informations académiques</h3>
-                
-                <div class="form-group">
-                    <label for="niveau">Niveau d'études *</label>
-                    <input type="text" 
-                           id="niveau" 
-                           name="niveau" 
-                           th:value="${candidat.niveau}" 
-                           required 
-                           placeholder="Ex: Licence 3, Master 1" />
-                    <small>Votre niveau d'études actuel</small>
+
+    <!-- ─── Formulaire de modification ───────────────────────── -->
+    <div class="card">
+        <div class="card-header">✏️ Modifier mes informations</div>
+        <div class="card-body">
+            <form method="post" action="/candidat/profil/modifier">
+
+                <!-- ── Champ commun ── -->
+                <p class="form-section-title">Coordonnées</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telephone">Téléphone <span class="req">*</span></label>
+                        <input type="tel"
+                               id="telephone"
+                               name="telephone"
+                               th:value="${candidat.telephone}"
+                               required
+                               placeholder="+216 12 345 678" />
+                        <span class="hint">Numéro utilisé pour vous contacter</span>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="filiere">Filière *</label>
-                    <input type="text" 
-                           id="filiere" 
-                           name="filiere" 
-                           th:value="${candidat.filiere}" 
-                           required 
-                           placeholder="Ex: Informatique, Finance, Marketing" />
-                    <small>Votre domaine d'études</small>
+
+                <!-- ── Champs Étudiant ── -->
+                <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">
+                    <p class="form-section-title">Parcours académique</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="niveau">Niveau d'études <span class="req">*</span></label>
+                            <input type="text"
+                                   id="niveau"
+                                   name="niveau"
+                                   th:value="${candidat.niveau}"
+                                   required
+                                   placeholder="Ex : Licence 3, Master 1" />
+                        </div>
+                        <div class="form-group">
+                            <label for="filiere">Filière <span class="req">*</span></label>
+                            <input type="text"
+                                   id="filiere"
+                                   name="filiere"
+                                   th:value="${candidat.filiere}"
+                                   required
+                                   placeholder="Ex : Informatique, Finance" />
+                        </div>
+                        <div class="form-group full">
+                            <label for="etablissement">Établissement <span class="req">*</span></label>
+                            <input type="text"
+                                   id="etablissement"
+                                   name="etablissement"
+                                   th:value="${candidat.etablissement}"
+                                   required
+                                   placeholder="Ex : IHEC Carthage" />
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="etablissement">Établissement *</label>
-                    <input type="text" 
-                           id="etablissement" 
-                           name="etablissement" 
-                           th:value="${candidat.etablissement}" 
-                           required 
-                           placeholder="Ex: IHEC Carthage" />
-                    <small>Votre établissement d'enseignement</small>
+
+                <!-- ── Champs Alumni ── -->
+                <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">
+                    <p class="form-section-title">Situation professionnelle</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posteActuel">Poste actuel</label>
+                            <input type="text"
+                                   id="posteActuel"
+                                   name="posteActuel"
+                                   th:value="${candidat.posteActuel}"
+                                   placeholder="Ex : Développeur Full-Stack" />
+                            <span class="hint">Optionnel</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="entrepriseActuelle">Entreprise actuelle</label>
+                            <input type="text"
+                                   id="entrepriseActuelle"
+                                   name="entrepriseActuelle"
+                                   th:value="${candidat.entrepriseActuelle}"
+                                   placeholder="Ex : Tunisie Telecom" />
+                            <span class="hint">Optionnel</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- ========== CHAMPS SPÉCIFIQUES ALUMNI ========== -->
-            <div th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}" 
-                 class="conditional-section">
-                <h3 style="color: #e74c3c; margin-bottom: 15px;">💼 Informations professionnelles</h3>
-                
-                <div class="form-group">
-                    <label for="posteActuel">Poste actuel</label>
-                    <input type="text" 
-                           id="posteActuel" 
-                           name="posteActuel" 
-                           th:value="${candidat.posteActuel}" 
-                           placeholder="Ex: Développeur Full-Stack, Chef de projet" />
-                    <small>Votre fonction actuelle (optionnel)</small>
+
+                <!-- ── Actions ── -->
+                <div class="btn-row">
+                    <button type="submit" class="btn btn-save">💾 Enregistrer</button>
+                    <a href="/candidat/dashboard" class="btn btn-cancel">Annuler</a>
                 </div>
-                
-                <div class="form-group">
-                    <label for="entrepriseActuelle">Entreprise actuelle</label>
-                    <input type="text" 
-                           id="entrepriseActuelle" 
-                           name="entrepriseActuelle" 
-                           th:value="${candidat.entrepriseActuelle}" 
-                           placeholder="Ex: Google, Tunisie Telecom" />
-                    <small>Votre employeur actuel (optionnel)</small>
-                </div>
-            </div>
-            
-            <!-- Boutons d'action -->
-            <div style="margin-top: 30px;">
-                <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
-                <a href="/candidat/dashboard" class="btn btn-secondary">Annuler</a>
-            </div>
-        </form>
+
+            </form>
+        </div>
     </div>
-    
-    <!-- Navigation -->
-    <div class="nav-links">
-        <a href="/candidat/dashboard">← Retour au tableau de bord</a>
-        <a href="/candidat/offres">Voir les offres</a>
+
+    <!-- ─── Navigation ───────────────────────────────────────── -->
+    <nav class="nav-links">
+        <a href="/candidat/dashboard">← Tableau de bord</a>
+        <a href="/candidat/offres">Offres</a>
         <a href="/candidat/candidatures">Mes candidatures</a>
-        <a href="/logout" style="color: #e74c3c;">Déconnexion</a>
-    </div>
+        <a href="/logout" class="danger">Déconnexion</a>
+    </nav>
+
 </div>
 </body>
 </html>

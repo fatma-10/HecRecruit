@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,17 +73,16 @@ public class EntrepriseController {
     /**
      * Affiche le tableau de bord de l'entreprise connectée.
      *
-     * <p>Correction BUG 2 : le calcul du nombre total de candidatures n'est
-     * plus effectué via un {@code stream().mapToInt().sum()} dans le controller.
-     * Il est délégué à {@link CandidatureService#getTotalCandidaturesParEntreprise(Long)},
-     * qui encapsule cette logique de comptage dans la couche service.</p>
+     * <p>Le calcul du nombre total de candidatures est délégué à
+     * {@link CandidatureService#getTotalCandidaturesParEntreprise(Long)}
+     * pour encapsuler cette logique dans la couche service.</p>
      *
      * <p>Injecte dans le modèle :
      * <ul>
-     *   <li>{@code entreprise}      — l'entreprise connectée</li>
-     *   <li>{@code nbOffres}        — nombre d'offres publiées</li>
-     *   <li>{@code nbCandidatures}  — total des candidatures reçues toutes offres confondues</li>
-     *   <li>{@code nbWishlist}      — nombre de candidats en wishlist</li>
+     *   <li>{@code entreprise}     — l'entreprise connectée</li>
+     *   <li>{@code nbOffres}       — nombre d'offres publiées</li>
+     *   <li>{@code nbCandidatures} — total des candidatures reçues</li>
+     *   <li>{@code nbWishlist}     — nombre de candidats en wishlist</li>
      * </ul>
      * </p>
      *
@@ -97,6 +97,7 @@ public class EntrepriseController {
 
         model.addAttribute("entreprise", entreprise);
         model.addAttribute("nbOffres", entreprise.getOffresPubliees().size());
+        // Calcul délégué au service — plus de stream dans le controller
         model.addAttribute("nbCandidatures",
                 candidatureService.getTotalCandidaturesParEntreprise(entreprise.getId()));
         model.addAttribute("nbWishlist", entreprise.getWishlist().size());
@@ -140,19 +141,22 @@ public class EntrepriseController {
     /**
      * Traite la soumission du formulaire de création d'offre.
      *
-     * <p>Les paramètres spécifiques (domaine, rythme, sujet, technologies)
-     * sont optionnels et dépendent du type d'offre sélectionné.</p>
+     * <p>Si le champ {@code dateExpiration} est renseigné,
+     * {@link OffreService#setDateExpiration(Long, LocalDate, Entreprise)} est appelée
+     * immédiatement après la création. La date doit être strictement postérieure à
+     * aujourd'hui ; un écart est reporté en message flash sans annuler la création.</p>
      *
-     * @param session      la session HTTP
-     * @param titre        le titre de l'offre
-     * @param description  la description de l'offre
-     * @param type         le type : "stage", "alternance" ou "projet fin d'etudes"
-     * @param domaine      domaine du stage (nullable)
-     * @param duree        durée en mois pour stage ou alternance (nullable selon le type)
-     * @param rythme       rythme de l'alternance (nullable)
-     * @param sujet        sujet du PFE (nullable)
-     * @param technologies technologies du PFE (nullable)
-     * @param ra           les attributs de redirection pour les messages flash
+     * @param session        la session HTTP
+     * @param titre          le titre de l'offre
+     * @param description    la description de l'offre
+     * @param type           "stage", "alternance" ou "projet fin d'etudes"
+     * @param domaine        domaine du stage (nullable)
+     * @param duree          durée en mois pour stage ou alternance (nullable selon type)
+     * @param rythme         rythme de l'alternance (nullable)
+     * @param sujet          sujet du PFE (nullable)
+     * @param technologies   technologies du PFE (nullable)
+     * @param dateExpiration date ISO yyyy-MM-dd, vide si non renseignée (nullable)
+     * @param ra             les attributs de redirection pour les messages flash
      * @return redirection vers la liste des offres de l'entreprise
      */
     @PostMapping("/offres/creer")
@@ -165,7 +169,9 @@ public class EntrepriseController {
                              @RequestParam(required = false) String rythme,
                              @RequestParam(required = false) String sujet,
                              @RequestParam(required = false) String technologies,
+                             @RequestParam(required = false) String dateExpiration,
                              RedirectAttributes ra) {
+
         Entreprise entreprise = resoudreEntreprise(session);
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
@@ -185,11 +191,27 @@ public class EntrepriseController {
                     infos.put("technologies", technologies);
                 }
             }
-            offreService.creerOffre(titre, description, type, entreprise, infos);
+
+            Offre offre = offreService.creerOffre(titre, description, type, entreprise, infos);
+
+            if (dateExpiration != null && !dateExpiration.isBlank()) {
+                try {
+                    LocalDate date = LocalDate.parse(dateExpiration);
+                    offreService.setDateExpiration(offre.getId(), date, entreprise);
+                } catch (IllegalArgumentException ex) {
+                    ra.addFlashAttribute("error",
+                            "Offre publiée, mais la date d'expiration est invalide : "
+                            + ex.getMessage());
+                    return "redirect:/entreprise/offres";
+                }
+            }
+
             ra.addFlashAttribute("success", "Offre publiée avec succès !");
+
         } catch (Exception ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
+
         return "redirect:/entreprise/offres";
     }
 
@@ -270,7 +292,7 @@ public class EntrepriseController {
     }
 
     /**
-     * Ajoute un candidat à la wishlist de l'entreprise depuis la vue des candidats d'une offre.
+     * Ajoute un candidat à la wishlist depuis la vue des candidats d'une offre.
      *
      * @param idOffre    l'identifiant de l'offre (utilisé pour la redirection)
      * @param idCandidat le CIN du candidat à ajouter

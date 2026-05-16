@@ -38,9 +38,9 @@ public class OffreService {
      *
      * @param titre       le titre de l'offre
      * @param description la description de l'offre
-     * @param type        le type : "stage", "alternance" ou "projet fin d'etudes"
-     * @param entreprise  l'entreprise publiant l'offre
-     * @param infos       les paramètres spécifiques au type (domaine, duree, rythme, sujet, technologies)
+     * @param type        "stage", "alternance" ou "projet fin d'etudes"
+     * @param entreprise  l'entreprise propriétaire
+     * @param infos       map des champs spécifiques au type (domaine, duree, rythme, sujet, technologies)
      * @return l'offre persistée
      */
     public Offre creerOffre(String titre, String description, String type,
@@ -85,10 +85,10 @@ public class OffreService {
     /**
      * Supprime une offre si elle appartient à l'entreprise donnée.
      *
-     * @param idOffre    l'identifiant de l'offre à supprimer
-     * @param entreprise l'entreprise propriétaire (contrôle d'accès)
-     * @throws IllegalArgumentException si l'offre est introuvable
-     * @throws SecurityException        si l'entreprise n'est pas propriétaire de l'offre
+     * @param idOffre    l'identifiant de l'offre
+     * @param entreprise l'entreprise qui demande la suppression
+     * @throws SecurityException        si l'offre n'appartient pas à cette entreprise
+     * @throws IllegalArgumentException si l'offre n'existe pas
      */
     public void supprimerOffre(Long idOffre, Entreprise entreprise) {
         Offre offre = offreRepository.findById(idOffre)
@@ -117,7 +117,7 @@ public class OffreService {
      *
      * @param id l'identifiant de l'offre
      * @return l'offre correspondante
-     * @throws IllegalArgumentException si aucune offre n'est trouvée
+     * @throws IllegalArgumentException si l'offre n'existe pas
      */
     public Offre getOffreById(Long id) {
         return offreRepository.findById(id)
@@ -125,17 +125,17 @@ public class OffreService {
     }
 
     /**
-     * Retourne toutes les offres d'une entreprise donnée.
+     * Retourne toutes les offres publiées par une entreprise donnée.
      *
      * @param entreprise l'entreprise concernée
-     * @return la liste des offres publiées par cette entreprise
+     * @return la liste des offres de cette entreprise
      */
     public List<Offre> getOffresEntreprise(Entreprise entreprise) {
         return offreRepository.findByEntreprise(entreprise);
     }
 
     /**
-     * Retourne les offres actives : date d'expiration nulle ou dans le futur.
+     * Retourne toutes les offres actives (date d'expiration nulle ou dans le futur).
      *
      * @return la liste des offres disponibles
      */
@@ -144,38 +144,69 @@ public class OffreService {
     }
 
     /**
-     * Retourne le nombre d'offres actives sans charger toute la liste en mémoire.
+     * Retourne le nombre total d'offres actives sans charger les entités en mémoire.
      *
-     * <p>Extrait du controller {@code CandidatController.dashboard()} pour éviter
-     * un double appel à {@link #getOffresDisponibles()} : l'un pour le comptage
-     * et l'autre pour la sous-liste des dernières offres.</p>
+     * <p>Cette méthode est destinée aux controllers qui n'ont besoin que du
+     * comptage pour l'affichage du tableau de bord, sans manipuler la liste.</p>
      *
      * @return le nombre d'offres dont la date d'expiration est nulle ou future
      */
     public long getOffresDisponiblesCount() {
-        return offreRepository.findByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now()).size();
+        return offreRepository
+                .findByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now())
+                .size();
     }
 
     /**
-     * Retourne les {@code n} dernières offres actives (les plus récemment publiées).
+     * Retourne les {@code n} offres actives les plus récentes, triées par date
+     * de publication décroissante.
      *
-     * <p>Extrait du controller {@code CandidatController.dashboard()} pour éviter
-     * de manipuler {@code subList} dans la couche présentation. La sélection des
-     * {@code n} derniers éléments est calculée ici, au plus près des données.</p>
+     * <p>Cette méthode centralise la logique de sous-liste qui était auparavant
+     * dispersée dans {@code CandidatController}, conformément au principe de
+     * séparation des responsabilités.</p>
      *
-     * @param n le nombre maximum d'offres à retourner
-     * @return une sous-liste des {@code n} dernières offres disponibles
+     * @param n le nombre maximum d'offres à retourner (doit être &gt; 0)
+     * @return la liste des {@code n} dernières offres disponibles
      */
     public List<Offre> getDernieresOffres(int n) {
-        List<Offre> offres = getOffresDisponibles();
+        List<Offre> offres = offreRepository
+                .findByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now());
+        // Les offres sont déjà triées par datePublication croissante côté DB ;
+        // on prend les n dernières éléments pour avoir les plus récentes.
         int debut = Math.max(0, offres.size() - n);
         return offres.subList(debut, offres.size());
     }
 
     /**
-     * Recherche des offres par titre (insensible à la casse).
+     * Recherche des offres selon un critère et une valeur.
      *
-     * @param titre la chaîne à rechercher dans le titre
+     * @param critere titre, type, domaine, rythme ou technologies
+     * @param valeur  la valeur à rechercher
+     * @return la liste des offres correspondantes, ou toutes les offres disponibles
+     *         si le critère est inconnu ou la valeur vide
+     */
+    public List<Offre> rechercherOffres(String critere, String valeur) {
+        if (valeur == null || valeur.isBlank()) {
+            return getOffresDisponibles();
+        }
+
+        return switch (critere.toLowerCase()) {
+            case "titre"        -> offreRepository.findByTitreContainingIgnoreCase(valeur);
+            case "type"         -> offreRepository.findByTypeOffre(valeur);
+            case "domaine"      -> new java.util.ArrayList<>(
+                                        stageRepository.findByDomaineContainingIgnoreCase(valeur));
+            case "rythme"       -> new java.util.ArrayList<>(
+                                        alternanceRepository.findByRythmeContainingIgnoreCase(valeur));
+            case "technologies" -> new java.util.ArrayList<>(
+                                        projetRepository.findByTechnologiesContainingIgnoreCase(valeur));
+            default             -> getOffresDisponibles();
+        };
+    }
+
+    /**
+     * Recherche des offres par titre.
+     *
+     * @param titre le titre (ou fragment) à rechercher
      * @return la liste des offres correspondantes
      */
     public List<Offre> rechercherParTitre(String titre) {
@@ -193,7 +224,7 @@ public class OffreService {
     }
 
     /**
-     * Recherche des stages par domaine (insensible à la casse).
+     * Recherche des stages dont le domaine contient la valeur donnée.
      *
      * @param domaine le domaine à rechercher
      * @return la liste des stages correspondants
@@ -203,7 +234,7 @@ public class OffreService {
     }
 
     /**
-     * Recherche des alternances par rythme (insensible à la casse).
+     * Recherche des alternances dont le rythme contient la valeur donnée.
      *
      * @param rythme le rythme à rechercher
      * @return la liste des alternances correspondantes
@@ -213,7 +244,7 @@ public class OffreService {
     }
 
     /**
-     * Recherche des projets de fin d'études par technologie (insensible à la casse).
+     * Recherche des PFE dont les technologies contiennent la valeur donnée.
      *
      * @param tech la technologie à rechercher
      * @return la liste des PFE correspondants
@@ -225,14 +256,14 @@ public class OffreService {
     // ========== DATE EXPIRATION ==========
 
     /**
-     * Modifie la date d'expiration d'une offre (doit être dans le futur).
+     * Modifie la date d'expiration d'une offre appartenant à l'entreprise donnée.
      *
      * @param idOffre    l'identifiant de l'offre
-     * @param date       la nouvelle date d'expiration (doit être postérieure à aujourd'hui)
-     * @param entreprise l'entreprise propriétaire (contrôle d'accès)
+     * @param date       la nouvelle date d'expiration (doit être strictement future)
+     * @param entreprise l'entreprise propriétaire de l'offre
      * @return l'offre mise à jour
+     * @throws SecurityException        si l'offre n'appartient pas à cette entreprise
      * @throws IllegalArgumentException si la date n'est pas dans le futur
-     * @throws SecurityException        si l'entreprise n'est pas propriétaire
      */
     public Offre setDateExpiration(Long idOffre, LocalDate date, Entreprise entreprise) {
         Offre offre = offreRepository.findById(idOffre)
@@ -250,45 +281,12 @@ public class OffreService {
         return offreRepository.save(offre);
     }
 
-    /**
-     * Recherche unifiée par critère avec fallback sur les offres disponibles.
-     *
-     * @param critere le critère parmi : titre, type, domaine, rythme, technologies
-     * @param valeur  la valeur à rechercher ; si vide, retourne toutes les offres disponibles
-     * @return la liste des offres correspondant aux critères
-     */
-    public List<Offre> rechercherOffres(String critere, String valeur) {
-        if (valeur == null || valeur.isBlank()) {
-            return getOffresDisponibles();
-        }
-
-        return switch (critere.toLowerCase()) {
-            case "titre" ->
-                    offreRepository.findByTitreContainingIgnoreCase(valeur);
-
-            case "type" ->
-                    offreRepository.findByTypeOffre(valeur);
-
-            case "domaine" ->
-                    new java.util.ArrayList<>(stageRepository.findByDomaineContainingIgnoreCase(valeur));
-
-            case "rythme" ->
-                    new java.util.ArrayList<>(alternanceRepository.findByRythmeContainingIgnoreCase(valeur));
-
-            case "technologies" ->
-                    new java.util.ArrayList<>(projetRepository.findByTechnologiesContainingIgnoreCase(valeur));
-
-            default ->
-                    getOffresDisponibles();
-        };
-    }
-
     // ========== STATISTIQUES ==========
 
     /**
-     * Retourne les statistiques globales des offres (totaux par type).
+     * Retourne les statistiques globales des offres.
      *
-     * @return une map avec les clés : total, stages, alternances, pfe
+     * @return une map contenant total, stages, alternances et pfe
      */
     public Map<String, Long> getStatistiques() {
         return Map.of(

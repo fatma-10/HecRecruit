@@ -31,23 +31,6 @@ public class Stage extends OffreSpecialisee {
     public String getDomaine() { return domaine; }
     public void setDomaine(String domaine) { this.domaine = domaine; }
 
-    // ---- getInfosPrincipales ----
-
-    @Override
-    public String[] getInfosPrincipales() {
-        return new String[] {
-            getId() != null ? getId().toString() : "",
-            getTitre(),
-            "Stage",
-            domaine,
-            dureeEnMois + " mois",
-            getDatePublication() != null ? getDatePublication().toString() : "",
-            getDateExpiration() != null ? getDateExpiration().toString() : "Non définie",
-            getEntreprise() != null ? getEntreprise().getNom() : "",
-            String.valueOf(getCandidatures().size())
-        };
-    }
-
     @Override
     public String getTypeOffre() { return "Stage"; }
 }

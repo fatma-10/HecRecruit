@@ -26,16 +26,17 @@ public class CandidatureService {
     // ========== POSTULER / RETIRER ==========
 
     /**
-     * Candidat postule à une offre.
+     * Enregistre la candidature d'un candidat pour une offre donnée.
      *
      * <p>La relation ManyToMany est gérée via l'entité {@link Offre}
-     * (table {@code candidature} en base). La relation est synchronisée
-     * des deux côtés avant la persistance.</p>
+     * (table {@code candidature} en base). Les deux côtés de la relation
+     * bidirectionnelle sont mis à jour avant la persistance.</p>
      *
      * @param idCandidat le CIN du candidat
-     * @param idOffre    l'identifiant de l'offre visée
-     * @throws IllegalArgumentException si le candidat ou l'offre est introuvable
-     * @throws IllegalStateException    si l'offre est expirée ou si le candidat a déjà postulé
+     * @param idOffre    l'identifiant de l'offre
+     * @throws IllegalArgumentException si le candidat ou l'offre n'existe pas
+     * @throws IllegalStateException    si l'offre est expirée ou si le candidat
+     *                                  a déjà postulé
      */
     public void postulerOffre(int idCandidat, Long idOffre) {
         Candidat candidat = candidatRepository.findById(idCandidat)
@@ -52,21 +53,18 @@ public class CandidatureService {
             throw new IllegalStateException("Vous avez déjà postulé à cette offre");
         }
 
-        // Synchronisation des deux côtés de la relation bidirectionnelle
         offre.getCandidatures().add(candidat);
         candidat.getCandidaturesEnCours().add(offre);
-
-        // Un seul save suffit grâce au CascadeType et à la relation mappedBy
         offreRepository.save(offre);
     }
 
     /**
-     * Candidat retire sa candidature d'une offre.
+     * Retire la candidature d'un candidat pour une offre donnée.
      *
      * @param idCandidat le CIN du candidat
-     * @param idOffre    l'identifiant de l'offre concernée
-     * @throws IllegalArgumentException si le candidat ou l'offre est introuvable
-     * @throws IllegalStateException    si le candidat n'a pas postulé à cette offre
+     * @param idOffre    l'identifiant de l'offre
+     * @throws IllegalArgumentException si le candidat ou l'offre n'existe pas
+     * @throws IllegalStateException    si le candidat n'avait pas postulé
      */
     public void retirerCandidature(int idCandidat, Long idOffre) {
         Candidat candidat = candidatRepository.findById(idCandidat)
@@ -91,7 +89,7 @@ public class CandidatureService {
      *
      * @param idCandidat le CIN du candidat
      * @return la liste des offres en cours pour ce candidat
-     * @throws IllegalArgumentException si le candidat est introuvable
+     * @throws IllegalArgumentException si le candidat n'existe pas
      */
     public List<Offre> getCandidaturesCandidat(int idCandidat) {
         Candidat candidat = candidatRepository.findById(idCandidat)
@@ -103,8 +101,8 @@ public class CandidatureService {
      * Retourne tous les candidats ayant postulé à une offre (vue entreprise).
      *
      * @param idOffre l'identifiant de l'offre
-     * @return la liste des candidats ayant postulé
-     * @throws IllegalArgumentException si l'offre est introuvable
+     * @return la liste des candidats pour cette offre
+     * @throws IllegalArgumentException si l'offre n'existe pas
      */
     public List<Candidat> getCandidatsOffre(Long idOffre) {
         Offre offre = offreRepository.findById(idOffre)
@@ -113,13 +111,33 @@ public class CandidatureService {
     }
 
     /**
-     * Entreprise supprime la candidature d'un candidat de son offre.
+     * Retourne le nombre total de candidatures reçues par une entreprise,
+     * toutes offres confondues.
+     *
+     * <p>Cette méthode centralise le calcul qui était auparavant effectué
+     * via un {@code stream} directement dans {@code EntrepriseController},
+     * conformément au principe de séparation des responsabilités.</p>
+     *
+     * @param idEntreprise l'identifiant de l'entreprise
+     * @return le total des candidatures reçues sur toutes les offres de l'entreprise
+     * @throws IllegalArgumentException si l'entreprise n'existe pas
+     */
+    public int getTotalCandidaturesParEntreprise(Long idEntreprise) {
+        Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
+            .orElseThrow(() -> new IllegalArgumentException("Entreprise non trouvée"));
+        return entreprise.getOffresPubliees().stream()
+                .mapToInt(o -> o.getCandidatures().size())
+                .sum();
+    }
+
+    /**
+     * L'entreprise retire la candidature d'un candidat de l'une de ses offres.
      *
      * @param idOffre    l'identifiant de l'offre
      * @param idCandidat le CIN du candidat à retirer
-     * @param entreprise l'entreprise effectuant l'action (contrôle d'accès)
-     * @throws IllegalArgumentException si l'offre ou le candidat est introuvable
-     * @throws SecurityException        si l'entreprise n'est pas propriétaire de l'offre
+     * @param entreprise l'entreprise qui effectue l'action
+     * @throws SecurityException        si l'offre n'appartient pas à cette entreprise
+     * @throws IllegalArgumentException si l'offre ou le candidat n'existe pas
      */
     public void supprimerCandidatureOffre(Long idOffre, int idCandidat, Entreprise entreprise) {
         Offre offre = offreRepository.findById(idOffre)
@@ -140,12 +158,12 @@ public class CandidatureService {
     // ========== WISHLIST ==========
 
     /**
-     * Entreprise ajoute un candidat à sa wishlist.
+     * Ajoute un candidat à la wishlist d'une entreprise.
      *
      * @param idEntreprise l'identifiant de l'entreprise
      * @param idCandidat   le CIN du candidat à ajouter
-     * @throws IllegalArgumentException si l'entreprise ou le candidat est introuvable
      * @throws IllegalStateException    si le candidat est déjà dans la wishlist
+     * @throws IllegalArgumentException si l'entreprise ou le candidat n'existe pas
      */
     public void ajouterWishlist(Long idEntreprise, int idCandidat) {
         Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
@@ -163,11 +181,11 @@ public class CandidatureService {
     }
 
     /**
-     * Entreprise retire un candidat de sa wishlist.
+     * Retire un candidat de la wishlist d'une entreprise.
      *
      * @param idEntreprise l'identifiant de l'entreprise
      * @param idCandidat   le CIN du candidat à retirer
-     * @throws IllegalArgumentException si l'entreprise ou le candidat est introuvable
+     * @throws IllegalArgumentException si l'entreprise ou le candidat n'existe pas
      */
     public void retirerWishlist(Long idEntreprise, int idCandidat) {
         Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
@@ -185,34 +203,11 @@ public class CandidatureService {
      *
      * @param idEntreprise l'identifiant de l'entreprise
      * @return la liste des candidats en wishlist
-     * @throws IllegalArgumentException si l'entreprise est introuvable
+     * @throws IllegalArgumentException si l'entreprise n'existe pas
      */
     public List<Candidat> getWishlist(Long idEntreprise) {
         Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
             .orElseThrow(() -> new IllegalArgumentException("Entreprise non trouvée"));
         return entreprise.getWishlist();
-    }
-
-    // ========== STATISTIQUES ==========
-
-    /**
-     * Calcule le nombre total de candidatures reçues par toutes les offres
-     * d'une entreprise donnée.
-     *
-     * <p>Extrait du controller {@code EntrepriseController.dashboard()} pour
-     * supprimer le {@code stream().mapToInt().sum()} qui s'effectuait dans la
-     * couche présentation. La logique métier de comptage appartient au service.</p>
-     *
-     * @param entrepriseId l'identifiant de l'entreprise
-     * @return le nombre total de candidatures sur l'ensemble des offres de l'entreprise
-     * @throws IllegalArgumentException si l'entreprise est introuvable
-     */
-    public int getTotalCandidaturesParEntreprise(Long entrepriseId) {
-        Entreprise entreprise = entrepriseRepository.findById(entrepriseId)
-            .orElseThrow(() -> new IllegalArgumentException("Entreprise non trouvée"));
-
-        return entreprise.getOffresPubliees().stream()
-                .mapToInt(o -> o.getCandidatures().size())
-                .sum();
     }
 }
