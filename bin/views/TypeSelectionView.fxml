@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--HECRECRUIT - VUE DE SÉLECTION DE TYPE
+ Permet de choisir entre connexion Candidat ou Entreprise-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/17" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controllers.TypeSelectionController"
+      alignment="CENTER" 
+      spacing="35" 
+      styleClass="root-pane"
+      prefWidth="750" 
+      prefHeight="600">
+    
+    <!-- Container principal -->
+    <VBox alignment="CENTER" spacing="45" styleClass="content-container" maxWidth="680">
+        
+        <!-- SECTION EN-TÊTE
+             Titre et description de la sélection-->
+        <VBox alignment="CENTER" spacing="15">
+            <!-- Titre principal -->
+            <Label fx:id="lblTitle" 
+                   text="Choisissez votre espace" 
+                   styleClass="title-medium"
+                   style="-fx-font-size: 32px;"/>
+            
+            <!-- Sous-titre explicatif -->
+            <Label text="Sélectionnez le type de compte approprié" 
+                   styleClass="subtitle"
+                   style="-fx-font-size: 15px;"/>
+        </VBox>
+        
+        <!-- CARTES DE SÉLECTION
+             Deux options : Candidat ou Entreprise-->
+        <HBox spacing="35" alignment="CENTER">
+            
+            <!--CARTE CANDIDAT
+                 Pour étudiants et alumni-->
+            <VBox alignment="CENTER" 
+                  spacing="20" 
+                  styleClass="stats-card"
+                  onMouseClicked="#handleCandidatSelection"
+                  prefWidth="280" 
+                  prefHeight="260"
+                  style="-fx-cursor: hand; -fx-padding: 35px;">
+                
+                <!-- Icône candidat -->
+                <Text text="👤" style="-fx-font-size: 72px;"/>
+                
+                <!-- Titre carte -->
+                <Label text="CANDIDAT" 
+                       styleClass="title-small"
+                       style="-fx-font-size: 20px; -fx-text-fill: #3498DB;"/>
+                
+                <!-- Description -->
+                <VBox alignment="CENTER" spacing="5">
+                    <Label text="Étudiant ou Alumni" 
+                           styleClass="subtitle" 
+                           style="-fx-font-size: 14px;"
+                           wrapText="true" 
+                           alignment="CENTER"/>
+                    <Label text="Recherchez des opportunités" 
+                           style="-fx-font-size: 12px; -fx-text-fill: #7F8C8D; -fx-opacity: 0.8;"
+                           wrapText="true" 
+                           alignment="CENTER"/>
+                </VBox>
+                
+            </VBox>
+            
+            <!--CARTE ENTREPRISE
+                 Pour les recruteurs-->
+            <VBox alignment="CENTER" 
+                  spacing="20" 
+                  styleClass="stats-card"
+                  onMouseClicked="#handleEntrepriseSelection"
+                  prefWidth="280" 
+                  prefHeight="260"
+                  style="-fx-cursor: hand; -fx-padding: 35px;">
+                
+                <!-- Icône entreprise -->
+                <Text text="🏢" style="-fx-font-size: 72px;"/>
+                
+                <!-- Titre carte -->
+                <Label text="ENTREPRISE" 
+                       styleClass="title-small"
+                       style="-fx-font-size: 20px; -fx-text-fill: #27AE60;"/>
+                
+                <!-- Description -->
+                <VBox alignment="CENTER" spacing="5">
+                    <Label text="Recruteur professionnel" 
+                           styleClass="subtitle" 
+                           style="-fx-font-size: 14px;"
+                           wrapText="true" 
+                           alignment="CENTER"/>
+                    <Label text="Publiez vos offres d'emploi" 
+                           style="-fx-font-size: 12px; -fx-text-fill: #7F8C8D; -fx-opacity: 0.8;"
+                           wrapText="true" 
+                           alignment="CENTER"/>
+                </VBox>
+                
+            </VBox>
+            
+        </HBox>
+        
+        <!-- Espaceur -->
+        <Region prefHeight="10"/>
+        
+        <!-- NAVIGATION
+             Bouton retour-->
+        <Button fx:id="btnBack" 
+                text="←  Retour à l'accueil" 
+                styleClass="btn-back"
+                onAction="#handleBack"
+                style="-fx-font-size: 13px;"/>
+        
+    </VBox>
+    
+</VBox>

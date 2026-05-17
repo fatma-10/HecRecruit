@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--HECRECRUIT - MES OFFRES
+ Gestion des offres publiées par l'entreprise
+-->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controllers.MesOffresController"
+            styleClass="root-pane">
+    
+    <top>
+        <HBox styleClass="content-container" alignment="CENTER_LEFT" spacing="18" 
+              style="-fx-background-color: linear-gradient(to right, #27AE60, #229954); -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+            <Button text="←  Retour" styleClass="btn-outline"
+                    style="-fx-text-fill: white; -fx-border-color: white; -fx-border-width: 2px;"
+                    onAction="#handleRetour" prefHeight="38"/>
+            <Text text="📋" style="-fx-font-size: 36px;"/>
+            <Label text="Mes offres publiées" 
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+    
+    <center>
+        <VBox spacing="28" styleClass="padding-large">
+            
+            <HBox spacing="30" alignment="CENTER">
+                <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="300" prefHeight="140">
+                    <Label text="Offres actives" styleClass="title" style="-fx-font-size: 13px;"/>
+                    <Label fx:id="lblNbOffres" text="0" styleClass="value" style="-fx-font-size: 40px;"/>
+                </VBox>
+            </HBox>
+            
+            <VBox spacing="18" VBox.vgrow="ALWAYS">
+                <Label text="Liste de vos offres" styleClass="title-small" style="-fx-font-size: 20px;"/>
+                
+                <TableView fx:id="tableOffres" styleClass="table-view" VBox.vgrow="ALWAYS" prefHeight="350">
+                    <columns>
+                        <TableColumn text="Titre" prefWidth="240" fx:id="colTitre"/>
+                        <TableColumn text="Type" prefWidth="140" fx:id="colType"/>
+                        <TableColumn text="Date publication" prefWidth="140" fx:id="colDate"/>
+                        <TableColumn text="Date expiration" prefWidth="140" fx:id="colExpiration"/>
+                        <TableColumn text="Candidatures" prefWidth="120" fx:id="colCandidatures"/>
+                        <TableColumn text="Statut" prefWidth="110" fx:id="colStatut"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            
+            <HBox spacing="15" alignment="CENTER_LEFT" styleClass="content-container" style="-fx-padding: 18px;">
+                <Button fx:id="btnVoirCandidats" 
+                        text="👥  Voir les candidats" 
+                        styleClass="btn-primary"
+                        onAction="#handleVoirCandidats"
+                        disable="true" prefHeight="42" prefWidth="180" style="-fx-font-size: 13px;"/>
+                
+                <Button fx:id="btnSupprimer" 
+                        text="🗑️  Supprimer l'offre" 
+                        styleClass="btn-danger"
+                        onAction="#handleSupprimer"
+                        disable="true" prefHeight="42" prefWidth="180" style="-fx-font-size: 13px;"/>
+                
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <Button text="➕  Créer une nouvelle offre" 
+                        styleClass="btn-success"
+                        onAction="#handleCreerOffre"
+                        prefHeight="42" prefWidth="220" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            </HBox>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

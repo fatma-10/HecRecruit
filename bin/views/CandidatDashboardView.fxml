@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ HECRECRUIT - TABLEAU DE BORD CANDIDAT
+ Interface principale pour les candidats (étudiants et alumni)
+ Contient : statistiques, recommandations, offres récentes
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controllers.CandidatDashboardController"
+            styleClass="root-pane">
+    
+    <!--  HEADER - En-tête avec informations utilisateur-->
+    <top>
+        <HBox styleClass="content-container" alignment="CENTER_LEFT" spacing="20" 
+              style="-fx-background-color: linear-gradient(to right, #2C3E50, #34495E); 
+                     -fx-padding: 22px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+            
+            <!-- Icône utilisateur -->
+            <Text text="👤" style="-fx-font-size: 38px;"/>
+            
+            <!-- Informations utilisateur -->
+            <VBox spacing="3">
+                <Label fx:id="lblNomCandidat" 
+                       text="Bienvenue, [Nom]" 
+                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label fx:id="lblTypeCandidat" 
+                       text="[Étudiant/Alumni]" 
+                       style="-fx-text-fill: white; -fx-font-size: 14px; -fx-opacity: 0.9;"/>
+            </VBox>
+            
+            <!-- Espaceur flexible -->
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <!-- Bouton déconnexion -->
+            <Button fx:id="btnDeconnexion" 
+                    text="🚪  Déconnexion" 
+                    styleClass="btn-danger"
+                    onAction="#handleDeconnexion"
+                    style="-fx-font-size: 14px; -fx-padding: 10px 20px;"/>
+        </HBox>
+    </top>
+    
+    <!-- MENU LATÉRAL - Navigation principale-->
+    <left>
+        <VBox spacing="8" styleClass="content-container" 
+              style="-fx-min-width: 260; -fx-background-color: linear-gradient(to bottom, #FFFFFF, #F8F9FA); 
+                     -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 2, 0);">
+            
+            <!-- Titre navigation -->
+            <Label text="NAVIGATION" 
+                   style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #7F8C8D; 
+                          -fx-padding: 8px 0;">
+                <VBox.margin>
+                    <Insets bottom="5"/>
+                </VBox.margin>
+            </Label>
+            
+            <Separator style="-fx-background-color: #ECF0F1;"/>
+            
+            <!-- Boutons de navigation -->
+            <Button fx:id="btnDashboard" 
+                    text="📊  Tableau de bord" 
+                    styleClass="btn-outline"
+                    onAction="#handleDashboard"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button fx:id="btnOffres" 
+                    text="🔍  Rechercher des offres" 
+                    styleClass="btn-outline"
+                    onAction="#handleOffres"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button fx:id="btnCandidatures" 
+                    text="📄  Mes candidatures" 
+                    styleClass="btn-outline"
+                    onAction="#handleCandidatures"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <Button fx:id="btnForum" 
+                    text="💬  Forum" 
+                    styleClass="btn-outline"
+                    onAction="#handleForum"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+            
+            <!-- Séparateur -->
+            <Region prefHeight="10"/>
+            
+            <Button fx:id="btnProfil" 
+                    text="⚙️ Mon profil" 
+                    styleClass="btn-outline"
+                    onAction="#handleProfil"
+                    maxWidth="Infinity"
+                    prefHeight="42"
+                    style="-fx-alignment: CENTER_LEFT; -fx-padding: 0 15px; -fx-font-size: 13px;"/>
+        </VBox>
+    </left>
+    
+    <!-- CONTENU CENTRAL - Tableau de bord-->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="root-pane">
+            <VBox spacing="35" styleClass="padding-large">
+                
+                <!-- TITRE SECTION-->
+                <Label text="📊  Vue d'ensemble" 
+                       styleClass="title-medium"
+                       style="-fx-font-size: 26px;"/>
+                
+                <!-- STATISTIQUES - Cards -->
+                <HBox spacing="30" alignment="CENTER">
+                    
+                    <!-- Card 1 : Candidatures actives -->
+                    <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="270" prefHeight="150">
+                        <Label text="Candidatures actives" 
+                               styleClass="title"
+                               style="-fx-font-size: 13px;"/>
+                        <Label fx:id="lblNbCandidatures" 
+                               text="0" 
+                               styleClass="value"
+                               style="-fx-font-size: 42px;"/>
+                    </VBox>
+                    
+                    <!-- Card 2 : Offres disponibles -->
+                    <VBox styleClass="stats-card" spacing="15" alignment="CENTER" prefWidth="270" prefHeight="150">
+                        <Label text="Offres disponibles" 
+                               styleClass="title"
+                               style="-fx-font-size: 13px;"/>
+                        <Label fx:id="lblNbOffres" 
+                               text="0" 
+                               styleClass="value"
+                               style="-fx-font-size: 42px;"/>
+                    </VBox>
+                    
+                </HBox>
+                
+                <!-- ACTIONS RAPIDES-->
+                <VBox spacing="18">
+                    <Label text="⚡  Actions rapides" 
+                           styleClass="title-small"
+                           style="-fx-font-size: 20px;"/>
+                    
+                    <HBox spacing="20">
+                        <Button text="🔍  Rechercher des offres" 
+                                styleClass="btn-primary"
+                                onAction="#handleOffres"
+                                prefWidth="280"
+                                prefHeight="45"
+                                style="-fx-font-size: 14px;"/>
+                        
+                        <Button text="📄  Voir mes candidatures" 
+                                styleClass="btn-secondary"
+                                onAction="#handleCandidatures"
+                                prefWidth="280"
+                                prefHeight="45"
+                                style="-fx-font-size: 14px;"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- SECTION RECOMMANDATIONS-->
+                <VBox spacing="15" 
+                      style="-fx-background-color: white; 
+                             -fx-padding: 25px; 
+                             -fx-background-radius: 12px; 
+                             -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.15), 12, 0, 0, 3);
+                             -fx-border-color: #27AE60; 
+                             -fx-border-width: 1; 
+                             -fx-border-radius: 12px;">
+                    
+                    <!-- En-tête section -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="🎯  Recommandé pour vous" 
+                               style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #27AE60;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="✨ Nouveauté" 
+                               style="-fx-background-color: #27AE60; 
+                                      -fx-text-fill: white; 
+                                      -fx-padding: 5 12; 
+                                      -fx-background-radius: 14; 
+                                      -fx-font-size: 11px; 
+                                      -fx-font-weight: bold;"/>
+                    </HBox>
+                    
+                    <Label text="Offres personnalisées selon votre profil et vos compétences" 
+                           style="-fx-font-size: 13px; -fx-text-fill: #7F8C8D;"/>
+                    
+                    <!-- Tableau des recommandations -->
+                    <TableView fx:id="tableRecommandations" 
+                               prefHeight="260" 
+                               style="-fx-background-color: transparent; -fx-background-radius: 8px;">
+                        <columns>
+                            <TableColumn fx:id="colTitreReco" text="Titre" prefWidth="220"/>
+                            <TableColumn fx:id="colTypeReco" text="Type" prefWidth="130"/>
+                            <TableColumn fx:id="colEntrepriseReco" text="Entreprise" prefWidth="170"/>
+                            <TableColumn fx:id="colScoreReco" text="Correspondance %" prefWidth="130" 
+                                        style="-fx-alignment: CENTER;"/>
+                        </columns>
+                    </TableView>
+                    
+                    <!-- Boutons d'action -->
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Button fx:id="btnVoirDetailsReco" 
+                                text="👁️  Voir les détails" 
+                                disable="true" 
+                                onAction="#handleVoirDetailsReco"
+                                style="-fx-background-color: #3498DB; 
+                                       -fx-text-fill: white; 
+                                       -fx-padding: 10 18; 
+                                       -fx-background-radius: 6; 
+                                       -fx-cursor: hand;
+                                       -fx-font-size: 13px;"/>
+                        
+                        <Button fx:id="btnPostulerReco" 
+                                text="✉️  Postuler maintenant" 
+                                disable="true" 
+                                onAction="#handlePostulerReco"
+                                style="-fx-background-color: #27AE60; 
+                                       -fx-text-fill: white; 
+                                       -fx-padding: 10 18; 
+                                       -fx-background-radius: 6; 
+                                       -fx-cursor: hand; 
+                                       -fx-font-weight: bold;
+                                       -fx-font-size: 13px;"/>
+                        
+                        <Region HBox.hgrow="ALWAYS"/>
+                        
+                        <Label text="💡 Astuce : Les offres sont triées par pertinence" 
+                               style="-fx-font-size: 11px; -fx-text-fill: #95A5A6; -fx-font-style: italic;"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- DERNIÈRES OFFRES PUBLIÉES-->
+                <VBox spacing="18">
+                    <Label text="🆕  Dernières offres publiées" 
+                           styleClass="title-small"
+                           style="-fx-font-size: 20px;"/>
+                    
+                    <!-- Tableau des dernières offres -->
+                    <TableView fx:id="tableDernieresOffres" 
+                               prefHeight="280"
+                               styleClass="table-view">
+                        <columns>
+                            <TableColumn text="Titre" prefWidth="230" fx:id="colTitre"/>
+                            <TableColumn text="Type" prefWidth="130" fx:id="colType"/>
+                            <TableColumn text="Entreprise" prefWidth="200" fx:id="colEntreprise"/>
+                            <TableColumn text="Date" prefWidth="110" fx:id="colDate"/>
+                        </columns>
+                    </TableView>
+                    
+                    <!-- Bouton voir toutes les offres -->
+                    <Button text="Voir toutes les offres  →" 
+                            styleClass="btn-outline"
+                            onAction="#handleOffres"
+                            prefHeight="40"
+                            style="-fx-font-size: 13px;"/>
+                </VBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

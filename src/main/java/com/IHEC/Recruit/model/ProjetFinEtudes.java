@@ -30,23 +30,6 @@ public class ProjetFinEtudes extends OffreSpecialisee {
     public String getTechnologies() { return technologies; }
     public void setTechnologies(String technologies) { this.technologies = technologies; }
 
-    // ---- getInfosPrincipales ----
-
-    @Override
-    public String[] getInfosPrincipales() {
-        return new String[] {
-            getId() != null ? getId().toString() : "",
-            getTitre(),
-            "Projet Fin d'Etudes",
-            sujet,
-            technologies,
-            getDatePublication() != null ? getDatePublication().toString() : "",
-            getDateExpiration() != null ? getDateExpiration().toString() : "Non définie",
-            getEntreprise() != null ? getEntreprise().getNom() : "",
-            String.valueOf(getCandidatures().size())
-        };
-    }
-
     @Override
     public String getTypeOffre() { return "Projet Fin d'Etudes"; }
 }

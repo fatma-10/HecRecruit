@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+═══════════════════════════════════════════════════════════
+ HECRECRUIT - VUE D'INSCRIPTION (REGISTER VIEW)
+ Formulaire d'inscription pour candidats et entreprises
+ avec champs dynamiques selon le type sélectionné
+═══════════════════════════════════════════════════════════
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox xmlns="http://javafx.com/javafx/17" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controllers.RegisterController"
+      alignment="CENTER" 
+      spacing="20" 
+      styleClass="root-pane"
+      prefWidth="750" 
+      prefHeight="750">
+    
+    <!-- ScrollPane pour contenu défilable -->
+    <ScrollPane fitToWidth="true" styleClass="root-pane" prefHeight="750">
+        
+        <!-- Container principal -->
+        <VBox alignment="CENTER" spacing="28" styleClass="content-container" maxWidth="650">
+            
+            <!-- ═══════════════════════════════════════════════════
+                 SECTION EN-TÊTE
+                 Icône et titre de l'inscription
+                 ═══════════════════════════════════════════════════ -->
+            <VBox alignment="CENTER" spacing="12">
+                <!-- Logo IHEC -->
+                <ImageView fitWidth="70" fitHeight="70" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/ihec-logo.png"/>
+                    </image>
+                </ImageView>
+                
+                <!-- Text invisible pour compatibilité avec le contrôleur -->
+                <Text fx:id="iconText" text="" visible="false" managed="false"/>
+                
+                <!-- Titre (sera mis à jour selon le type) -->
+                <Label fx:id="lblTitle" 
+                       text="Inscription Candidat" 
+                       styleClass="title-medium"
+                       style="-fx-font-size: 28px;"/>
+                
+                <!-- Sous-titre -->
+                <Label text="Créez votre compte professionnel" 
+                       styleClass="subtitle"
+                       style="-fx-font-size: 14px;"/>
+            </VBox>
+            
+            <!-- ═══════════════════════════════════════════════════
+                 SÉLECTION TYPE CANDIDAT
+                 Visible uniquement pour les candidats
+                 ═══════════════════════════════════════════════════ -->
+            <VBox fx:id="candidatTypeContainer" 
+                  spacing="12" 
+                  alignment="CENTER"
+                  visible="true"
+                  managed="true"
+                  style="-fx-background-color: #ECF0F1; -fx-padding: 20px; -fx-background-radius: 8px;">
+                
+                <Label text="Type de profil" 
+                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2C3E50;"/>
+                
+                <HBox spacing="15" alignment="CENTER">
+                    <!-- Toggle Étudiant -->
+                    <ToggleButton fx:id="btnEtudiant" 
+                                  text="🎓 Étudiant" 
+                                  styleClass="btn-outline"
+                                  onAction="#handleTypeChange"
+                                  selected="true"
+                                  prefWidth="150"
+                                  prefHeight="40"/>
+                    
+                    <!-- Toggle Alumni -->
+                    <ToggleButton fx:id="btnAlumni" 
+                                  text="👨‍🎓 Alumni" 
+                                  styleClass="btn-outline"
+                                  onAction="#handleTypeChange"
+                                  prefWidth="150"
+                                  prefHeight="40"/>
+                </HBox>
+            </VBox>
+            
+            <!-- ═══════════════════════════════════════════════════
+                 FORMULAIRE D'INSCRIPTION
+                 Grille de champs avec validation
+                 ═══════════════════════════════════════════════════ -->
+            <GridPane hgap="20" vgap="18" alignment="CENTER" 
+                      style="-fx-padding: 10px;">
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 0 : CIN (Candidat uniquement)
+                     ═══════════════════════════════════════════ -->
+                <Label fx:id="lblCIN" 
+                       text="CIN (8 chiffres) *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="0"/>
+                <TextField fx:id="txtCIN" 
+                           promptText="12345678"
+                           prefWidth="280"
+                           prefHeight="42"
+                           visible="true"
+                           managed="true"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="0"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 1 : Nom
+                     ═══════════════════════════════════════════ -->
+                <Label text="Nom *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="1"/>
+                <TextField fx:id="txtNom" 
+                           promptText="Votre nom"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="1"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 2 : Prénom/Secteur (dynamique)
+                     ═══════════════════════════════════════════ -->
+                <Label fx:id="lblField2" 
+                       text="Prénom *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="2"/>
+                <TextField fx:id="txtField2" 
+                           promptText="Votre prénom"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="2"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 3 : Email
+                     ═══════════════════════════════════════════ -->
+                <Label text="Email *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="3"/>
+                <TextField fx:id="txtEmail" 
+                           promptText="exemple@email.com"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="3"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 4 : Téléphone
+                     ═══════════════════════════════════════════ -->
+                <Label text="Téléphone *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="4"/>
+                <TextField fx:id="txtTelephone" 
+                           promptText="+216 XX XXX XXX"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="4"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     Ligne 5 : Mot de passe
+                     ═══════════════════════════════════════════ -->
+                <Label text="Mot de passe *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="5"/>
+                <PasswordField fx:id="txtPassword" 
+                               promptText="Mot de passe sécurisé"
+                               prefWidth="280"
+                               prefHeight="42"
+                               GridPane.columnIndex="1" 
+                               GridPane.rowIndex="5"/>
+                
+                <!-- ═══════════════════════════════════════════
+                     CHAMPS SPÉCIFIQUES DYNAMIQUES
+                     Ces champs changent selon le type d'utilisateur
+                     ═══════════════════════════════════════════ -->
+                
+                <!-- Champ spécifique 1 (ex: Niveau pour étudiant) -->
+                <Label fx:id="lblSpecific1" 
+                       text="Niveau *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="6"/>
+                <TextField fx:id="txtSpecific1" 
+                           promptText="Ex: Licence 3"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="6"/>
+                
+                <!-- Champ spécifique 2 (ex: Filière pour étudiant) -->
+                <Label fx:id="lblSpecific2" 
+                       text="Filière *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="7"/>
+                <TextField fx:id="txtSpecific2" 
+                           promptText="Ex: Informatique"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="7"/>
+                
+                <!-- Champ spécifique 3 (ex: Établissement pour étudiant) -->
+                <Label fx:id="lblSpecific3" 
+                       text="Établissement *" 
+                       style="-fx-font-weight: bold; -fx-font-size: 13px;" 
+                       GridPane.columnIndex="0" 
+                       GridPane.rowIndex="8"/>
+                <TextField fx:id="txtSpecific3" 
+                           promptText="Ex: HEC Carthage"
+                           prefWidth="280"
+                           prefHeight="42"
+                           GridPane.columnIndex="1" 
+                           GridPane.rowIndex="8"/>
+                
+            </GridPane>
+            
+            <!-- ═══════════════════════════════════════════════════
+                 MESSAGE D'ERREUR
+                 Affiché uniquement si validation échoue
+                 ═══════════════════════════════════════════════════ -->
+            <Label fx:id="lblError" 
+                   text="" 
+                   styleClass="label-danger"
+                   wrapText="true"
+                   maxWidth="580"
+                   visible="false"
+                   managed="false"/>
+            
+            <!-- ═══════════════════════════════════════════════════
+                 ACTIONS
+                 Bouton d'inscription et liens
+                 ═══════════════════════════════════════════════════ -->
+            
+            <!-- Bouton principal d'inscription -->
+            <Button fx:id="btnRegister" 
+                    text="CRÉER MON COMPTE" 
+                    styleClass="btn-success"
+                    onAction="#handleRegister"
+                    minWidth="450"
+                    prefHeight="50"
+                    style="-fx-font-size: 15px; -fx-font-weight: bold;">
+                <VBox.margin>
+                    <Insets top="10"/>
+                </VBox.margin>
+            </Button>
+            
+            <!-- Séparateur -->
+            <Region prefHeight="8"/>
+            
+            <!-- Lien vers connexion -->
+            <Label fx:id="lblLoginLink" 
+                   text="Vous avez déjà un compte ? Connectez-vous ici" 
+                   style="-fx-text-fill: #3498DB; -fx-cursor: hand; -fx-underline: true; -fx-font-size: 13px;"
+                   onMouseClicked="#handleGoToLogin"/>
+            
+            <!-- Espaceur -->
+            <Region prefHeight="5"/>
+            
+            <!-- Bouton retour -->
+            <Button fx:id="btnBack" 
+                    text="←  Retour" 
+                    styleClass="btn-back"
+                    onAction="#handleBack"
+                    style="-fx-font-size: 13px;"/>
+            
+            <!-- Marge en bas pour le scroll -->
+            <VBox.margin>
+                <Insets bottom="20"/>
+            </VBox.margin>
+            
+        </VBox>
+    </ScrollPane>
+    
+</VBox>

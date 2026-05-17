@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ HECRECRUIT - VUE D'ACCUEIL (WELCOME VIEW)
+ Premiere page de l'application avec options de connexion
+ et d'inscription
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox xmlns="http://javafx.com/javafx/17" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controllers.WelcomeController"
+      alignment="CENTER" 
+      spacing="40" 
+      styleClass="root-pane"
+      prefWidth="700" 
+      prefHeight="600">
+    
+    <!-- Container principal avec effet de carte moderne -->
+    <VBox alignment="CENTER" spacing="35" styleClass="welcome-card" maxWidth="550">
+        
+        <!--SECTION EN-TÊTE
+            Logo et titre de l'application -->
+        <VBox alignment="CENTER" spacing="15">
+            <!-- Logo IHEC -->
+            <ImageView fitWidth="120" fitHeight="120" preserveRatio="true">
+                <image>
+                    <Image url="@/images/ihec-logo.png"/>
+                </image>
+            </ImageView>
+            
+            <!-- Titre principal de l'application -->
+            <Label text="HecRecruit" styleClass="title-large" style="-fx-text-fill: white;"/>
+            
+            <!-- Sous-titre descriptif -->
+            <Label text="Plateforme de Recrutement Professionnel" 
+                   styleClass="subtitle" 
+                   style="-fx-text-fill: white; -fx-font-size: 17px; -fx-opacity: 0.95;" 
+                   wrapText="true" 
+                   alignment="CENTER"/>
+        </VBox>
+        
+        <!-- Espaceur visuel -->
+        <Region prefHeight="25"/>
+        
+        <!-- SECTION ACTIONS PRINCIPALES
+             Boutons de connexion et d'inscription-->
+        <VBox spacing="18" alignment="CENTER">
+            
+            <!-- Bouton de connexion -->
+            <Button fx:id="btnLogin" 
+                    text="🔑  SE CONNECTER" 
+                    styleClass="btn-large, btn-primary"
+                    onAction="#handleLogin"
+                    minWidth="380"
+                    prefHeight="55">
+                <VBox.margin>
+                    <Insets bottom="5"/>
+                </VBox.margin>
+            </Button>
+            
+            <!-- Bouton d'inscription -->
+            <Button fx:id="btnRegister" 
+                    text="✨  S'INSCRIRE" 
+                    styleClass="btn-large, btn-success"
+                    onAction="#handleRegister"
+                    minWidth="380"
+                    prefHeight="55"/>
+            
+        </VBox>
+        
+        <!-- Espaceur flexible -->
+        <Region prefHeight="15"/>
+        
+        <!-- FOOTER
+             Message de bienvenue-->
+        <VBox alignment="CENTER" spacing="5">
+            <Label text="Bienvenue sur HecRecruit" 
+                   style="-fx-text-fill: white; -fx-font-size: 13px; -fx-opacity: 0.85; -fx-font-weight: bold;" 
+                   wrapText="true" 
+                   alignment="CENTER"/>
+            <Label text="Votre avenir commence ici" 
+                   style="-fx-text-fill: white; -fx-font-size: 12px; -fx-opacity: 0.75;" 
+                   wrapText="true" 
+                   alignment="CENTER"/>
+        </VBox>
+        
+    </VBox>
+    
+</VBox>
