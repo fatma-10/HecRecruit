@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard entreprise - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/entreprise/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Company workspace</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/entreprise/offres" class="btn btn-secondary">Offers</a>
+            <a href="/entreprise/wishlist" class="btn btn-secondary">Wishlist</a>
+            <a href="/entreprise/profil" class="btn btn-secondary">Profile</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+    </header>
+
+    <section class="page-title">
+        <div>
+            <h1>Welcome, <span th:text="${entreprise.nom}"></span></h1>
+            <p>Manage IHEC opportunities and review candidates through compatibility indicators.</p>
+        </div>
+        <a href="/entreprise/offres/creer" class="btn btn-primary">Publish offer</a>
+    </section>
+
+    <section class="stat-row">
+        <article class="card stat-card">
+            <strong th:text="${nbOffres}"></strong>
+            <span>Published offers</span>
+        </article>
+        <article class="card stat-card">
+            <strong th:text="${nbCandidatures}"></strong>
+            <span>Applications received</span>
+        </article>
+        <article class="card stat-card">
+            <strong th:text="${nbWishlist}"></strong>
+            <span>Saved candidates</span>
+        </article>
+    </section>
+
+    <section class="section">
+        <div class="grid two">
+            <article class="card">
+                <h3>Review candidates by offer</h3>
+                <p>Open each offer to see applicants with their compatibility score, skills preview, and profile actions.</p>
+                <a href="/entreprise/offres" class="btn btn-primary">Manage offers</a>
+            </article>
+            <article class="card">
+                <h3>Improve matching quality</h3>
+                <p>Use precise descriptions with technologies, missions, tools, and business skills expected from candidates.</p>
+                <a href="/entreprise/offres/creer" class="btn btn-secondary">Create a clear offer</a>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -2,18 +2,91 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HecRecruit</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .btn { display: inline-block; margin: 20px; padding: 10px 20px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px; }
-    </style>
+    <link rel="stylesheet" href="/css/hec-ui.css">
 </head>
 <body>
-<h1>Bienvenue sur HecRecruit</h1>
-<p>Plateforme de recrutement dédiée à l'IHEC Carthage</p>
-<a href="/login?type=candidat" class="btn">Connexion Candidat</a>
-<a href="/login?type=entreprise" class="btn">Connexion Entreprise</a>
-<a href="/register?type=candidat" class="btn">Inscription Candidat</a>
-<a href="/register?type=entreprise" class="btn">Inscription Entreprise</a>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/" class="brand">
+            <strong>HecRecruit</strong>
+            <span>IHEC Carthage career platform</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/login?type=candidat" class="btn btn-secondary">Student login</a>
+            <a href="/login?type=entreprise" class="btn btn-secondary">Company login</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div>
+            <h1>Internships, alternance, and PFE opportunities for IHEC students.</h1>
+            <p>
+                A focused recruitment space for IHEC students and partner companies, with profile skills,
+                applications, and simple compatibility matching between candidates and offers.
+            </p>
+            <div class="actions">
+                <a href="/register?type=candidat" class="btn btn-primary">Create student profile</a>
+                <a href="/register?type=entreprise" class="btn btn-secondary">Register company</a>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Quick access</h3>
+            <p>Students can manage their skills and applications. Companies can publish offers and review matching candidates.</p>
+            <div class="actions">
+                <a href="/login?type=candidat" class="btn btn-primary">Find offers</a>
+                <a href="/login?type=entreprise" class="btn btn-secondary">Publish an offer</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <div>
+                <h2>Featured opportunity tracks</h2>
+                <p>Common paths for IHEC students and recent graduates.</p>
+            </div>
+        </div>
+        <div class="grid">
+            <article class="card offer-card">
+                <span class="badge badge-success">Stage</span>
+                <h3>Business systems and web development</h3>
+                <p class="description-preview">Spring Boot, SQL, HTML, CSS, REST APIs, and internal tools for partner companies.</p>
+            </article>
+            <article class="card offer-card">
+                <span class="badge badge-warning">Alternance</span>
+                <h3>Data analysis and business intelligence</h3>
+                <p class="description-preview">Python, SQL, Excel, Power BI, dashboards, and decision support for operational teams.</p>
+            </article>
+            <article class="card offer-card">
+                <span class="badge badge-score">PFE</span>
+                <h3>Recruitment matching and digital transformation</h3>
+                <p class="description-preview">Scoring, candidate matching, CRM, marketing automation, and process optimization projects.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <div>
+                <h2>How matching works</h2>
+                <p>Students keep skills updated; companies write clear descriptions; HecRecruit highlights compatibility.</p>
+            </div>
+        </div>
+        <div class="grid two">
+            <article class="card">
+                <h3>For IHEC students</h3>
+                <p>Complete your skills, browse offers, compare matching indicators, and apply from one clean dashboard.</p>
+                <a href="/register?type=candidat" class="btn btn-primary">Start as student</a>
+            </article>
+            <article class="card">
+                <h3>For partner companies</h3>
+                <p>Publish opportunities and review candidates with visible compatibility scores based on skills and descriptions.</p>
+                <a href="/register?type=entreprise" class="btn btn-primary">Start as company</a>
+            </article>
+        </div>
+    </section>
+</main>
 </body>
 </html>

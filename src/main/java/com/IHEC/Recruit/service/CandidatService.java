@@ -84,6 +84,9 @@ public class CandidatService {
         if (nouvellesInfos.containsKey("telephone")) {
             candidat.setTelephone(nouvellesInfos.get("telephone"));
         }
+        if (nouvellesInfos.containsKey("skills")) {
+            candidat.setSkills(nouvellesInfos.get("skills"));
+        }
 
         // Champs spécifiques aux étudiants
         if (candidat instanceof Etudiant) {

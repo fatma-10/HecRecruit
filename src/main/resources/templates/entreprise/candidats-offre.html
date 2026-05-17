@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Candidats - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/entreprise/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Candidate review</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/entreprise/offres" class="btn btn-secondary">Offers</a>
+            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
+        </nav>
+    </header>
+
+    <section class="page-title">
+        <div>
+            <h1>Candidates for <span th:text="${offre.titre}"></span></h1>
+            <p>Review applicants and prioritize profiles with stronger compatibility.</p>
+        </div>
+    </section>
+
+    <section class="grid" th:if="${candidats != null && !candidats.isEmpty()}">
+        <article class="card offer-card" th:each="candidat : ${candidats}">
+            <div class="candidate-meta">
+                <span class="badge badge-score">
+                    <span th:text="${scoresCompatibilite[candidat.id]}"></span>% match
+                </span>
+                <span th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Student' : 'Alumni'"></span>
+            </div>
+            <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
+            <p class="description-preview" th:text="${candidat.skills}"></p>
+            <div class="candidate-meta">
+                <span th:text="${candidat.email}"></span>
+                <span th:text="${candidat.telephone}"></span>
+            </div>
+            <div class="actions">
+                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/wishlist/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-primary">Save candidate</button>
+                </form>
+                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/supprimer/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-danger">Remove</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <div class="empty-state" th:if="${candidats == null || candidats.isEmpty()}">
+        No candidates have applied to this offer yet.
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Offres - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/candidat/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Student workspace</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/candidat/dashboard" class="btn btn-secondary">Dashboard</a>
+            <a href="/candidat/profil" class="btn btn-secondary">Profile</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+    </header>
+
+    <section class="page-title">
+        <div>
+            <h1>Available offers</h1>
+            <p>Compare opportunities using your skills-based compatibility score.</p>
+        </div>
+    </section>
+
+    <form method="get" class="form-panel">
+        <div class="form-grid">
+            <div class="field">
+                <label for="critere">Search by</label>
+                <select id="critere" name="critere">
+                    <option value="titre">Title</option>
+                    <option value="type">Type</option>
+                    <option value="domaine">Internship domain</option>
+                    <option value="rythme">Alternance rhythm</option>
+                    <option value="technologies">PFE technologies</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="valeur">Keyword</label>
+                <input id="valeur" type="text" name="valeur" th:value="${valeur}" placeholder="Spring Boot, SQL, marketing...">
+            </div>
+        </div>
+        <div class="actions" style="margin-top: 16px;">
+            <button type="submit" class="btn btn-primary">Filter offers</button>
+            <a href="/candidat/offres" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <section class="section">
+        <div class="grid" th:if="${offres != null && !offres.isEmpty()}">
+            <article class="card offer-card" th:each="offre : ${offres}">
+                <div class="offer-meta">
+                    <span class="badge badge-score">
+                        <span th:text="${scoresCompatibilite[offre.id]}"></span>% match
+                    </span>
+                    <span th:text="${offre.typeOffre}"></span>
+                </div>
+                <h3 th:text="${offre.titre}"></h3>
+                <p class="description-preview" th:text="${offre.description}"></p>
+                <div class="offer-meta">
+                    <strong th:text="${offre.entreprise.nom}"></strong>
+                    <span th:if="${offre.dateExpiration != null}">
+                        Deadline: <span th:text="${offre.dateExpiration}"></span>
+                    </span>
+                </div>
+                <div class="actions">
+                    <form method="post" th:action="'/candidat/offres/postuler/' + ${offre.id}">
+                        <button type="submit" class="btn btn-primary">Apply</button>
+                    </form>
+                    <a href="/candidat/offres" class="btn btn-secondary">View details</a>
+                </div>
+            </article>
+        </div>
+        <div class="empty-state" th:if="${offres == null || offres.isEmpty()}">
+            No offers match the current filter.
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mon profil - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/candidat/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Student profile</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/candidat/dashboard" class="btn btn-secondary">Dashboard</a>
+            <a href="/candidat/offres" class="btn btn-secondary">Offers</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+    </header>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <section class="page-title">
+        <div>
+            <h1 th:text="${candidat.prenom} + ' ' + ${candidat.nom}">Student name</h1>
+            <p>Keep your skills clear and current to improve offer matching.</p>
+        </div>
+        <span class="badge badge-score" th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">IHEC student</span>
+        <span class="badge badge-warning" th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">Alumni</span>
+    </section>
+
+    <section class="grid two">
+        <article class="card">
+            <h3>Account information</h3>
+            <p><strong>CIN:</strong> <span th:text="${candidat.id}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${candidat.email}"></span></p>
+            <p><strong>Phone:</strong> <span th:text="${candidat.telephone}"></span></p>
+        </article>
+        <article class="card">
+            <h3>Skills used for matching</h3>
+            <p th:text="${candidat.skills}"></p>
+        </article>
+    </section>
+
+    <section class="section">
+        <form method="post" action="/candidat/profil/modifier" class="form-panel">
+            <div class="section-header">
+                <div>
+                    <h2>Edit profile</h2>
+                    <p>Use short, searchable keywords separated by spaces or commas.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="telephone">Phone</label>
+                    <input type="tel" id="telephone" name="telephone" th:value="${candidat.telephone}" required>
+                </div>
+
+                <div class="field full">
+                    <label for="skills">Skills</label>
+                    <textarea id="skills" name="skills" required
+                              placeholder="Java, Spring Boot, SQL, Excel, Power BI..."
+                              th:text="${candidat.skills}"></textarea>
+                    <span class="hint">These keywords are compared with offer descriptions to calculate your compatibility score.</span>
+                </div>
+
+                <th:block th:if="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)}">
+                    <div class="field">
+                        <label for="niveau">Level</label>
+                        <input type="text" id="niveau" name="niveau" th:value="${candidat.niveau}" required>
+                    </div>
+                    <div class="field">
+                        <label for="filiere">Field</label>
+                        <input type="text" id="filiere" name="filiere" th:value="${candidat.filiere}" required>
+                    </div>
+                    <div class="field full">
+                        <label for="etablissement">Institution</label>
+                        <input type="text" id="etablissement" name="etablissement" th:value="${candidat.etablissement}" required>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${candidat instanceof T(com.IHEC.Recruit.model.Alumni)}">
+                    <div class="field">
+                        <label for="posteActuel">Current position</label>
+                        <input type="text" id="posteActuel" name="posteActuel" th:value="${candidat.posteActuel}">
+                    </div>
+                    <div class="field">
+                        <label for="entrepriseActuelle">Current company</label>
+                        <input type="text" id="entrepriseActuelle" name="entrepriseActuelle" th:value="${candidat.entrepriseActuelle}">
+                    </div>
+                </th:block>
+            </div>
+
+            <div class="actions" style="margin-top: 18px;">
+                <button type="submit" class="btn btn-primary">Save profile</button>
+                <a href="/candidat/dashboard" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

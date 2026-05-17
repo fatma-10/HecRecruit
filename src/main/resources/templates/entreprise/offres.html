@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mes offres - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/entreprise/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Company offers</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
+            <a href="/entreprise/wishlist" class="btn btn-secondary">Wishlist</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+    </header>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <section class="page-title">
+        <div>
+            <h1>My offers</h1>
+            <p>Publish opportunities and monitor candidate applications by compatibility.</p>
+        </div>
+        <a href="/entreprise/offres/creer" class="btn btn-primary">Create offer</a>
+    </section>
+
+    <section class="grid" th:if="${offres != null && !offres.isEmpty()}">
+        <article class="card offer-card" th:each="offre : ${offres}">
+            <div class="offer-meta">
+                <span class="badge badge-score" th:text="${offre.typeOffre}"></span>
+                <span th:if="${offre.dateExpiration != null}">Deadline <span th:text="${offre.dateExpiration}"></span></span>
+            </div>
+            <h3 th:text="${offre.titre}"></h3>
+            <p class="description-preview" th:text="${offre.description}"></p>
+            <div class="actions">
+                <a th:href="'/entreprise/offres/' + ${offre.id} + '/candidats'" class="btn btn-primary">View candidates</a>
+                <form method="post" th:action="'/entreprise/offres/supprimer/' + ${offre.id}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <div class="empty-state" th:if="${offres == null || offres.isEmpty()}">
+        No offers published yet. Create your first opportunity for IHEC students.
+    </div>
+</main>
+</body>
+</html>
