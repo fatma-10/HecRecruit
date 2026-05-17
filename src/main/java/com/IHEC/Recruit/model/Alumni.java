@@ -21,13 +21,25 @@ public class Alumni extends Candidat {
     public Alumni(int id, String nom, String prenom, String email, String telephone,
                   String mdp, int anneeDiplome, String posteActuel, String entrepriseActuelle) {
         super(id, nom, prenom, email, telephone, mdp);
-
-        if (anneeDiplome <= 0)
-            throw new IllegalArgumentException("L'année de diplôme est invalide");
-
+        validerChampsAlumni(anneeDiplome);
         this.anneeDiplome = anneeDiplome;
         this.posteActuel = (posteActuel == null) ? "" : posteActuel.trim();
         this.entrepriseActuelle = (entrepriseActuelle == null) ? "" : entrepriseActuelle.trim();
+    }
+
+    public Alumni(int id, String nom, String prenom, String email, String telephone,
+                  String mdp, String skills, int anneeDiplome, String posteActuel,
+                  String entrepriseActuelle) {
+        super(id, nom, prenom, email, telephone, mdp, skills);
+        validerChampsAlumni(anneeDiplome);
+        this.anneeDiplome = anneeDiplome;
+        this.posteActuel = (posteActuel == null) ? "" : posteActuel.trim();
+        this.entrepriseActuelle = (entrepriseActuelle == null) ? "" : entrepriseActuelle.trim();
+    }
+
+    private void validerChampsAlumni(int anneeDiplome) {
+        if (anneeDiplome <= 0)
+            throw new IllegalArgumentException("L'annee de diplome est invalide");
     }
 
     // ---- Getters & Setters ----
@@ -43,7 +55,7 @@ public class Alumni extends Candidat {
         this.entrepriseActuelle = entrepriseActuelle;
     }
 
-    // ---- Override getInfosPrincipales (héritage + polymorphisme) ----
+    // ---- Override getInfosPrincipales (heritage + polymorphisme) ----
 
     @Override
     public String[] getInfosPrincipales() {
@@ -53,9 +65,10 @@ public class Alumni extends Candidat {
             getPrenom(),
             getEmail(),
             getTelephone(),
+            getSkills(),
             String.valueOf(anneeDiplome),
-            (posteActuel == null || posteActuel.isEmpty()) ? "Non spécifié" : posteActuel,
-            (entrepriseActuelle == null || entrepriseActuelle.isEmpty()) ? "Non spécifiée" : entrepriseActuelle
+            (posteActuel == null || posteActuel.isEmpty()) ? "Non specifie" : posteActuel,
+            (entrepriseActuelle == null || entrepriseActuelle.isEmpty()) ? "Non specifiee" : entrepriseActuelle
         };
     }
 }

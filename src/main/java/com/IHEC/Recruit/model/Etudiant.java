@@ -21,17 +21,28 @@ public class Etudiant extends Candidat {
     public Etudiant(int id, String nom, String prenom, String email, String telephone,
                     String mdp, String niveau, String filiere, String etablissement) {
         super(id, nom, prenom, email, telephone, mdp);
-
-        if (niveau == null || niveau.trim().isEmpty())
-            throw new IllegalArgumentException("Le niveau est obligatoire");
-        if (filiere == null || filiere.trim().isEmpty())
-            throw new IllegalArgumentException("La filière est obligatoire");
-        if (etablissement == null || etablissement.trim().isEmpty())
-            throw new IllegalArgumentException("L'établissement est obligatoire");
-
+        validerChampsEtudiant(niveau, filiere, etablissement);
         this.niveau = niveau.trim();
         this.filiere = filiere.trim();
         this.etablissement = etablissement.trim();
+    }
+
+    public Etudiant(int id, String nom, String prenom, String email, String telephone,
+                    String mdp, String skills, String niveau, String filiere, String etablissement) {
+        super(id, nom, prenom, email, telephone, mdp, skills);
+        validerChampsEtudiant(niveau, filiere, etablissement);
+        this.niveau = niveau.trim();
+        this.filiere = filiere.trim();
+        this.etablissement = etablissement.trim();
+    }
+
+    private void validerChampsEtudiant(String niveau, String filiere, String etablissement) {
+        if (niveau == null || niveau.trim().isEmpty())
+            throw new IllegalArgumentException("Le niveau est obligatoire");
+        if (filiere == null || filiere.trim().isEmpty())
+            throw new IllegalArgumentException("La filiere est obligatoire");
+        if (etablissement == null || etablissement.trim().isEmpty())
+            throw new IllegalArgumentException("L'etablissement est obligatoire");
     }
 
     // ---- Getters & Setters ----
@@ -45,7 +56,7 @@ public class Etudiant extends Candidat {
     public String getEtablissement() { return etablissement; }
     public void setEtablissement(String etablissement) { this.etablissement = etablissement; }
 
-    // ---- Override getInfosPrincipales (héritage + polymorphisme) ----
+    // ---- Override getInfosPrincipales (heritage + polymorphisme) ----
 
     @Override
     public String[] getInfosPrincipales() {
@@ -57,7 +68,8 @@ public class Etudiant extends Candidat {
             filiere,
             etablissement,
             getEmail(),
-            getTelephone()
+            getTelephone(),
+            getSkills()
         };
     }
 }

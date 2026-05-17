@@ -6,12 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Repository
 public interface OffreRepository extends JpaRepository<Offre, Long> {
 
     // Toutes les offres d'une entreprise
     List<Offre> findByEntreprise(Entreprise entreprise);
+
+    long countByEntreprise(Entreprise entreprise);
 
     // Toutes les offres d'une entreprise par ID
     List<Offre> findByEntrepriseId(Long entrepriseId);
@@ -23,5 +26,9 @@ public interface OffreRepository extends JpaRepository<Offre, Long> {
     List<Offre> findByTitreContainingIgnoreCase(String titre);
 
     // Offres dont la date d'expiration est nulle OU après aujourd'hui
-    List<Offre> findByDateExpirationIsNullOrDateExpirationAfter(java.time.LocalDate date);
+    List<Offre> findByDateExpirationIsNullOrDateExpirationAfter(LocalDate date);
+
+    long countByDateExpirationIsNullOrDateExpirationAfter(LocalDate date);
+
+    List<Offre> findByDateExpirationIsNullOrDateExpirationAfterOrderByDatePublicationDesc(LocalDate date);
 }

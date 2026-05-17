@@ -3,11 +3,11 @@ package com.IHEC.Recruit.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "stage")
-public class Stage extends OffreSpecialisee {
+@DiscriminatorValue("stage")
+public class Stage extends Offre {
 
-    @Column(name = "duree_en_mois", nullable = false)
-    private int dureeEnMois;
+    @Column(name = "duree_en_mois")
+    private Integer dureeEnMois;
 
     @Column(name = "domaine")
     private String domaine;
@@ -25,7 +25,7 @@ public class Stage extends OffreSpecialisee {
 
     // ---- Getters & Setters ----
 
-    public int getDureeEnMois() { return dureeEnMois; }
+    public int getDureeEnMois() { return dureeEnMois != null ? dureeEnMois : 0; }
     public void setDureeEnMois(int dureeEnMois) { this.dureeEnMois = dureeEnMois; }
 
     public String getDomaine() { return domaine; }

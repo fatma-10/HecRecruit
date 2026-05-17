@@ -33,15 +33,18 @@ public class CandidatController {
     private final CandidatureService candidatureService;
     private final OffreService offreService;
     private final RecommendationService recommendationService;
+    private final ScoringService scoringService;
 
     public CandidatController(CandidatService candidatService,
                                CandidatureService candidatureService,
                                OffreService offreService,
-                               RecommendationService recommendationService) {
+                               RecommendationService recommendationService,
+                               ScoringService scoringService) {
         this.candidatService = candidatService;
         this.candidatureService = candidatureService;
         this.offreService = offreService;
         this.recommendationService = recommendationService;
+        this.scoringService = scoringService;
     }
 
     // ----------------------------------------------------------------
@@ -100,9 +103,13 @@ public class CandidatController {
         if (candidat == null) return "redirect:/login?type=candidat";
 
         model.addAttribute("candidat", candidat);
-        model.addAttribute("nbCandidatures", candidat.getCandidaturesEnCours().size());
+        model.addAttribute("nbCandidatures",
+                candidatureService.getNombreCandidaturesCandidat(candidat.getId()));
         model.addAttribute("nbOffresDisponibles", offreService.getOffresDisponiblesCount());
-        model.addAttribute("dernieresOffres", offreService.getDernieresOffres(5));
+        List<Offre> dernieresOffres = offreService.getDernieresOffres(5);
+        model.addAttribute("dernieresOffres", dernieresOffres);
+        model.addAttribute("scoresCompatibilite",
+                scoringService.calculerScoresPourOffres(candidat, dernieresOffres));
 
         if (candidat instanceof Etudiant etudiant) {
             model.addAttribute("recommandations",
@@ -147,6 +154,8 @@ public class CandidatController {
 
         model.addAttribute("candidat", candidat);
         model.addAttribute("offres", offres);
+        model.addAttribute("scoresCompatibilite",
+                scoringService.calculerScoresPourOffres(candidat, offres));
         return "candidat/offres";
     }
 
@@ -191,7 +200,8 @@ public class CandidatController {
         if (candidat == null) return "redirect:/login?type=candidat";
 
         model.addAttribute("candidat", candidat);
-        model.addAttribute("candidatures", candidat.getCandidaturesEnCours());
+        model.addAttribute("candidatures",
+                candidatureService.getCandidaturesCandidat(candidat.getId()));
         return "candidat/candidatures";
     }
 

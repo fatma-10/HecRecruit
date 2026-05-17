@@ -46,13 +46,14 @@ public class OffreService {
     public Offre creerOffre(String titre, String description, String type,
                              Entreprise entreprise, Map<String, String> infos) {
 
-        OffreSpecialisee nouvelleOffre;
+        Offre nouvelleOffre;
+        String typeNormalise = normaliserTypeOffre(type);
 
-        switch (type.toLowerCase()) {
+        switch (typeNormalise) {
             case "stage":
                 nouvelleOffre = new Stage(
                     titre, description, entreprise,
-                    Integer.parseInt(infos.get("duree")),
+                    parseDuree(infos.get("duree")),
                     infos.get("domaine")
                 );
                 break;
@@ -61,11 +62,11 @@ public class OffreService {
                 nouvelleOffre = new Alternance(
                     titre, description, entreprise,
                     infos.get("rythme"),
-                    Integer.parseInt(infos.get("duree"))
+                    parseDuree(infos.get("duree"))
                 );
                 break;
 
-            case "projet fin d'etudes":
+            case "projet_fin_etudes":
                 nouvelleOffre = new ProjetFinEtudes(
                     titre, description, entreprise,
                     infos.get("sujet"),
@@ -134,6 +135,10 @@ public class OffreService {
         return offreRepository.findByEntreprise(entreprise);
     }
 
+    public long getNombreOffresEntreprise(Entreprise entreprise) {
+        return offreRepository.countByEntreprise(entreprise);
+    }
+
     /**
      * Retourne toutes les offres actives (date d'expiration nulle ou dans le futur).
      *
@@ -152,9 +157,7 @@ public class OffreService {
      * @return le nombre d'offres dont la date d'expiration est nulle ou future
      */
     public long getOffresDisponiblesCount() {
-        return offreRepository
-                .findByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now())
-                .size();
+        return offreRepository.countByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now());
     }
 
     /**
@@ -169,12 +172,12 @@ public class OffreService {
      * @return la liste des {@code n} dernières offres disponibles
      */
     public List<Offre> getDernieresOffres(int n) {
+        if (n <= 0) {
+            return List.of();
+        }
         List<Offre> offres = offreRepository
-                .findByDateExpirationIsNullOrDateExpirationAfter(LocalDate.now());
-        // Les offres sont déjà triées par datePublication croissante côté DB ;
-        // on prend les n dernières éléments pour avoir les plus récentes.
-        int debut = Math.max(0, offres.size() - n);
-        return offres.subList(debut, offres.size());
+                .findByDateExpirationIsNullOrDateExpirationAfterOrderByDatePublicationDesc(LocalDate.now());
+        return offres.subList(0, Math.min(n, offres.size()));
     }
 
     /**
@@ -192,7 +195,7 @@ public class OffreService {
 
         return switch (critere.toLowerCase()) {
             case "titre"        -> offreRepository.findByTitreContainingIgnoreCase(valeur);
-            case "type"         -> offreRepository.findByTypeOffre(valeur);
+            case "type"         -> offreRepository.findByTypeOffre(normaliserTypeOffre(valeur));
             case "domaine"      -> new java.util.ArrayList<>(
                                         stageRepository.findByDomaineContainingIgnoreCase(valeur));
             case "rythme"       -> new java.util.ArrayList<>(
@@ -220,7 +223,7 @@ public class OffreService {
      * @return la liste des offres de ce type
      */
     public List<Offre> rechercherParType(String type) {
-        return offreRepository.findByTypeOffre(type);
+        return offreRepository.findByTypeOffre(normaliserTypeOffre(type));
     }
 
     /**
@@ -295,5 +298,42 @@ public class OffreService {
             "alternances", alternanceRepository.count(),
             "pfe",         projetRepository.count()
         );
+    }
+
+    private String normaliserTypeOffre(String type) {
+        if (type == null || type.isBlank()) {
+            throw new IllegalArgumentException("Le type d'offre est obligatoire");
+        }
+
+        String normalized = type.trim().toLowerCase()
+                .replace("é", "e")
+                .replace("è", "e")
+                .replace("ê", "e")
+                .replace("'", "")
+                .replace("-", " ")
+                .replace("_", " ");
+
+        return switch (normalized) {
+            case "stage" -> "stage";
+            case "alternance" -> "alternance";
+            case "projet fin detudes", "projet fin d etudes", "pfe" -> "projet_fin_etudes";
+            default -> throw new IllegalArgumentException("Type d'offre non reconnu : " + type);
+        };
+    }
+
+    private int parseDuree(String duree) {
+        if (duree == null || duree.isBlank()) {
+            throw new IllegalArgumentException("La durée est obligatoire");
+        }
+
+        try {
+            int valeur = Integer.parseInt(duree.trim());
+            if (valeur <= 0) {
+                throw new IllegalArgumentException("La durée doit être supérieure à 0");
+            }
+            return valeur;
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("La durée doit être un nombre valide");
+        }
     }
 }

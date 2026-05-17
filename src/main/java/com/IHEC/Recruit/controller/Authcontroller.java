@@ -105,6 +105,7 @@ public class Authcontroller {
                                    @RequestParam String password,
                                    @RequestParam String candidatType,
                                    @RequestParam String cin,
+                                   @RequestParam String skills,
                                    @RequestParam(required = false) String niveau,
                                    @RequestParam(required = false) String filiere,
                                    @RequestParam(required = false) String etablissement,
@@ -116,6 +117,7 @@ public class Authcontroller {
         try {
             Map<String, String> infos = new HashMap<>();
             infos.put("id", cin);
+            infos.put("skills", skills);
 
             if ("etudiant".equals(candidatType)) {
                 infos.put("niveau", niveau);

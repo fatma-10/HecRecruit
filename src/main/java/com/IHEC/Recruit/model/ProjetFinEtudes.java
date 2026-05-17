@@ -3,8 +3,8 @@ package com.IHEC.Recruit.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "projet_fin_etudes")
-public class ProjetFinEtudes extends OffreSpecialisee {
+@DiscriminatorValue("projet_fin_etudes")
+public class ProjetFinEtudes extends Offre {
 
     @Column(name = "sujet", columnDefinition = "TEXT")
     private String sujet;

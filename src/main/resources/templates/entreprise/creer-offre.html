@@ -243,8 +243,8 @@
                                    placeholder="Ex : Développement web" />
                         </div>
                         <div class="form-group">
-                            <label for="duree">Durée (mois) <span class="req">*</span></label>
-                            <input type="number" id="duree" name="duree"
+                            <label for="dureeStage">Durée (mois) <span class="req">*</span></label>
+                            <input type="number" id="dureeStage" name="dureeStage"
                                    min="1" placeholder="Ex : 3" />
                         </div>
                     </div>
@@ -260,14 +260,8 @@
                                    placeholder="Ex : 3 jours entreprise / 2 jours école" />
                         </div>
                         <div class="form-group">
-                            <label for="duree-alt">Durée (mois) <span class="req">*</span></label>
-                            <!--
-                                Le controller lit le paramètre "duree" pour les deux types.
-                                On utilise le même name="duree" mais un id différent pour éviter
-                                le conflit HTML ; seul le panel visible sera soumis (pas de
-                                required dynamique pour simplifier).
-                            -->
-                            <input type="number" id="duree-alt" name="duree"
+                            <label for="dureeAlternance">Durée (mois) <span class="req">*</span></label>
+                            <input type="number" id="dureeAlternance" name="dureeAlternance"
                                    min="1" placeholder="Ex : 12" />
                         </div>
                     </div>

@@ -3,14 +3,14 @@ package com.IHEC.Recruit.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "alternance")
-public class Alternance extends OffreSpecialisee {
+@DiscriminatorValue("alternance")
+public class Alternance extends Offre {
 
     @Column(name = "rythme")
     private String rythme;
 
-    @Column(name = "duree_en_mois", nullable = false)
-    private int dureeEnMois;
+    @Column(name = "duree_en_mois")
+    private Integer dureeEnMois;
 
     // ---- No-arg constructor required by JPA ----
     public Alternance() {}
@@ -28,7 +28,7 @@ public class Alternance extends OffreSpecialisee {
     public String getRythme() { return rythme; }
     public void setRythme(String rythme) { this.rythme = rythme; }
 
-    public int getDureeEnMois() { return dureeEnMois; }
+    public int getDureeEnMois() { return dureeEnMois != null ? dureeEnMois : 0; }
     public void setDureeEnMois(int dureeEnMois) { this.dureeEnMois = dureeEnMois; }
 
     @Override

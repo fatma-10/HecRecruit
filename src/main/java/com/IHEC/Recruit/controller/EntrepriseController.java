@@ -33,13 +33,16 @@ public class EntrepriseController {
     private final EntrepriseService entrepriseService;
     private final OffreService offreService;
     private final CandidatureService candidatureService;
+    private final ScoringService scoringService;
 
     public EntrepriseController(EntrepriseService entrepriseService,
                                 OffreService offreService,
-                                CandidatureService candidatureService) {
+                                CandidatureService candidatureService,
+                                ScoringService scoringService) {
         this.entrepriseService = entrepriseService;
         this.offreService = offreService;
         this.candidatureService = candidatureService;
+        this.scoringService = scoringService;
     }
 
     // ----------------------------------------------------------------
@@ -96,11 +99,11 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         model.addAttribute("entreprise", entreprise);
-        model.addAttribute("nbOffres", entreprise.getOffresPubliees().size());
+        model.addAttribute("nbOffres", offreService.getNombreOffresEntreprise(entreprise));
         // Calcul délégué au service — plus de stream dans le controller
         model.addAttribute("nbCandidatures",
                 candidatureService.getTotalCandidaturesParEntreprise(entreprise.getId()));
-        model.addAttribute("nbWishlist", entreprise.getWishlist().size());
+        model.addAttribute("nbWishlist", candidatureService.getNombreWishlist(entreprise.getId()));
         return "entreprise/dashboard";
     }
 
@@ -121,7 +124,7 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         model.addAttribute("entreprise", entreprise);
-        model.addAttribute("offres", entreprise.getOffresPubliees());
+        model.addAttribute("offres", offreService.getOffresEntreprise(entreprise));
         return "entreprise/offres";
     }
 
@@ -165,7 +168,8 @@ public class EntrepriseController {
                              @RequestParam String description,
                              @RequestParam String type,
                              @RequestParam(required = false) String domaine,
-                             @RequestParam(required = false) String duree,
+                             @RequestParam(required = false) String dureeStage,
+                             @RequestParam(required = false) String dureeAlternance,
                              @RequestParam(required = false) String rythme,
                              @RequestParam(required = false) String sujet,
                              @RequestParam(required = false) String technologies,
@@ -180,11 +184,11 @@ public class EntrepriseController {
             switch (type.toLowerCase()) {
                 case "stage" -> {
                     infos.put("domaine", domaine);
-                    infos.put("duree", duree);
+                    infos.put("duree", dureeStage);
                 }
                 case "alternance" -> {
                     infos.put("rythme", rythme);
-                    infos.put("duree", duree);
+                    infos.put("duree", dureeAlternance);
                 }
                 case "projet fin d'etudes" -> {
                     infos.put("sujet", sujet);
@@ -259,9 +263,12 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         Offre offre = offreService.getOffreById(idOffre);
+        var candidats = candidatureService.getCandidatsOffrePourEntreprise(idOffre, entreprise);
         model.addAttribute("entreprise", entreprise);
         model.addAttribute("offre", offre);
-        model.addAttribute("candidats", offre.getCandidatures());
+        model.addAttribute("candidats", candidats);
+        model.addAttribute("scoresCompatibilite",
+                scoringService.calculerScoresPourCandidats(offre, candidats));
         return "entreprise/candidats-offre";
     }
 
@@ -334,7 +341,7 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         model.addAttribute("entreprise", entreprise);
-        model.addAttribute("wishlist", entreprise.getWishlist());
+        model.addAttribute("wishlist", candidatureService.getWishlist(entreprise.getId()));
         return "entreprise/wishlist";
     }
 

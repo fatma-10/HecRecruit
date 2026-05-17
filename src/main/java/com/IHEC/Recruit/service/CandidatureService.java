@@ -97,6 +97,10 @@ public class CandidatureService {
         return candidat.getCandidaturesEnCours();
     }
 
+    public int getNombreCandidaturesCandidat(int idCandidat) {
+        return getCandidaturesCandidat(idCandidat).size();
+    }
+
     /**
      * Retourne tous les candidats ayant postulé à une offre (vue entreprise).
      *
@@ -107,6 +111,17 @@ public class CandidatureService {
     public List<Candidat> getCandidatsOffre(Long idOffre) {
         Offre offre = offreRepository.findById(idOffre)
             .orElseThrow(() -> new IllegalArgumentException("Offre non trouvée"));
+        return offre.getCandidatures();
+    }
+
+    public List<Candidat> getCandidatsOffrePourEntreprise(Long idOffre, Entreprise entreprise) {
+        Offre offre = offreRepository.findById(idOffre)
+            .orElseThrow(() -> new IllegalArgumentException("Offre non trouvée"));
+
+        if (!offre.getEntreprise().equals(entreprise)) {
+            throw new SecurityException("Accès refusé");
+        }
+
         return offre.getCandidatures();
     }
 
@@ -209,5 +224,9 @@ public class CandidatureService {
         Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
             .orElseThrow(() -> new IllegalArgumentException("Entreprise non trouvée"));
         return entreprise.getWishlist();
+    }
+
+    public int getNombreWishlist(Long idEntreprise) {
+        return getWishlist(idEntreprise).size();
     }
 }

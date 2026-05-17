@@ -7,7 +7,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "offre")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type_offre", discriminatorType = DiscriminatorType.STRING)
 public class Offre {
 
     @Id
@@ -20,7 +21,7 @@ public class Offre {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "type_offre", nullable = false)
+    @Column(name = "type_offre", nullable = false, insertable = false, updatable = false)
     private String typeOffre;
 
     @Column(name = "date_publication")

@@ -163,6 +163,7 @@ public class AuthService {
 
         // Hacher le mot de passe avant persistance
         String mdpHache = passwordEncoder.encode(mdp);
+        String skills = infos.get("skills");
 
         Candidat nouveau;
 
@@ -170,6 +171,7 @@ public class AuthService {
             case "etudiant":
                 nouveau = new Etudiant(
                     id, nom, prenom, email, telephone, mdpHache,
+                    skills,
                     infos.get("niveau"),
                     infos.get("filiere"),
                     infos.get("etablissement")
@@ -179,6 +181,7 @@ public class AuthService {
             case "alumni":
                 nouveau = new Alumni(
                     id, nom, prenom, email, telephone, mdpHache,
+                    skills,
                     Integer.parseInt(infos.get("anneeDiplome")),
                     infos.getOrDefault("posteActuel", ""),
                     infos.getOrDefault("entrepriseActuelle", "")
