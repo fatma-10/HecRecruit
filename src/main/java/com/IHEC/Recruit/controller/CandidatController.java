@@ -78,21 +78,6 @@ public class CandidatController {
     /**
      * Affiche le tableau de bord du candidat connecté.
      *
-     * <p>Correction BUG 1 : {@code getOffresDisponibles()} n'est plus appelée
-     * deux fois. Le comptage est délégué à {@link OffreService#getOffresDisponiblesCount()}
-     * et la sous-liste des dernières offres à {@link OffreService#getDernieresOffres(int)},
-     * supprimant ainsi toute manipulation de {@code subList} dans la couche présentation.</p>
-     *
-     * <p>Injecte dans le modèle :
-     * <ul>
-     *   <li>{@code candidat}           — le candidat connecté</li>
-     *   <li>{@code nbCandidatures}      — nombre de candidatures en cours</li>
-     *   <li>{@code nbOffresDisponibles} — nombre total d'offres actives</li>
-     *   <li>{@code dernieresOffres}     — les 5 offres les plus récentes</li>
-     *   <li>{@code recommandations}     — top 5 recommandations personnalisées</li>
-     * </ul>
-     * </p>
-     *
      * @param session la session HTTP
      * @param model   le modèle Thymeleaf
      * @return la vue "candidat/dashboard" ou une redirection vers le login
@@ -130,7 +115,7 @@ public class CandidatController {
      * Affiche la liste des offres disponibles, avec filtrage optionnel.
      *
      * @param session la session HTTP
-     * @param critere le critère de recherche (titre, type, domaine, rythme, technologies) ; peut être null
+     * @param critere le critère de recherche ; peut être null
      * @param valeur  la valeur recherchée ; peut être null ou vide
      * @param model   le modèle Thymeleaf
      * @return la vue "candidat/offres"
@@ -157,6 +142,37 @@ public class CandidatController {
         model.addAttribute("scoresCompatibilite",
                 scoringService.calculerScoresPourOffres(candidat, offres));
         return "candidat/offres";
+    }
+
+    // ----------------------------------------------------------------
+    //  BUG #3 — Détail d'une offre
+    // ----------------------------------------------------------------
+
+    /**
+     * Affiche le détail d'une offre.
+     *
+     * @param id      l'identifiant de l'offre
+     * @param session la session HTTP
+     * @param model   le modèle Thymeleaf
+     * @return la vue "candidat/offre-detail" ou une redirection vers le login
+     */
+    @GetMapping("/offres/{id}")
+    public String detailOffre(@PathVariable Long id,
+                              HttpSession session,
+                              Model model) {
+        Candidat candidat = resoudreCandidat(session);
+        if (candidat == null) return "redirect:/login?type=candidat";
+
+        try {
+            Offre offre = offreService.getOffreById(id);
+            model.addAttribute("candidat", candidat);
+            model.addAttribute("offre", offre);
+            model.addAttribute("scoreCompatibilite",
+                    scoringService.calculerScoreCompatibilite(candidat, offre));
+        } catch (Exception ex) {
+            return "redirect:/candidat/offres";
+        }
+        return "candidat/offre-detail";
     }
 
     /**
@@ -252,11 +268,8 @@ public class CandidatController {
     /**
      * Applique les modifications de profil soumises par le candidat connecté.
      *
-     * <p>Le token CSRF est retiré de la map avant de la transmettre au service,
-     * conformément à la convention de l'application.</p>
-     *
      * @param session la session HTTP
-     * @param params  tous les paramètres du formulaire (téléphone, niveau, filière, etc.)
+     * @param params  tous les paramètres du formulaire
      * @param ra      les attributs de redirection pour les messages flash
      * @return redirection vers la page de profil
      */

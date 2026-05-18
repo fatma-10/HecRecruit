@@ -64,7 +64,29 @@
             line-height: 1.6;
         }
 
-        /* Formulaire */
+        /* Formulaire de recherche */
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .search-form select,
+        .search-form input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        .search-form button {
+            padding: 6px 14px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background: #2980b9;
+        }
+
+        /* Formulaire de publication */
         .post-form {
             background: #e8f4f8;
             padding: 20px;
@@ -147,6 +169,32 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
 
+    <!--
+        Formulaire de recherche.
+        BUG 8 CORRIGÉ : le champ texte #valeurInput est masqué (et son attribut
+        required retiré) lorsque le critère sélectionné est "etudiant" ou "entreprise",
+        car ces deux filtres ne nécessitent aucune valeur textuelle.
+        La fonction toggleValeur() est appelée au changement de <select> ET au
+        chargement de la page (pour refléter le critère déjà sélectionné côté serveur).
+    -->
+    <form method="get" action="/forum/recherche" class="search-form">
+        <select name="critere" id="critereSelect" onchange="toggleValeur()">
+            <option value="auteur"
+                    th:selected="${critere == 'auteur'}">Auteur</option>
+            <option value="message"
+                    th:selected="${critere == 'message'}">Contenu</option>
+            <option value="etudiant"
+                    th:selected="${critere == 'etudiant'}">Messages étudiants</option>
+            <option value="entreprise"
+                    th:selected="${critere == 'entreprise'}">Messages entreprises</option>
+        </select>
+        <!-- BUG 8 : cet input est masqué pour les critères sans valeur textuelle -->
+        <input type="text" name="valeur" id="valeurInput"
+               th:value="${valeur}"
+               placeholder="Rechercher..." />
+        <button type="submit">Filtrer</button>
+    </form>
+
     <!-- Liste des messages -->
     <div th:if="${messages == null or messages.empty}"
          style="text-align: center; color: #7f8c8d; padding: 30px;">
@@ -195,5 +243,29 @@
         <a href="/logout" class="danger">Déconnexion</a>
     </div>
 </div>
+
+<script>
+    /**
+     * BUG 8 CORRIGÉ : masque le champ texte et retire son attribut required
+     * quand le critère sélectionné est "etudiant" ou "entreprise".
+     * Pour "auteur" et "message", le champ est affiché et required est restauré.
+     */
+    function toggleValeur() {
+        var critere = document.getElementById('critereSelect').value;
+        var valeurInput = document.getElementById('valeurInput');
+        var sansValeur = (critere === 'etudiant' || critere === 'entreprise');
+
+        valeurInput.style.display = sansValeur ? 'none' : 'inline-block';
+        if (sansValeur) {
+            valeurInput.removeAttribute('required');
+            valeurInput.value = ''; // évite d'envoyer une valeur parasite
+        } else {
+            valeurInput.setAttribute('required', 'required');
+        }
+    }
+
+    // Appel au chargement pour refléter le critère restitué par Thymeleaf
+    document.addEventListener('DOMContentLoaded', toggleValeur);
+</script>
 </body>
 </html>

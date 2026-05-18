@@ -26,7 +26,10 @@ import java.util.List;
  *
  * <p><strong>Navigation (BUG 2 corrigé) :</strong> {@code userType} est injecté dans
  * le modèle afin que la vue n'affiche que le lien retour correspondant au type
- * d'utilisateur effectivement connecté.</p>
+ * d'utilisateur effectivement connecté.
+ *
+ * <p><strong>Vue (BUG 7 corrigé) :</strong> toutes les méthodes retournent désormais
+ * {@code "forum/forum"} au lieu de {@code "forum/list"}.</p>
  */
 @Controller
 @RequestMapping("/forum")
@@ -75,18 +78,16 @@ public class ForumController {
     /**
      * Affiche tous les messages du forum avec le formulaire de publication.
      *
-     * <p>Les informations de l'utilisateur connecté sont extraites de la session
-     * pour pré-remplir le formulaire et déterminer le type (étudiant / entreprise).</p>
-     *
      * @param session la session HTTP contenant les attributs de l'utilisateur connecté
      * @param model   le modèle Thymeleaf
-     * @return la vue {@code forum/list}
+     * @return la vue {@code forum/forum} (BUG 7 corrigé)
      */
     @GetMapping
     public String afficherForum(HttpSession session, Model model) {
         model.addAttribute("messages", forumService.getAllCommentaires());
         alimenterInfosUtilisateur(session, model);
-        return "forum/list";
+        // BUG 7 — "forum/forum" au lieu de "forum/list"
+        return "forum/forum";
     }
 
     // ================================================================
@@ -98,12 +99,6 @@ public class ForumController {
      *
      * <p><strong>BUG 1 corrigé :</strong> {@code auteur} et {@code email} sont lus
      * exclusivement depuis les attributs de session {@code userNom} et {@code userEmail}.
-     * Les paramètres éponymes du formulaire (précédemment {@code @RequestParam auteur}
-     * et {@code emailAuteur}) ont été supprimés : un utilisateur malveillant ne peut
-     * plus falsifier l'identité de l'auteur via la requête HTTP.</p>
-     *
-     * <p>Si la session ne contient pas les informations attendues (utilisateur non
-     * connecté), la publication est refusée et un message d'erreur est renvoyé.</p>
      *
      * @param message le contenu textuel du message à publier
      * @param session la session HTTP contenant {@code userNom}, {@code userEmail}
@@ -142,19 +137,11 @@ public class ForumController {
     /**
      * Recherche et filtre les messages du forum selon un critère donné.
      *
-     * <p>Critères de recherche supportés (délégués à {@link ForumService}) :
-     * <ul>
-     *   <li><strong>auteur</strong>    – recherche par nom d'auteur (contient, insensible à la casse)</li>
-     *   <li><strong>message</strong>   – recherche dans le contenu du message</li>
-     *   <li><strong>etudiant</strong>  – affiche uniquement les messages d'étudiants</li>
-     *   <li><strong>entreprise</strong>– affiche uniquement les messages d'entreprises</li>
-     * </ul>
-     *
      * @param critere le critère de recherche (auteur, message, etudiant, entreprise)
      * @param valeur  la valeur recherchée (peut être vide pour "etudiant" et "entreprise")
      * @param session la session HTTP pour récupérer les informations de l'utilisateur
      * @param model   le modèle Thymeleaf
-     * @return la vue {@code forum/list} avec les résultats filtrés
+     * @return la vue {@code forum/forum} (BUG 7 corrigé)
      */
     @GetMapping("/recherche")
     public String rechercher(@RequestParam String critere,
@@ -166,6 +153,7 @@ public class ForumController {
         model.addAttribute("critere", critere);
         model.addAttribute("valeur", valeur);
         alimenterInfosUtilisateur(session, model);
-        return "forum/list";
+        // BUG 7 — "forum/forum" au lieu de "forum/list"
+        return "forum/forum";
     }
 }

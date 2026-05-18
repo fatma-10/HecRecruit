@@ -2,18 +2,64 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Wishlist</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wishlist - HecRecruit</title>
+    <link rel="stylesheet" href="/css/hec-ui.css">
 </head>
 <body>
-<h1>Wishlist</h1>
-<div th:each="candidat : ${wishlist}">
-    <div>
-        <span th:text="${candidat.nom} + ' ' + ${candidat.prenom}"></span>
-        <form method="post" th:action="'/entreprise/wishlist/retirer/' + ${candidat.id}" style="display:inline;">
-            <button type="submit">Retirer</button>
-        </form>
+<main class="app-shell">
+    <header class="topbar">
+        <a href="/entreprise/dashboard" class="brand">
+            <strong>HecRecruit</strong>
+            <span>Wishlist</span>
+        </a>
+        <nav class="nav-actions">
+            <a href="/entreprise/offres" class="btn btn-secondary">Offres</a>
+            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
+        </nav>
+    </header>
+
+    <!-- Messages flash -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+    <section class="page-title">
+        <div>
+            <h1>Wishlist</h1>
+            <p>Candidats sauvegardés — score basé sur leur meilleure candidature chez vous.</p>
+        </div>
+    </section>
+
+    <section class="grid" th:if="${wishlist != null && !wishlist.isEmpty()}">
+        <article class="card offer-card" th:each="candidat : ${wishlist}">
+            <div class="candidate-meta">
+                <span class="badge badge-score">
+                    <span th:text="${scoresCompatibilite[candidat.id]}"></span>% match
+                </span>
+                <span th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Étudiant' : 'Alumni'"></span>
+            </div>
+            <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
+            <p class="description-preview" th:text="${candidat.skills}"></p>
+            <div class="candidate-meta">
+                <span th:text="${candidat.email}"></span>
+                <span th:text="${candidat.telephone}"></span>
+            </div>
+            <div class="actions">
+                <form method="post"
+                      th:action="'/entreprise/wishlist/retirer/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-danger">Retirer</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <div class="empty-state" th:if="${wishlist == null || wishlist.isEmpty()}">
+        Votre wishlist est vide. Ajoutez des candidats depuis les offres.
     </div>
-</div>
-<a href="/entreprise/dashboard">← Retour</a>
+
+    <div style="margin-top:2rem;">
+        <a href="/entreprise/dashboard">← Retour au dashboard</a>
+    </div>
+</main>
 </body>
 </html>

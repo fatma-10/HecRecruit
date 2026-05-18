@@ -5,7 +5,9 @@ import com.IHEC.Recruit.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -228,5 +230,46 @@ public class CandidatureService {
 
     public int getNombreWishlist(Long idEntreprise) {
         return getWishlist(idEntreprise).size();
+    }
+
+    /**
+     * Pour chaque candidat de la wishlist, retourne l'offre de l'entreprise
+     * à laquelle il a postulé (parmi toutes les offres de cette entreprise).
+     *
+     * <p>Si un candidat a postulé à plusieurs offres de la même entreprise,
+     * l'offre retournée est celle dont le score de compatibilité est le plus
+     * élevé — la logique de scoring reste dans {@link ScoringService} ;
+     * cette méthode se contente de collecter les offres candidates.</p>
+     *
+     * <p>Un candidat présent dans la wishlist mais sans aucune candidature
+     * enregistrée chez cette entreprise est simplement absent de la map
+     * retournée (cas de bord : candidat ajouté manuellement à la wishlist
+     * sans avoir postulé, ou candidature supprimée a posteriori).</p>
+     *
+     * @param idEntreprise l'identifiant de l'entreprise
+     * @param wishlist     la liste des candidats en wishlist
+     * @return {@code Map<CIN du candidat, liste de ses offres chez cette entreprise>}
+     * @throws IllegalArgumentException si l'entreprise n'existe pas
+     */
+    public Map<Integer, List<Offre>> getOffresParCandidatWishlist(Long idEntreprise,
+                                                                   List<Candidat> wishlist) {
+        Entreprise entreprise = entrepriseRepository.findById(idEntreprise)
+            .orElseThrow(() -> new IllegalArgumentException("Entreprise non trouvée"));
+
+        List<Offre> offresEntreprise = entreprise.getOffresPubliees();
+        Map<Integer, List<Offre>> result = new HashMap<>();
+
+        for (Candidat candidat : wishlist) {
+            // Offres de CETTE entreprise auxquelles le candidat a postulé
+            List<Offre> offresCandidат = candidat.getCandidaturesEnCours().stream()
+                    .filter(offresEntreprise::contains)
+                    .toList();
+
+            if (!offresCandidат.isEmpty()) {
+                result.put(candidat.getId(), offresCandidат);
+            }
+        }
+
+        return result;
     }
 }

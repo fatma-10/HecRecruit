@@ -31,12 +31,13 @@
         <div class="form-grid">
             <div class="field">
                 <label for="critere">Search by</label>
+                <!-- BUG #5 : th:selected ajouté sur chaque option -->
                 <select id="critere" name="critere">
-                    <option value="titre">Title</option>
-                    <option value="type">Type</option>
-                    <option value="domaine">Internship domain</option>
-                    <option value="rythme">Alternance rhythm</option>
-                    <option value="technologies">PFE technologies</option>
+                    <option value="titre"        th:selected="${critere == 'titre'}">Title</option>
+                    <option value="type"          th:selected="${critere == 'type'}">Type</option>
+                    <option value="domaine"       th:selected="${critere == 'stage'}">Stage</option>
+                    <option value="rythme"        th:selected="${critere == 'alternance'}">Alternance</option>
+                    <option value="technologies"  th:selected="${critere == 'technologies'}">PFE technologies</option>
                 </select>
             </div>
             <div class="field">
@@ -71,7 +72,8 @@
                     <form method="post" th:action="'/candidat/offres/postuler/' + ${offre.id}">
                         <button type="submit" class="btn btn-primary">Apply</button>
                     </form>
-                    <a href="/candidat/offres" class="btn btn-secondary">View details</a>
+                    <!-- BUG #3 : href corrigé vers /candidat/offres/{id} -->
+                    <a th:href="'/candidat/offres/' + ${offre.id}" class="btn btn-secondary">View details</a>
                 </div>
             </article>
         </div>

@@ -4,28 +4,16 @@ import com.IHEC.Recruit.model.*;
 import com.IHEC.Recruit.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * Controller des pages entreprise.
- * Toutes les routes commencent par /entreprise/
- *
- * <p>La résolution de l'entreprise depuis la session est centralisée dans
- * {@link #resoudreEntreprise(HttpSession)} afin d'éviter toute duplication.</p>
- *
- * <p>Convention de session :
- * <ul>
- *   <li>{@code entrepriseId} — Long (id de l'entreprise connectée)</li>
- *   <li>{@code userType}     — "entreprise"</li>
- * </ul>
- * </p>
- */
 @Controller
 @RequestMapping("/entreprise")
 public class EntrepriseController {
@@ -45,20 +33,6 @@ public class EntrepriseController {
         this.scoringService = scoringService;
     }
 
-    // ----------------------------------------------------------------
-    //  Utilitaire interne : résout l'entreprise ou retourne null
-    // ----------------------------------------------------------------
-
-    /**
-     * Résout l'{@link Entreprise} associée à la session courante.
-     *
-     * <p>Lit {@code entrepriseId} (Long) dans la session puis délègue
-     * au service. Retourne {@code null} si la session est vide ou si
-     * l'entreprise n'existe plus en base.</p>
-     *
-     * @param session la session HTTP courante
-     * @return l'{@link Entreprise} connectée, ou {@code null}
-     */
     private Entreprise resoudreEntreprise(HttpSession session) {
         Long id = (Long) session.getAttribute("entrepriseId");
         if (id == null) return null;
@@ -73,26 +47,6 @@ public class EntrepriseController {
     //  DASHBOARD
     // ================================================================
 
-    /**
-     * Affiche le tableau de bord de l'entreprise connectée.
-     *
-     * <p>Le calcul du nombre total de candidatures est délégué à
-     * {@link CandidatureService#getTotalCandidaturesParEntreprise(Long)}
-     * pour encapsuler cette logique dans la couche service.</p>
-     *
-     * <p>Injecte dans le modèle :
-     * <ul>
-     *   <li>{@code entreprise}     — l'entreprise connectée</li>
-     *   <li>{@code nbOffres}       — nombre d'offres publiées</li>
-     *   <li>{@code nbCandidatures} — total des candidatures reçues</li>
-     *   <li>{@code nbWishlist}     — nombre de candidats en wishlist</li>
-     * </ul>
-     * </p>
-     *
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf
-     * @return la vue "entreprise/dashboard" ou une redirection vers le login
-     */
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         Entreprise entreprise = resoudreEntreprise(session);
@@ -100,7 +54,6 @@ public class EntrepriseController {
 
         model.addAttribute("entreprise", entreprise);
         model.addAttribute("nbOffres", offreService.getNombreOffresEntreprise(entreprise));
-        // Calcul délégué au service — plus de stream dans le controller
         model.addAttribute("nbCandidatures",
                 candidatureService.getTotalCandidaturesParEntreprise(entreprise.getId()));
         model.addAttribute("nbWishlist", candidatureService.getNombreWishlist(entreprise.getId()));
@@ -111,13 +64,6 @@ public class EntrepriseController {
     //  GESTION DES OFFRES
     // ================================================================
 
-    /**
-     * Affiche la liste des offres publiées par l'entreprise connectée.
-     *
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf
-     * @return la vue "entreprise/offres"
-     */
     @GetMapping("/offres")
     public String mesOffres(HttpSession session, Model model) {
         Entreprise entreprise = resoudreEntreprise(session);
@@ -128,13 +74,6 @@ public class EntrepriseController {
         return "entreprise/offres";
     }
 
-    /**
-     * Affiche le formulaire de création d'une nouvelle offre.
-     *
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf (requis par Spring MVC)
-     * @return la vue "entreprise/creer-offre"
-     */
     @GetMapping("/offres/creer")
     public String creerOffreForm(HttpSession session, Model model) {
         if (resoudreEntreprise(session) == null) return "redirect:/login?type=entreprise";
@@ -144,24 +83,11 @@ public class EntrepriseController {
     /**
      * Traite la soumission du formulaire de création d'offre.
      *
-     * <p>Si le champ {@code dateExpiration} est renseigné,
-     * {@link OffreService#setDateExpiration(Long, LocalDate, Entreprise)} est appelée
-     * immédiatement après la création. La date doit être strictement postérieure à
-     * aujourd'hui ; un écart est reporté en message flash sans annuler la création.</p>
-     *
-     * @param session        la session HTTP
-     * @param titre          le titre de l'offre
-     * @param description    la description de l'offre
-     * @param type           "stage", "alternance" ou "projet fin d'etudes"
-     * @param domaine        domaine du stage (nullable)
-     * @param duree          durée en mois pour stage ou alternance (nullable selon type)
-     * @param rythme         rythme de l'alternance (nullable)
-     * @param sujet          sujet du PFE (nullable)
-     * @param technologies   technologies du PFE (nullable)
-     * @param dateExpiration date ISO yyyy-MM-dd, vide si non renseignée (nullable)
-     * @param ra             les attributs de redirection pour les messages flash
-     * @return redirection vers la liste des offres de l'entreprise
+     * <p>La date est validée AVANT toute persistance (Bug #6).
+     * {@code @Transactional} garantit le rollback si {@code setDateExpiration} échoue
+     * après la création de l'offre.</p>
      */
+    @Transactional
     @PostMapping("/offres/creer")
     public String creerOffre(HttpSession session,
                              @RequestParam String titre,
@@ -180,6 +106,23 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         try {
+            // Validation de la date AVANT toute persistance
+            LocalDate dateParsee = null;
+            if (dateExpiration != null && !dateExpiration.isBlank()) {
+                try {
+                    dateParsee = LocalDate.parse(dateExpiration);
+                    if (!dateParsee.isAfter(LocalDate.now())) {
+                        ra.addFlashAttribute("error",
+                                "La date d'expiration doit être strictement postérieure à aujourd'hui.");
+                        return "redirect:/entreprise/offres/creer";
+                    }
+                } catch (Exception ex) {
+                    ra.addFlashAttribute("error",
+                            "Format de date invalide : " + dateExpiration);
+                    return "redirect:/entreprise/offres/creer";
+                }
+            }
+
             Map<String, String> infos = new HashMap<>();
             switch (type.toLowerCase()) {
                 case "stage" -> {
@@ -198,16 +141,8 @@ public class EntrepriseController {
 
             Offre offre = offreService.creerOffre(titre, description, type, entreprise, infos);
 
-            if (dateExpiration != null && !dateExpiration.isBlank()) {
-                try {
-                    LocalDate date = LocalDate.parse(dateExpiration);
-                    offreService.setDateExpiration(offre.getId(), date, entreprise);
-                } catch (IllegalArgumentException ex) {
-                    ra.addFlashAttribute("error",
-                            "Offre publiée, mais la date d'expiration est invalide : "
-                            + ex.getMessage());
-                    return "redirect:/entreprise/offres";
-                }
+            if (dateParsee != null) {
+                offreService.setDateExpiration(offre.getId(), dateParsee, entreprise);
             }
 
             ra.addFlashAttribute("success", "Offre publiée avec succès !");
@@ -219,14 +154,6 @@ public class EntrepriseController {
         return "redirect:/entreprise/offres";
     }
 
-    /**
-     * Supprime une offre appartenant à l'entreprise connectée.
-     *
-     * @param idOffre l'identifiant de l'offre à supprimer
-     * @param session la session HTTP
-     * @param ra      les attributs de redirection pour les messages flash
-     * @return redirection vers la liste des offres
-     */
     @PostMapping("/offres/supprimer/{idOffre}")
     public String supprimerOffre(@PathVariable Long idOffre,
                                  HttpSession session,
@@ -247,14 +174,6 @@ public class EntrepriseController {
     //  CANDIDATS D'UNE OFFRE
     // ================================================================
 
-    /**
-     * Affiche la liste des candidats ayant postulé à une offre donnée.
-     *
-     * @param idOffre l'identifiant de l'offre
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf
-     * @return la vue "entreprise/candidats-offre"
-     */
     @GetMapping("/offres/{idOffre}/candidats")
     public String candidatsOffre(@PathVariable Long idOffre,
                                  HttpSession session,
@@ -272,15 +191,6 @@ public class EntrepriseController {
         return "entreprise/candidats-offre";
     }
 
-    /**
-     * Retire la candidature d'un candidat d'une offre (action entreprise).
-     *
-     * @param idOffre    l'identifiant de l'offre
-     * @param idCandidat le CIN du candidat à retirer
-     * @param session    la session HTTP
-     * @param ra         les attributs de redirection pour les messages flash
-     * @return redirection vers la liste des candidats de l'offre
-     */
     @PostMapping("/offres/{idOffre}/candidats/supprimer/{idCandidat}")
     public String supprimerCandidatureOffre(@PathVariable Long idOffre,
                                             @PathVariable int idCandidat,
@@ -298,15 +208,6 @@ public class EntrepriseController {
         return "redirect:/entreprise/offres/" + idOffre + "/candidats";
     }
 
-    /**
-     * Ajoute un candidat à la wishlist depuis la vue des candidats d'une offre.
-     *
-     * @param idOffre    l'identifiant de l'offre (utilisé pour la redirection)
-     * @param idCandidat le CIN du candidat à ajouter
-     * @param session    la session HTTP
-     * @param ra         les attributs de redirection pour les messages flash
-     * @return redirection vers la liste des candidats de l'offre
-     */
     @PostMapping("/offres/{idOffre}/candidats/wishlist/{idCandidat}")
     public String ajouterWishlistDepuisOffre(@PathVariable Long idOffre,
                                              @PathVariable int idCandidat,
@@ -329,30 +230,52 @@ public class EntrepriseController {
     // ================================================================
 
     /**
-     * Affiche la wishlist complète de l'entreprise connectée.
+     * Affiche la wishlist enrichie avec le meilleur score de compatibilité
+     * de chaque candidat parmi les offres de l'entreprise auxquelles il a postulé.
      *
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf
-     * @return la vue "entreprise/wishlist"
+     * <p>Algorithme :
+     * <ol>
+     *   <li>Récupère la wishlist.</li>
+     *   <li>Via {@link CandidatureService#getOffresParCandidatWishlist}, obtient
+     *       pour chaque candidat la liste des offres de cette entreprise
+     *       auxquelles il a postulé.</li>
+     *   <li>Calcule le score sur chaque offre et retient le maximum
+     *       (= meilleur match). Score 0 si aucune candidature trouvée.</li>
+     * </ol>
+     * </p>
      */
     @GetMapping("/wishlist")
     public String wishlist(HttpSession session, Model model) {
         Entreprise entreprise = resoudreEntreprise(session);
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
+        List<Candidat> wishlist = candidatureService.getWishlist(entreprise.getId());
+
+        // CIN → liste des offres postulées chez cette entreprise
+        Map<Integer, List<Offre>> offresParCandidat =
+                candidatureService.getOffresParCandidatWishlist(entreprise.getId(), wishlist);
+
+        // CIN → meilleur score parmi ces offres
+        Map<Integer, Integer> meilleursScores = new HashMap<>();
+        for (Candidat candidat : wishlist) {
+            List<Offre> offres = offresParCandidat.get(candidat.getId());
+            if (offres == null || offres.isEmpty()) {
+                meilleursScores.put(candidat.getId(), 0);
+            } else {
+                int max = offres.stream()
+                        .mapToInt(o -> scoringService.calculerScoreCompatibilite(candidat, o))
+                        .max()
+                        .orElse(0);
+                meilleursScores.put(candidat.getId(), max);
+            }
+        }
+
         model.addAttribute("entreprise", entreprise);
-        model.addAttribute("wishlist", candidatureService.getWishlist(entreprise.getId()));
+        model.addAttribute("wishlist", wishlist);
+        model.addAttribute("scoresCompatibilite", meilleursScores);
         return "entreprise/wishlist";
     }
 
-    /**
-     * Retire un candidat de la wishlist de l'entreprise connectée.
-     *
-     * @param idCandidat le CIN du candidat à retirer
-     * @param session    la session HTTP
-     * @param ra         les attributs de redirection pour les messages flash
-     * @return redirection vers la wishlist
-     */
     @PostMapping("/wishlist/retirer/{idCandidat}")
     public String retirerWishlist(@PathVariable int idCandidat,
                                   HttpSession session,
@@ -373,13 +296,6 @@ public class EntrepriseController {
     //  PROFIL
     // ================================================================
 
-    /**
-     * Affiche le profil de l'entreprise connectée avec le formulaire de modification.
-     *
-     * @param session la session HTTP
-     * @param model   le modèle Thymeleaf
-     * @return la vue "entreprise/profil"
-     */
     @GetMapping("/profil")
     public String profil(HttpSession session, Model model) {
         Entreprise entreprise = resoudreEntreprise(session);
@@ -389,16 +305,6 @@ public class EntrepriseController {
         return "entreprise/profil";
     }
 
-    /**
-     * Applique les modifications de profil soumises par l'entreprise connectée.
-     *
-     * @param session   la session HTTP
-     * @param secteur   le nouveau secteur d'activité
-     * @param adresse   la nouvelle adresse
-     * @param telephone le nouveau numéro de téléphone
-     * @param ra        les attributs de redirection pour les messages flash
-     * @return redirection vers la page de profil entreprise
-     */
     @PostMapping("/profil/modifier")
     public String modifierProfil(HttpSession session,
                                  @RequestParam String secteur,
