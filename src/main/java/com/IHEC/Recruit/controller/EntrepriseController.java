@@ -182,17 +182,55 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         Offre offre = offreService.getOffreById(idOffre);
-        var candidats = candidatureService.getCandidatsOffrePourEntreprise(idOffre, entreprise);
+        List<Candidature> candidatures = candidatureService.getCandidaturesOffrePourEntreprise(idOffre, entreprise);
+        List<Candidat> candidats = candidatures.stream()
+                .map(Candidature::getCandidat)
+                .toList();
         model.addAttribute("entreprise", entreprise);
         model.addAttribute("offre", offre);
+        model.addAttribute("candidatures", candidatures);
         model.addAttribute("candidats", candidats);
         model.addAttribute("scoresCompatibilite",
                 scoringService.calculerScoresPourCandidats(offre, candidats));
         return "entreprise/candidats-offre";
     }
 
-    @PostMapping("/offres/{idOffre}/candidats/supprimer/{idCandidat}")
-    public String supprimerCandidatureOffre(@PathVariable Long idOffre,
+    @PostMapping("/offres/{idOffre}/candidats/contacte/{idCandidat}")
+    public String contacterCandidat(@PathVariable Long idOffre,
+                                    @PathVariable int idCandidat,
+                                    HttpSession session,
+                                    RedirectAttributes ra) {
+        Entreprise entreprise = resoudreEntreprise(session);
+        if (entreprise == null) return "redirect:/login?type=entreprise";
+
+        try {
+            candidatureService.marquerCommeContacte(idOffre, idCandidat, entreprise);
+            ra.addFlashAttribute("success", "Candidature marquee comme contactee.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/entreprise/offres/" + idOffre + "/candidats";
+    }
+
+    @PostMapping("/offres/{idOffre}/candidats/refuser/{idCandidat}")
+    public String refuserCandidat(@PathVariable Long idOffre,
+                                  @PathVariable int idCandidat,
+                                  HttpSession session,
+                                  RedirectAttributes ra) {
+        Entreprise entreprise = resoudreEntreprise(session);
+        if (entreprise == null) return "redirect:/login?type=entreprise";
+
+        try {
+            candidatureService.marquerCommeRefuse(idOffre, idCandidat, entreprise);
+            ra.addFlashAttribute("success", "Candidature refusee.");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/entreprise/offres/" + idOffre + "/candidats";
+    }
+
+    @PostMapping("/offres/{idOffre}/candidats/attente/{idCandidat}")
+    public String remettreCandidatEnAttente(@PathVariable Long idOffre,
                                             @PathVariable int idCandidat,
                                             HttpSession session,
                                             RedirectAttributes ra) {
@@ -200,8 +238,8 @@ public class EntrepriseController {
         if (entreprise == null) return "redirect:/login?type=entreprise";
 
         try {
-            candidatureService.supprimerCandidatureOffre(idOffre, idCandidat, entreprise);
-            ra.addFlashAttribute("success", "Candidature retirée.");
+            candidatureService.remettreEnAttente(idOffre, idCandidat, entreprise);
+            ra.addFlashAttribute("success", "Candidature remise en attente.");
         } catch (Exception ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
@@ -327,3 +365,4 @@ public class EntrepriseController {
         return "redirect:/entreprise/profil";
     }
 }
+

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "offre")
@@ -34,13 +35,8 @@ public class Offre {
     @JoinColumn(name = "entreprise_id", nullable = false)
     private Entreprise entreprise;
 
-    @ManyToMany
-    @JoinTable(
-        name = "candidature",
-        joinColumns = @JoinColumn(name = "offre_id"),
-        inverseJoinColumns = @JoinColumn(name = "candidat_id")
-    )
-    private List<Candidat> candidatures = new ArrayList<>();
+    @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Candidature> candidatureDetails = new ArrayList<>();
 
     // ---- No-arg constructor required by JPA ----
     public Offre() {}
@@ -86,8 +82,17 @@ public class Offre {
     public Entreprise getEntreprise() { return entreprise; }
     public void setEntreprise(Entreprise entreprise) { this.entreprise = entreprise; }
 
-    public List<Candidat> getCandidatures() { return candidatures; }
-    public void setCandidatures(List<Candidat> candidatures) { this.candidatures = candidatures; }
+    public List<Candidature> getCandidatureDetails() { return candidatureDetails; }
+    public void setCandidatureDetails(List<Candidature> candidatureDetails) {
+        this.candidatureDetails = candidatureDetails;
+    }
+
+    @Transient
+    public List<Candidat> getCandidatures() {
+        return candidatureDetails.stream()
+                .map(Candidature::getCandidat)
+                .collect(Collectors.toList());
+    }
 
     // ---- Business methods ----
 
@@ -97,19 +102,20 @@ public class Offre {
     }
 
     public boolean ajouterCandidature(Candidat candidat) {
-        if (candidat == null || estExpiree() || candidatures.contains(candidat))
+        if (candidat == null || estExpiree() || candidatAPostule(candidat))
             return false;
-        candidatures.add(candidat);
+        candidatureDetails.add(new Candidature(this, candidat));
         return true;
     }
 
     public boolean candidatAPostule(Candidat candidat) {
         if (candidat == null) return false;
-        return candidatures.contains(candidat);
+        return candidatureDetails.stream()
+                .anyMatch(candidature -> candidat.equals(candidature.getCandidat()));
     }
 
     public int getNombreCandidatures() {
-        return candidatures.size();
+        return candidatureDetails.size();
     }
 
     @Override

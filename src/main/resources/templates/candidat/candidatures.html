@@ -28,14 +28,19 @@
     </section>
 
     <section class="grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
-        <article class="card offer-card" th:each="offre : ${candidatures}">
-            <span class="badge badge-score" th:text="${offre.typeOffre}"></span>
-            <h3 th:text="${offre.titre}"></h3>
-            <p class="description-preview" th:text="${offre.description}"></p>
+        <article class="card offer-card" th:each="candidature : ${candidatures}">
             <div class="offer-meta">
-                <strong th:text="${offre.entreprise.nom}"></strong>
+                <span class="badge badge-score" th:text="${candidature.offre.typeOffre}"></span>
+                <span class="badge badge-warning" th:if="${candidature.pending}">Pending</span>
+                <span class="badge badge-success" th:if="${candidature.contacted}">You will be contacted</span>
+                <span class="badge badge-warning" th:if="${candidature.refused}">Refused</span>
             </div>
-            <form method="post" th:action="'/candidat/candidatures/retirer/' + ${offre.id}">
+            <h3 th:text="${candidature.offre.titre}"></h3>
+            <p class="description-preview" th:text="${candidature.offre.description}"></p>
+            <div class="offer-meta">
+                <strong th:text="${candidature.offre.entreprise.nom}"></strong>
+            </div>
+            <form method="post" th:action="'/candidat/candidatures/retirer/' + ${candidature.offre.id}">
                 <button type="submit" class="btn btn-danger">Withdraw</button>
             </form>
         </article>

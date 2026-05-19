@@ -3,6 +3,7 @@ package com.IHEC.Recruit.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "candidat")
@@ -33,8 +34,8 @@ public class Candidat {
     @Column(name = "skills", nullable = false)
     private String skills;
 
-    @ManyToMany(mappedBy = "candidatures")
-    private List<Offre> candidaturesEnCours = new ArrayList<>();
+    @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Candidature> candidatureDetails = new ArrayList<>();
 
     // ---- No-arg constructor required by JPA ----
     public Candidat() {}
@@ -109,9 +110,16 @@ public class Candidat {
         this.skills = skills.trim();
     }
 
-    public List<Offre> getCandidaturesEnCours() { return candidaturesEnCours; }
-    public void setCandidaturesEnCours(List<Offre> candidaturesEnCours) {
-        this.candidaturesEnCours = candidaturesEnCours;
+    public List<Candidature> getCandidatureDetails() { return candidatureDetails; }
+    public void setCandidatureDetails(List<Candidature> candidatureDetails) {
+        this.candidatureDetails = candidatureDetails;
+    }
+
+    @Transient
+    public List<Offre> getCandidaturesEnCours() {
+        return candidatureDetails.stream()
+                .map(Candidature::getOffre)
+                .collect(Collectors.toList());
     }
 
     // ---- Methodes ----
@@ -124,7 +132,7 @@ public class Candidat {
             email,
             telephone,
             skills,
-            String.valueOf(candidaturesEnCours.size())
+            String.valueOf(candidatureDetails.size())
         };
     }
 

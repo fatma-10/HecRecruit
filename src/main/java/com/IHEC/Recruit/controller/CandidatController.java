@@ -217,7 +217,7 @@ public class CandidatController {
 
         model.addAttribute("candidat", candidat);
         model.addAttribute("candidatures",
-                candidatureService.getCandidaturesCandidat(candidat.getId()));
+                candidatureService.getCandidaturesDetailsCandidat(candidat.getId()));
         return "candidat/candidatures";
     }
 

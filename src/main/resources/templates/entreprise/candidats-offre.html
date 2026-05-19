@@ -16,6 +16,7 @@
         <nav class="nav-actions">
             <a href="/entreprise/offres" class="btn btn-secondary">Offers</a>
             <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
+            <a href="/forum" class="btn btn-secondary">Forum</a>
         </nav>
     </header>
 
@@ -26,13 +27,16 @@
         </div>
     </section>
 
-    <section class="grid" th:if="${candidats != null && !candidats.isEmpty()}">
-        <article class="card offer-card" th:each="candidat : ${candidats}">
+    <section class="grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
+        <article class="card offer-card" th:each="candidature : ${candidatures}" th:with="candidat=${candidature.candidat}">
             <div class="candidate-meta">
                 <span class="badge badge-score">
                     <span th:text="${scoresCompatibilite[candidat.id]}"></span>% match
                 </span>
                 <span th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Student' : 'Alumni'"></span>
+                <span class="badge badge-warning" th:if="${candidature.pending}">Pending</span>
+                <span class="badge badge-success" th:if="${candidature.contacted}">Contacted</span>
+                <span class="badge badge-warning" th:if="${candidature.refused}">Refused</span>
             </div>
             <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
             <p class="description-preview" th:text="${candidat.skills}"></p>
@@ -44,14 +48,20 @@
                 <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/wishlist/' + ${candidat.id}">
                     <button type="submit" class="btn btn-primary">Save candidate</button>
                 </form>
-                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/supprimer/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-danger">Remove</button>
+                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/contacte/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-secondary">Contacted</button>
+                </form>
+                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/refuser/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-danger">Refuse</button>
+                </form>
+                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/attente/' + ${candidat.id}">
+                    <button type="submit" class="btn btn-secondary">Pending</button>
                 </form>
             </div>
         </article>
     </section>
 
-    <div class="empty-state" th:if="${candidats == null || candidats.isEmpty()}">
+    <div class="empty-state" th:if="${candidatures == null || candidatures.isEmpty()}">
         No candidates have applied to this offer yet.
     </div>
 </main>
