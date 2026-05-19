@@ -1,0 +1,81 @@
+---
+description: Strict MVC layering for HecRecruit Spring Boot + Thymeleaf
+alwaysApply: true
+---
+
+# HecRecruit — Clean MVC Architecture
+
+Keep the architecture strictly clean and simple. Never mix responsibilities between layers.
+
+## Package responsibilities
+
+| Layer | Package | Responsibility only |
+|-------|---------|---------------------|
+| Model | `com.IHEC.Recruit.model` | JPA entities, enums, composite keys — data structure only |
+| Repository | `com.IHEC.Recruit.repository` | Spring Data JPA — database access only |
+| Service | `com.IHEC.Recruit.service` | Business logic, transactions, orchestration |
+| Controller | `com.IHEC.Recruit.controller` | HTTP mapping, session checks, redirect/flash, populate `Model`, return view names |
+| View | `src/main/resources/templates/` + `static/css/` | Thymeleaf display — no business rules |
+
+## Rules by layer
+
+### Models
+- No HTTP, session, or UI concerns
+- No service or repository calls
+- Validation annotations on entities are OK; complex validation belongs in services
+
+### Repositories
+- Extend `JpaRepository` (or similar); custom queries only
+- No business rules, no DTO shaping for views
+
+### Services
+- Inject repositories (and other services), never controllers
+- Throw domain-appropriate exceptions; let controllers map to redirects/messages
+- Reuse existing services instead of duplicating logic
+
+### Controllers
+- Inject **services only** — never repositories
+- Thin handlers: read request/session → call service → set model attributes → return view or redirect
+- Session → user resolution may live in a private helper or `SessionControllerAdvice` for cross-cutting model attributes
+- No SQL, no multi-step business workflows inline
+
+### Views (Thymeleaf)
+- `th:text`, `th:each`, `th:if`, `th:href`, `th:action` for display and links
+- Shared layout/CSS via `hec-ui.css` and fragments
+- JavaScript only when Thymeleaf cannot suffice (confirm dialogs, small UX) — no SPA frameworks
+- No business calculations or database logic in HTML
+
+## When changing code
+
+1. Place new logic in the correct layer first; refactor if a file already violates separation
+2. Prefer extending existing `*Service` / `*Controller` over new parallel classes
+3. Keep diffs minimal — no over-engineering, no duplicate helpers
+4. Match existing naming (French routes/messages, `resoudreCandidat`-style helpers)
+
+## Examples
+
+```java
+// BAD — business logic in controller
+@PostMapping("/postuler")
+public String postuler(@RequestParam int offreId, HttpSession session) {
+    Offre o = offreRepository.findById(offreId).get();
+    if (candidatureRepository.existsBy...) { ... }
+}
+
+// GOOD
+@PostMapping("/postuler")
+public String postuler(@RequestParam int offreId, HttpSession session, RedirectAttributes ra) {
+    Candidat c = resoudreCandidat(session);
+    if (c == null) return "redirect:/login";
+    candidatureService.postuler(c.getCin(), offreId);
+    return "redirect:/candidat/dashboard";
+}
+```
+
+```html
+<!-- BAD — scoring in template -->
+<span th:text="${offre.salaire * 0.1 + candidat.score}"></span>
+
+<!-- GOOD — computed in service, passed as model attribute -->
+<span th:text="${scoreAffiche}"></span>
+```

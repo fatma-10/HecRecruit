@@ -1,115 +1,140 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Inscription - HecRecruit</title>
-    <style>
-        body { font-family: Arial; margin: 50px; text-align: center; }
-        .form { width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        input, select, button { width: 100%; margin: 8px 0; padding: 8px; }
-        .error { color: red; }
-    </style>
-</head>
-<body>
-<h1>Inscription <span th:text="${type == 'candidat' ? 'Candidat' : 'Entreprise'}"></span></h1>
-<div class="form">
-    <!-- Formulaire candidat -->
-    <div th:if="${type == 'candidat'}">
-        <form method="post" action="/register/candidat">
-            <input type="text"     name="nom"       placeholder="Nom"                              required />
-            <input type="text"     name="prenom"    placeholder="Prénom"                           required />
-            <input type="email"    name="email"     placeholder="Email (doit finir par @ihec.ucar.tn)" required />
-            <input type="tel"      name="telephone" placeholder="Téléphone"                        required />
-            <input type="password" name="password"  placeholder="Mot de passe"                    required />
-            <input type="text"     name="cin"       placeholder="CIN (8 chiffres)"                required />
-            <input type="text"     name="skills"    placeholder="Competences"                     required />
-            <select name="candidatType" id="candidatType" required onchange="toggleCandidatFields()">
-                <option value="etudiant">Étudiant</option>
-                <option value="alumni">Alumni</option>
-            </select>
+<head th:replace="~{fragments/layout :: head('Inscription')}"></head>
+<body class="page-auth page-register">
+<header th:replace="~{fragments/layout :: header-public}"></header>
 
-            <!--
-                BUG 9 CORRIGÉ : les champs du bloc actif reçoivent l'attribut required
-                via toggleCandidatFields(). Le bloc inactif a ses required retirés,
-                ce qui évite toute erreur de validation HTML5 sur des champs masqués.
-            -->
+<div class="auth-wrap">
+    <div class="auth-card auth-card--register">
+        <aside class="auth-side auth-side--animated">
+            <h2>Rejoignez HecRecruit</h2>
+            <p>Accédez aux offres, au matching et au forum en quelques clics.</p>
+            <a th:href="'/login?type=' + ${type}" class="btn">J'ai déjà un compte</a>
+            <a href="/" class="btn btn-ghost-auth">Accueil</a>
+        </aside>
 
-            <!-- Champs Étudiant -->
-            <div id="etudiant-fields">
-                <input type="text" name="niveau"        id="niveau"        placeholder="Niveau (ex: Licence 3)" />
-                <input type="text" name="filiere"       id="filiere"       placeholder="Filière" />
-                <input type="text" name="etablissement" id="etablissement" placeholder="Établissement" />
+        <div class="auth-form-side auth-form-side--compact">
+            <div class="auth-form-head">
+                <h2 th:text="${type == 'candidat'} ? 'Inscription candidat' : 'Inscription entreprise'">Inscription</h2>
+                <p class="subtitle" th:text="${type == 'candidat'} ? 'Profil étudiant ou alumni IHEC' : 'Compte recruteur partenaire'"></p>
             </div>
 
-            <!-- Champs Alumni -->
-            <div id="alumni-fields" style="display:none;">
-                <input type="text" name="anneeDiplome"       id="anneeDiplome"       placeholder="Année de diplôme" />
-                <input type="text" name="posteActuel"        id="posteActuel"        placeholder="Poste actuel" />
-                <input type="text" name="entrepriseActuelle" id="entrepriseActuelle" placeholder="Entreprise actuelle" />
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div th:if="${type == 'candidat'}">
+                <form method="post" action="/register/candidat" class="auth-form-grid">
+                    <div class="form-group">
+                        <label for="nom">Nom</label>
+                        <input id="nom" type="text" name="nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom">Prénom</label>
+                        <input id="prenom" type="text" name="prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cin">CIN</label>
+                        <input id="cin" type="text" name="cin" placeholder="8 chiffres" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="email">Email IHEC</label>
+                        <input id="email" type="email" name="email" placeholder="nom@ihec.ucar.tn" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Tél.</label>
+                        <input id="telephone" type="tel" name="telephone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input id="password" type="password" name="password" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="skills">Compétences</label>
+                        <input id="skills" type="text" name="skills" placeholder="Java, SQL, Power BI..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candidatType">Profil</label>
+                        <select name="candidatType" id="candidatType" required onchange="toggleCandidatFields()">
+                            <option value="etudiant">Étudiant</option>
+                            <option value="alumni">Alumni</option>
+                        </select>
+                    </div>
+
+                    <div id="etudiant-fields" class="auth-panel-grid">
+                        <div class="form-group">
+                            <label for="niveau">Niveau</label>
+                            <input type="text" name="niveau" id="niveau" list="niveaux-list"
+                                   placeholder="Niveau 2, Master..." autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="filiere">Filière</label>
+                            <input type="text" name="filiere" id="filiere" list="filieres-list"
+                                   placeholder="BI, Comptabilité..." autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="etablissement">Établissement</label>
+                            <input type="text" name="etablissement" id="etablissement" placeholder="IHEC">
+                        </div>
+                    </div>
+
+                    <div id="alumni-fields" class="auth-panel-grid is-hidden">
+                        <div class="form-group">
+                            <label for="anneeDiplome">Année diplôme</label>
+                            <input type="text" name="anneeDiplome" id="anneeDiplome">
+                        </div>
+                        <div class="form-group">
+                            <label for="posteActuel">Poste</label>
+                            <input type="text" name="posteActuel" id="posteActuel">
+                        </div>
+                        <div class="form-group">
+                            <label for="entrepriseActuelle">Entreprise</label>
+                            <input type="text" name="entrepriseActuelle" id="entrepriseActuelle">
+                        </div>
+                    </div>
+
+                    <div class="form-actions span-3">
+                        <button type="submit" class="btn btn-primary">Créer mon compte</button>
+                    </div>
+                </form>
             </div>
 
-            <button type="submit">S'inscrire</button>
-            <div th:if="${error}" class="error" th:text="${error}"></div>
-        </form>
+            <div th:if="${type == 'entreprise'}">
+                <form method="post" action="/register/entreprise" class="auth-form-grid auth-form-grid--2">
+                    <div class="form-group span-2">
+                        <label for="entrepriseNom">Entreprise</label>
+                        <input id="entrepriseNom" type="text" name="nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="secteur">Secteur</label>
+                        <input id="secteur" type="text" name="secteur">
+                    </div>
+                    <div class="form-group">
+                        <label for="adresse">Adresse</label>
+                        <input id="adresse" type="text" name="adresse">
+                    </div>
+                    <div class="form-group">
+                        <label for="entrepriseEmail">Email</label>
+                        <input id="entrepriseEmail" type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="entrepriseTelephone">Téléphone</label>
+                        <input id="entrepriseTelephone" type="tel" name="telephone" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="entreprisePassword">Mot de passe</label>
+                        <input id="entreprisePassword" type="password" name="password" required>
+                    </div>
+                    <div class="form-actions span-2">
+                        <button type="submit" class="btn btn-primary">Créer le compte entreprise</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <!-- Formulaire entreprise -->
-    <div th:if="${type == 'entreprise'}">
-        <form method="post" action="/register/entreprise">
-            <input type="text"     name="nom"       placeholder="Nom de l'entreprise" required />
-            <input type="text"     name="secteur"   placeholder="Secteur d'activité" />
-            <input type="text"     name="adresse"   placeholder="Adresse" />
-            <input type="email"    name="email"     placeholder="Email"               required />
-            <input type="tel"      name="telephone" placeholder="Téléphone"           required />
-            <input type="password" name="password"  placeholder="Mot de passe"       required />
-            <button type="submit">S'inscrire</button>
-            <div th:if="${error}" class="error" th:text="${error}"></div>
-        </form>
-    </div>
-
-    <a href="/">← Retour à l'accueil</a>
 </div>
 
-<script>
-    /**
-     * BUG 9 CORRIGÉ : gestion du required sur les champs conditionnels.
-     *
-     * Principe : un champ masqué avec required bloque la soumission du formulaire
-     * en HTML5 même s'il est invisible. On retire donc required sur le bloc inactif
-     * et on l'ajoute sur le bloc actif à chaque changement de type de candidat.
-     */
-    var etudiantInputIds = ['niveau', 'filiere', 'etablissement'];
-    var alumniInputIds   = ['anneeDiplome', 'posteActuel', 'entrepriseActuelle'];
+<th:block th:replace="~{fragments/suggestions :: filieres}"></th:block>
+<th:block th:replace="~{fragments/suggestions :: niveaux}"></th:block>
 
-    function setRequired(ids, required) {
-        ids.forEach(function(id) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            if (required) {
-                el.setAttribute('required', 'required');
-            } else {
-                el.removeAttribute('required');
-            }
-        });
-    }
-
-    function toggleCandidatFields() {
-        var select = document.getElementById('candidatType');
-        if (!select) return; // formulaire entreprise : rien à faire
-
-        var isEtudiant = select.value === 'etudiant';
-
-        // Affichage des blocs
-        document.getElementById('etudiant-fields').style.display = isEtudiant ? 'block' : 'none';
-        document.getElementById('alumni-fields').style.display   = isEtudiant ? 'none'  : 'block';
-
-        // BUG 9 — required uniquement sur le bloc visible
-        setRequired(etudiantInputIds, isEtudiant);
-        setRequired(alumniInputIds,   !isEtudiant);
-    }
-
-    // Initialisation au chargement : applique l'état correct dès l'affichage
-    document.addEventListener('DOMContentLoaded', toggleCandidatFields);
-</script>
+<script th:replace="~{fragments/layout :: auth-script}"></script>
 </body>
 </html>

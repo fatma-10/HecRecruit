@@ -1,61 +1,61 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Forum - HecRecruit</title>
-    <style>
-        .message { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding: 5px; }
-        .author { font-weight: bold; }
-        .date { font-size: 0.8em; color: gray; }
-    </style>
-</head>
+<head th:replace="~{fragments/layout :: head('Forum')}"></head>
 <body>
-<h1>Forum de discussion</h1>
+<header th:replace="${userType == 'entreprise'} ? ~{fragments/layout :: header-entreprise('forum')} : ~{fragments/layout :: header-candidat('forum')}"></header>
 
-<!-- Formulaire de recherche -->
-<form method="get" action="/forum/recherche">
-    <select name="critere">
-        <option value="auteur">Auteur</option>
-        <option value="message">Contenu</option>
-        <option value="etudiant">Messages étudiants</option>
-        <option value="entreprise">Messages entreprises</option>
-    </select>
-    <input type="text" name="valeur" placeholder="Rechercher..." />
-    <button type="submit">Filtrer</button>
-</form>
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1>Forum</h1>
+                <p class="subtitle">Recherche et publication de messages.</p>
+            </div>
+        </header>
 
-<!-- Liste des messages -->
-<div th:each="msg : ${messages}">
-    <div class="message">
-        <div class="author">
-            <span th:text="${msg.auteur}"></span>
-            (<span th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'"></span>)
+        <form method="get" action="/forum/recherche" class="filter-bar">
+            <div class="form-group">
+                <label for="legacyCritere">Rechercher par</label>
+                <select id="legacyCritere" name="critere">
+                    <option value="auteur">Auteur</option>
+                    <option value="message">Contenu</option>
+                    <option value="etudiant">Posts étudiants</option>
+                    <option value="entreprise">Posts entreprises</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="legacyValeur">Mot-clé</label>
+                <input id="legacyValeur" type="text" name="valeur" placeholder="Rechercher...">
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+        </form>
+
+        <div th:if="${messages != null}">
+            <article class="forum-message etudiant" th:each="msg : ${messages}"
+                     th:classappend="${msg.estEtudiant} ? ' etudiant' : ' entreprise'">
+                <div class="meta">
+                    <span><em class="auteur" th:text="${msg.auteur}"></em>
+                        <span class="role" th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'"></span>
+                    </span>
+                    <span class="date" th:text="${msg.datePublication}"></span>
+                </div>
+                <p class="body" th:text="${msg.message}"></p>
+            </article>
         </div>
-        <div class="date" th:text="${msg.datePublication}"></div>
-        <p th:text="${msg.message}"></p>
+
+        <section class="forum-compose">
+            <h3>Nouveau message</h3>
+            <form method="post" action="/forum/poster">
+                <div class="form-group">
+                    <label for="legacyMessage">Message</label>
+                    <textarea id="legacyMessage" name="message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Publier</button>
+            </form>
+        </section>
     </div>
-</div>
+</main>
 
-<hr/>
-
-<!-- Formulaire de publication -->
-<!-- auteur et email sont lus depuis la session côté controller ;
-     seul le contenu du message est envoyé par le formulaire. -->
-<h3>Poster un nouveau message</h3>
-<form method="post" action="/forum/poster">
-    <textarea name="message" rows="4" cols="50"
-              placeholder="Votre message..." required></textarea><br/>
-    <button type="submit">Publier</button>
-</form>
-
-<!-- Navigation conditionnelle selon le type d'utilisateur connecté -->
-<p>
-    <span th:if="${userType == 'candidat'}">
-        <a href="/candidat/dashboard">Retour au tableau de bord candidat</a>
-    </span>
-    <span th:if="${userType == 'entreprise'}">
-        <a href="/entreprise/dashboard">Retour au tableau de bord entreprise</a>
-    </span>
-</p>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

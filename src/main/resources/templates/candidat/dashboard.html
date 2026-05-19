@@ -1,99 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard étudiant - HecRecruit</title>
-    <link rel="stylesheet" href="/css/hec-ui.css">
-</head>
+<head th:replace="~{fragments/layout :: head('Tableau de bord')}"></head>
 <body>
-<main class="app-shell">
-    <header class="topbar">
-        <a href="/candidat/dashboard" class="brand">
-            <strong>HecRecruit</strong>
-            <span>Student workspace</span>
-        </a>
-        <nav class="nav-actions">
-            <a href="/candidat/offres" class="btn btn-secondary">Offers</a>
-            <a href="/candidat/candidatures" class="btn btn-secondary">Applications</a>
-            <a href="/candidat/profil" class="btn btn-secondary">Profile</a>
-            <!-- BUG #2 : lien forum ajouté -->
-            <a href="/forum" class="btn btn-secondary">Forum</a>
-            <a href="/logout" class="btn btn-danger">Logout</a>
-        </nav>
-    </header>
+<header th:replace="~{fragments/layout :: header-candidat('dashboard')}"></header>
 
-    <section class="page-title">
-        <div>
-            <h1>Welcome, <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></h1>
-            <p>Track your applications and prioritize opportunities that fit your skills.</p>
-        </div>
-        <a href="/candidat/offres" class="btn btn-primary">Browse offers</a>
-    </section>
-
-    <section class="stat-row">
-        <article class="card stat-card">
-            <strong th:text="${nbCandidatures}"></strong>
-            <span>Applications</span>
-        </article>
-        <article class="card stat-card">
-            <strong th:text="${nbOffresDisponibles}"></strong>
-            <span>Available offers</span>
-        </article>
-        <article class="card stat-card">
-            <strong th:text="${candidat.skills != null ? 'Ready' : 'Missing'}"></strong>
-            <span>Skills profile</span>
-        </article>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
+<main>
+    <div class="container">
+        <header class="page-header">
             <div>
-                <h2>Recommended matches</h2>
-                <p>Personalized suggestions based on your academic profile and applications.</p>
+                <p class="eyebrow">Espace candidat</p>
+                <h1>Bonjour, <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></h1>
+                <p class="subtitle">Suivez vos candidatures et les offres qui vous correspondent.</p>
             </div>
-            <a href="/recommandations" class="btn btn-secondary">View all</a>
-        </div>
-        <div class="grid" th:if="${recommandations != null && !recommandations.isEmpty()}">
-            <article class="card offer-card" th:each="rec : ${recommandations}">
-                <span class="badge badge-score">Score <span th:text="${rec.scoreFormate}"></span></span>
-                <h3 th:text="${rec.offre.titre}"></h3>
-                <p class="description-preview" th:text="${rec.offre.description}"></p>
-                <div class="offer-meta">
-                    <strong th:text="${rec.offre.entreprise.nom}"></strong>
-                    <span th:text="${rec.offre.typeOffre}"></span>
+            <a href="/candidat/offres" class="btn btn-primary">Voir les offres</a>
+        </header>
+
+        <section class="stat-grid">
+            <article class="stat-card">
+                <p class="label">Candidatures</p>
+                <p class="value" th:text="${nbCandidatures}">0</p>
+            </article>
+            <article class="stat-card">
+                <p class="label">Offres disponibles</p>
+                <p class="value" th:text="${nbOffresDisponibles}">0</p>
+            </article>
+            <article class="stat-card">
+                <p class="label">Profil compétences</p>
+                <p class="value" th:text="${candidat.skills != null && !candidat.skills.isBlank()} ? 'OK' : '—'">—</p>
+                <p class="delta">Complétez vos skills pour de meilleurs matchs</p>
+            </article>
+        </section>
+
+        <header class="page-header">
+            <div>
+                <h2>Recommandations</h2>
+                <p class="subtitle">Suggestions personnalisées selon votre profil.</p>
+            </div>
+            <a href="/recommandations" class="btn btn-ghost">Tout voir</a>
+        </header>
+
+        <div class="offre-grid" th:if="${recommandations != null && !recommandations.isEmpty()}">
+            <article class="offre-card" th:each="rec : ${recommandations}">
+                <span class="type-badge" th:text="${rec.offre.typeOffre}">Type</span>
+                <h3 th:text="${rec.offre.titre}">Titre</h3>
+                <p class="company" th:text="${rec.offre.entreprise.nom}">Entreprise</p>
+                <p class="desc" th:text="${rec.offre.description}">Description</p>
+                <div class="meta">
+                    <span>Score</span>
+                    <span class="score" th:text="${rec.scoreFormate}">0</span>
                 </div>
-                <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
-                    <button type="submit" class="btn btn-primary">Apply</button>
+                <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}" style="margin-top:1rem;">
+                    <button type="submit" class="btn btn-primary btn-sm">Postuler</button>
                 </form>
             </article>
         </div>
-        <div class="empty-state" th:if="${recommandations == null || recommandations.isEmpty()}">
-            No recommendations yet. Update your profile skills and check available offers.
+        <div class="empty" th:if="${recommandations == null || recommandations.isEmpty()}">
+            <span class="icon">?</span>
+            <h3>Aucune recommandation</h3>
+            <p>Mettez à jour vos compétences et consultez les offres disponibles.</p>
+            <a href="/candidat/profil" class="btn btn-primary">Mon profil</a>
         </div>
-    </section>
 
-    <section class="section">
-        <div class="section-header">
+        <header class="page-header" style="margin-top:2.5rem;">
             <div>
-                <h2>Latest offers</h2>
-                <p>New opportunities recently published by partner companies.</p>
+                <h2>Dernières offres</h2>
+                <p class="subtitle">Opportunités récemment publiées.</p>
             </div>
-        </div>
-        <div class="grid" th:if="${dernieresOffres != null && !dernieresOffres.isEmpty()}">
-            <article class="card offer-card" th:each="offre : ${dernieresOffres}">
-                <span class="badge badge-score">
-                    <span th:text="${scoresCompatibilite[offre.id]}"></span>% match
-                </span>
-                <h3 th:text="${offre.titre}"></h3>
-                <p class="description-preview" th:text="${offre.description}"></p>
-                <div class="offer-meta">
-                    <strong th:text="${offre.entreprise.nom}"></strong>
-                    <span th:text="${offre.typeOffre}"></span>
+        </header>
+
+        <div class="offre-grid" th:if="${dernieresOffres != null && !dernieresOffres.isEmpty()}">
+            <a class="offre-card" th:each="offre : ${dernieresOffres}"
+               th:href="'/candidat/offres/' + ${offre.id}">
+                <span class="type-badge" th:text="${offre.typeOffre}">Type</span>
+                <h3 th:text="${offre.titre}">Titre</h3>
+                <p class="company" th:text="${offre.entreprise.nom}">Entreprise</p>
+                <p class="desc" th:text="${offre.description}">Description</p>
+                <div class="meta">
+                    <span>Compatibilité</span>
+                    <span class="score" th:text="${scoresCompatibilite[offre.id]} + '%'">0%</span>
                 </div>
-            </article>
+            </a>
         </div>
-    </section>
+    </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

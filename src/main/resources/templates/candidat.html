@@ -1,36 +1,55 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Tableau de bord - Candidat</title>
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        .card { border: 1px solid #ccc; padding: 15px; margin: 10px; display: inline-block; width: 200px; }
-        .btn { background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; }
-    </style>
-</head>
+<head th:replace="~{fragments/layout :: head('Candidat')}"></head>
 <body>
-<h1>Bienvenue, <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span> !</h1>
-<div>
-    <div class="card">📄 Candidatures : <strong th:text="${nbCandidatures}"></strong></div>
-    <div class="card">🎯 Offres disponibles : <strong th:text="${nbOffresDisponibles}"></strong></div>
-</div>
-<h2>Dernières offres</h2>
-<ul>
-    <li th:each="offre : ${dernieresOffres}">
-        <span th:text="${offre.titre}"></span> - <span th:text="${offre.entreprise.nom}"></span>
-    </li>
-</ul>
-<h2>Recommandations (top 5)</h2>
-<div th:each="rec : ${recommandations}">
-    <div class="card">
-        <strong th:text="${rec.offre.titre}"></strong><br/>
-        Score : <span th:text="${rec.scoreFormate}"></span><br/>
-        <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
-            <button type="submit" class="btn">Postuler</button>
-        </form>
+<header th:replace="~{fragments/layout :: header-candidat('dashboard')}"></header>
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1>Bonjour, <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></h1>
+                <p class="subtitle">Vue candidat — candidatures, offres et recommandations.</p>
+            </div>
+        </header>
+
+        <section class="stat-grid">
+            <article class="stat-card">
+                <p class="label">Candidatures</p>
+                <p class="value" th:text="${nbCandidatures}">0</p>
+            </article>
+            <article class="stat-card">
+                <p class="label">Offres disponibles</p>
+                <p class="value" th:text="${nbOffresDisponibles}">0</p>
+            </article>
+        </section>
+
+        <header class="page-header">
+            <div><h2>Dernières offres</h2></div>
+        </header>
+        <div class="offre-grid" th:if="${dernieresOffres != null && !dernieresOffres.isEmpty()}">
+            <article class="offre-card" th:each="offre : ${dernieresOffres}">
+                <h3 th:text="${offre.titre}"></h3>
+                <p class="company" th:text="${offre.entreprise.nom}"></p>
+            </article>
+        </div>
+
+        <header class="page-header" style="margin-top:2rem;">
+            <div><h2>Recommandations</h2></div>
+            <a href="/recommandations" class="btn btn-ghost">Détails</a>
+        </header>
+        <div class="offre-grid" th:if="${recommandations != null && !recommandations.isEmpty()}">
+            <article class="offre-card" th:each="rec : ${recommandations}">
+                <span class="score" th:text="${rec.scoreFormate}"></span>
+                <h3 th:text="${rec.offre.titre}"></h3>
+                <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
+                    <button type="submit" class="btn btn-primary btn-sm">Postuler</button>
+                </form>
+            </article>
+        </div>
     </div>
-</div>
-<p><a href="/candidat/offres">Voir toutes les offres</a> | <a href="/candidat/candidatures">Mes candidatures</a> | <a href="/candidat/profil">Mon profil</a> | <a href="/forum">Forum</a> | <a href="/recommandations">Recommandations détaillées</a> | <a href="/logout">Déconnexion</a></p>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

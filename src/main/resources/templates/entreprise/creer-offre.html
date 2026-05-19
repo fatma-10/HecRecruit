@@ -1,320 +1,120 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Créer une offre — HecRecruit</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-        :root {
-            --ink:    #1a1a2e;
-            --slate:  #374151;
-            --muted:  #6b7280;
-            --border: #e5e7eb;
-            --surface:#f9fafb;
-            --white:  #ffffff;
-            --blue:   #2563eb;
-            --green:  #16a34a;
-            --red:    #dc2626;
-            --red-lt: #fef2f2;
-            --radius: 10px;
-            --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.06);
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--surface);
-            color: var(--ink);
-            min-height: 100vh;
-            padding: 2rem 1rem 4rem;
-        }
-
-        .page {
-            max-width: 680px;
-            margin: 0 auto;
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .page-header {
-            display: flex;
-            align-items: center;
-            gap: .8rem;
-            padding-bottom: 1.25rem;
-            border-bottom: 2px solid var(--border);
-        }
-        .page-header h1 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.8rem;
-            font-weight: 400;
-        }
-
-        /* ── Alert ───────────────────────────────────────────── */
-        .alert {
-            padding: .85rem 1.1rem;
-            border-radius: var(--radius);
-            font-size: .88rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            border: 1px solid #fecaca;
-            background: var(--red-lt);
-            color: #991b1b;
-        }
-
-        /* ── Card ────────────────────────────────────────────── */
-        .card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        .card-header {
-            padding: 1rem 1.4rem;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            font-weight: 600;
-            font-size: .88rem;
-            color: var(--slate);
-            text-transform: uppercase;
-            letter-spacing: .06em;
-        }
-        .card-body { padding: 1.5rem; }
-
-        /* ── Form elements ───────────────────────────────────── */
-        .form-group { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1.1rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
-
-        label {
-            font-size: .82rem;
-            font-weight: 500;
-            color: var(--slate);
-        }
-        label span.req { color: var(--red); margin-left: 2px; }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        textarea,
-        select {
-            width: 100%;
-            padding: .6rem .9rem;
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            font-family: inherit;
-            font-size: .88rem;
-            color: var(--ink);
-            background: var(--white);
-            transition: border-color .18s, box-shadow .18s;
-        }
-        textarea { min-height: 90px; resize: vertical; }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-        }
-        .hint { font-size: .75rem; color: var(--muted); }
-
-        /* ── Section divider ─────────────────────────────────── */
-        .section-title {
-            font-size: .78rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            color: var(--muted);
-            margin: 1.4rem 0 .9rem;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-        }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        /* ── Conditional panels ──────────────────────────────── */
-        .type-panel { display: none; }
-        .type-panel.active { display: block; }
-
-        /* ── Buttons ─────────────────────────────────────────── */
-        .btn-row {
-            display: flex;
-            gap: .75rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding: .65rem 1.5rem;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: .88rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid transparent;
-            text-decoration: none;
-            transition: background .15s, box-shadow .15s, transform .1s;
-        }
-        .btn:active { transform: scale(.97); }
-        .btn-primary {
-            background: var(--blue);
-            color: #fff;
-        }
-        .btn-primary:hover { background: #1d4ed8; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
-        .btn-secondary {
-            background: var(--white);
-            color: var(--slate);
-            border-color: var(--border);
-        }
-        .btn-secondary:hover { background: var(--surface); }
-
-        /* ── Nav ─────────────────────────────────────────────── */
-        .nav-links { font-size: .85rem; }
-        .nav-links a { color: var(--blue); text-decoration: none; }
-        .nav-links a:hover { text-decoration: underline; }
-    </style>
-</head>
+<head th:replace="~{fragments/layout :: head('Créer une offre')}"></head>
 <body>
-<div class="page">
+<header th:replace="~{fragments/layout :: header-entreprise('offres')}"></header>
 
-    <!-- ─── Flash error ───────────────────────────────────────── -->
-    <div th:if="${error}" class="alert">
-        <span>✕</span>
-        <span th:text="${error}"></span>
-    </div>
+<main>
+    <div class="container">
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <!-- ─── Page header ──────────────────────────────────────── -->
-    <div class="page-header">
-        <span style="font-size:1.6rem;">➕</span>
-        <h1>Nouvelle offre</h1>
-    </div>
+        <header class="page-header">
+            <div>
+                <h1>Nouvelle offre</h1>
+                <p class="subtitle">Rédigez une offre claire pour améliorer le matching avec les candidats.</p>
+            </div>
+        </header>
 
-    <!-- ─── Formulaire ───────────────────────────────────────── -->
-    <div class="card">
-        <div class="card-header">Informations de l'offre</div>
-        <div class="card-body">
-            <form method="post" action="/entreprise/offres/creer">
+        <form method="post" action="/entreprise/offres/creer" class="form-card">
+            <div class="form-group">
+                <label for="titre">Titre</label>
+                <input type="text" id="titre" name="titre" placeholder="Ex : Stage Spring Boot" required>
+            </div>
 
-                <!-- ── Champs communs ── -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description"
+                          placeholder="Missions, environnement, profil attendu..." required></textarea>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                    <label for="titre">Titre <span class="req">*</span></label>
-                    <input type="text" id="titre" name="titre"
-                           placeholder="Ex : Stage développement web" required />
+                    <label for="type">Type d'offre</label>
+                    <select id="type" name="type" required>
+                        <option value="stage">Stage</option>
+                        <option value="alternance">Alternance</option>
+                        <option value="projet fin d'etudes">Projet Fin d'Études</option>
+                    </select>
                 </div>
-
                 <div class="form-group">
-                    <label for="description">Description <span class="req">*</span></label>
-                    <textarea id="description" name="description"
-                              placeholder="Décrivez les missions, l'environnement de travail…" required></textarea>
+                    <label for="dateExpiration">Date d'expiration</label>
+                    <input type="date" id="dateExpiration" name="dateExpiration">
+                    <p class="form-help">Laisser vide pour une offre sans date limite.</p>
                 </div>
+            </div>
 
+            <div id="panel-stage">
+                <h3 style="margin:1.5rem 0 1rem;">Détails stage</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="type">Type d'offre <span class="req">*</span></label>
-                        <select id="type" name="type" required>
-                            <option value="stage">Stage</option>
-                            <option value="alternance">Alternance</option>
-                            <option value="projet fin d'etudes">Projet Fin d'Études</option>
-                        </select>
+                        <label for="domaine">Domaine</label>
+                        <input type="text" id="domaine" name="domaine" placeholder="Développement web">
                     </div>
                     <div class="form-group">
-                        <label for="dateExpiration">Date d'expiration</label>
-                        <input type="date" id="dateExpiration" name="dateExpiration" />
-                        <span class="hint">Laissez vide pour une offre sans limite</span>
+                        <label for="dureeStage">Durée (mois)</label>
+                        <input type="number" id="dureeStage" name="dureeStage" min="1">
                     </div>
                 </div>
+            </div>
 
-                <!-- ── Panel Stage ── -->
-                <div class="type-panel active" id="panel-stage">
-                    <p class="section-title">Détails — Stage</p>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="domaine">Domaine</label>
-                            <input type="text" id="domaine" name="domaine"
-                                   placeholder="Ex : Développement web" />
-                        </div>
-                        <div class="form-group">
-                            <label for="dureeStage">Durée (mois) <span class="req">*</span></label>
-                            <input type="number" id="dureeStage" name="dureeStage"
-                                   min="1" placeholder="Ex : 3" />
-                        </div>
+            <div id="panel-alternance" class="hidden">
+                <h3 style="margin:1.5rem 0 1rem;">Détails alternance</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rythme">Rythme</label>
+                        <input type="text" id="rythme" name="rythme" placeholder="3j entreprise / 2j école">
+                    </div>
+                    <div class="form-group">
+                        <label for="dureeAlternance">Durée (mois)</label>
+                        <input type="number" id="dureeAlternance" name="dureeAlternance" min="1">
                     </div>
                 </div>
+            </div>
 
-                <!-- ── Panel Alternance ── -->
-                <div class="type-panel" id="panel-alternance">
-                    <p class="section-title">Détails — Alternance</p>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="rythme">Rythme</label>
-                            <input type="text" id="rythme" name="rythme"
-                                   placeholder="Ex : 3 jours entreprise / 2 jours école" />
-                        </div>
-                        <div class="form-group">
-                            <label for="dureeAlternance">Durée (mois) <span class="req">*</span></label>
-                            <input type="number" id="dureeAlternance" name="dureeAlternance"
-                                   min="1" placeholder="Ex : 12" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ── Panel PFE ── -->
-                <div class="type-panel" id="panel-pfe">
-                    <p class="section-title">Détails — Projet Fin d'Études</p>
+            <div id="panel-pfe" class="hidden">
+                <h3 style="margin:1.5rem 0 1rem;">Détails PFE</h3>
+                <div class="form-row">
                     <div class="form-group">
                         <label for="sujet">Sujet</label>
-                        <input type="text" id="sujet" name="sujet"
-                               placeholder="Ex : Développement d'une application mobile IoT" />
+                        <input type="text" id="sujet" name="sujet">
                     </div>
                     <div class="form-group">
                         <label for="technologies">Technologies</label>
-                        <input type="text" id="technologies" name="technologies"
-                               placeholder="Ex : React Native, Spring Boot, MySQL" />
+                        <input type="text" id="technologies" name="technologies" placeholder="Spring Boot, MySQL...">
                     </div>
                 </div>
+            </div>
 
-                <!-- ── Actions ── -->
-                <div class="btn-row">
-                    <button type="submit" class="btn btn-primary">🚀 Publier l'offre</button>
-                    <a href="/entreprise/offres" class="btn btn-secondary">Annuler</a>
-                </div>
-
-            </form>
-        </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Publier</button>
+                <a href="/entreprise/offres" class="btn btn-ghost">Annuler</a>
+            </div>
+        </form>
     </div>
+</main>
 
-    <!-- ─── Navigation ───────────────────────────────────────── -->
-    <div class="nav-links">
-        <a href="/entreprise/offres">← Retour à mes offres</a>
-        <a href="/forum">Forum</a>
-    </div>
-
-</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
-    const typeSelect  = document.getElementById('type');
-    const panels = {
-        'stage':              document.getElementById('panel-stage'),
-        'alternance':         document.getElementById('panel-alternance'),
-        "projet fin d'etudes": document.getElementById('panel-pfe'),
+    var typeSelect = document.getElementById('type');
+    var panels = {
+        'stage': document.getElementById('panel-stage'),
+        'alternance': document.getElementById('panel-alternance'),
+        "projet fin d'etudes": document.getElementById('panel-pfe')
     };
 
-    function switchPanel(val) {
-        Object.values(panels).forEach(p => p.classList.remove('active'));
-        if (panels[val]) panels[val].classList.add('active');
+    function switchPanel(value) {
+        Object.keys(panels).forEach(function(key) {
+            if (panels[key]) {
+                panels[key].classList.toggle('hidden', key !== value);
+            }
+        });
     }
 
-    typeSelect.addEventListener('change', () => switchPanel(typeSelect.value));
-    switchPanel(typeSelect.value); // init au chargement
+    typeSelect.addEventListener('change', function() {
+        switchPanel(typeSelect.value);
+    });
+    switchPanel(typeSelect.value);
 </script>
 </body>
 </html>

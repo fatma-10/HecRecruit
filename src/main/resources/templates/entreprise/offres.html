@@ -1,57 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mes offres - HecRecruit</title>
-    <link rel="stylesheet" href="/css/hec-ui.css">
-</head>
+<head th:replace="~{fragments/layout :: head('Mes offres')}"></head>
 <body>
-<main class="app-shell">
-    <header class="topbar">
-        <a href="/entreprise/dashboard" class="brand">
-            <strong>HecRecruit</strong>
-            <span>Company offers</span>
-        </a>
-        <nav class="nav-actions">
-            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
-            <a href="/entreprise/wishlist" class="btn btn-secondary">Wishlist</a>
-            <a href="/forum" class="btn btn-secondary">Forum</a>
-            <a href="/logout" class="btn btn-danger">Logout</a>
-        </nav>
-    </header>
+<header th:replace="~{fragments/layout :: header-entreprise('offres')}"></header>
 
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+<main>
+    <div class="container">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <section class="page-title">
-        <div>
-            <h1>My offers</h1>
-            <p>Publish opportunities and monitor candidate applications by compatibility.</p>
+        <header class="page-header">
+            <div>
+                <h1>Mes offres</h1>
+                <p class="subtitle">Publiez et gérez vos opportunités IHEC.</p>
+            </div>
+            <a href="/entreprise/offres/creer" class="btn btn-primary">Créer une offre</a>
+        </header>
+
+        <div class="offre-grid" th:if="${offres != null && !offres.isEmpty()}">
+            <article class="offre-card" th:each="offre : ${offres}">
+                <span class="type-badge" th:text="${offre.typeOffre}"></span>
+                <h3 th:text="${offre.titre}"></h3>
+                <p class="desc" th:text="${offre.description}"></p>
+                <div class="meta">
+                    <span th:if="${offre.dateExpiration != null}" th:text="'Expire : ' + ${offre.dateExpiration}"></span>
+                </div>
+                <div class="form-actions" style="margin-top:1rem;">
+                    <a th:href="'/entreprise/offres/' + ${offre.id} + '/candidats'" class="btn btn-primary btn-sm">Candidats</a>
+                    <form method="post" th:action="'/entreprise/offres/supprimer/' + ${offre.id}">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </div>
+            </article>
         </div>
-        <a href="/entreprise/offres/creer" class="btn btn-primary">Create offer</a>
-    </section>
 
-    <section class="grid" th:if="${offres != null && !offres.isEmpty()}">
-        <article class="card offer-card" th:each="offre : ${offres}">
-            <div class="offer-meta">
-                <span class="badge badge-score" th:text="${offre.typeOffre}"></span>
-                <span th:if="${offre.dateExpiration != null}">Deadline <span th:text="${offre.dateExpiration}"></span></span>
-            </div>
-            <h3 th:text="${offre.titre}"></h3>
-            <p class="description-preview" th:text="${offre.description}"></p>
-            <div class="actions">
-                <a th:href="'/entreprise/offres/' + ${offre.id} + '/candidats'" class="btn btn-primary">View candidates</a>
-                <form method="post" th:action="'/entreprise/offres/supprimer/' + ${offre.id}">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </article>
-    </section>
-
-    <div class="empty-state" th:if="${offres == null || offres.isEmpty()}">
-        No offers published yet. Create your first opportunity for IHEC students.
+        <div class="empty" th:if="${offres == null || offres.isEmpty()}">
+            <span class="icon">+</span>
+            <h3>Aucune offre</h3>
+            <p>Publiez votre première opportunité pour les étudiants IHEC.</p>
+            <a href="/entreprise/offres/creer" class="btn btn-primary">Créer une offre</a>
+        </div>
     </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

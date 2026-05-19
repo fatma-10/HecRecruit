@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - HecRecruit'">HecRecruit</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/ui.js" defer></script>
+</head>
+
+<script th:fragment="auth-script">
+    function setRequired(ids, required) {
+        ids.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (required) el.setAttribute('required', 'required');
+            else el.removeAttribute('required');
+        });
+    }
+
+    function toggleCandidatFields() {
+        var select = document.getElementById('candidatType');
+        var etu = document.getElementById('etudiant-fields');
+        var alum = document.getElementById('alumni-fields');
+        if (!select || !etu || !alum) return;
+        var isEtudiant = select.value === 'etudiant';
+        etu.classList.toggle('is-hidden', !isEtudiant);
+        alum.classList.toggle('is-hidden', isEtudiant);
+        setRequired(['niveau', 'filiere', 'etablissement'], isEtudiant);
+        setRequired(['anneeDiplome', 'posteActuel', 'entrepriseActuelle'], !isEtudiant);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('is-loaded');
+        toggleCandidatFields();
+    });
+</script>
+
+<footer class="site-footer" th:fragment="footer">
+    <div class="container">
+        <span>&copy; 2026 <em>HecRecruit</em> — Plateforme de recrutement IHEC</span>
+        <span>Spring Boot · Thymeleaf</span>
+    </div>
+</footer>
+
+<header class="site-header" th:fragment="header-public">
+    <div class="container">
+        <a href="/" class="brand">HecRecruit<span class="dot"></span></a>
+        <nav class="nav-links">
+            <a href="/login?type=candidat">Connexion</a>
+            <a href="/register?type=candidat">Inscription</a>
+        </nav>
+        <div class="nav-user">
+            <a href="/login?type=candidat" class="btn btn-ghost btn-sm">Candidat</a>
+            <a href="/login?type=entreprise" class="btn btn-primary btn-sm">Entreprise</a>
+        </div>
+    </div>
+</header>
+
+<header class="site-header" th:fragment="header-candidat(active)">
+    <div class="container">
+        <a href="/candidat/dashboard" class="brand">HecRecruit<span class="dot"></span></a>
+        <nav class="nav-links">
+            <a href="/candidat/dashboard" th:classappend="${active == 'dashboard'} ? ' is-active' : ''">Tableau de bord</a>
+            <a href="/candidat/offres" th:classappend="${active == 'offres'} ? ' is-active' : ''">Offres</a>
+            <a href="/candidat/candidatures" th:classappend="${active == 'candidatures'} ? ' is-active' : ''">Candidatures</a>
+            <a href="/recommandations" th:classappend="${active == 'recommandations'} ? ' is-active' : ''">Recommandations</a>
+            <a href="/forum" th:classappend="${active == 'forum'} ? ' is-active' : ''">Forum</a>
+            <a href="/candidat/profil" th:classappend="${active == 'profil'} ? ' is-active' : ''">Profil</a>
+        </nav>
+        <div class="nav-user">
+            <span class="who" th:text="${currentUserNom}">Candidat</span>
+            <a href="/logout" class="logout-btn">Déconnexion</a>
+        </div>
+    </div>
+</header>
+
+<header class="site-header" th:fragment="header-entreprise(active)">
+    <div class="container">
+        <a href="/entreprise/dashboard" class="brand">HecRecruit<span class="dot"></span></a>
+        <nav class="nav-links">
+            <a href="/entreprise/dashboard" th:classappend="${active == 'dashboard'} ? ' is-active' : ''">Tableau de bord</a>
+            <a href="/entreprise/offres" th:classappend="${active == 'offres'} ? ' is-active' : ''">Offres</a>
+            <a href="/entreprise/wishlist" th:classappend="${active == 'wishlist'} ? ' is-active' : ''">Wishlist</a>
+            <a href="/forum" th:classappend="${active == 'forum'} ? ' is-active' : ''">Forum</a>
+            <a href="/entreprise/profil" th:classappend="${active == 'profil'} ? ' is-active' : ''">Profil</a>
+        </nav>
+        <div class="nav-user">
+            <span class="who" th:text="${currentUserNom}">Entreprise</span>
+            <a href="/logout" class="logout-btn">Déconnexion</a>
+        </div>
+    </div>
+</header>
+</html>

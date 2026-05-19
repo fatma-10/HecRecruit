@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Détail offre')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header-candidat('offres')}"></header>
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <a href="/candidat/offres" class="eyebrow" style="display:inline-block;margin-bottom:0.5rem;">← Retour aux offres</a>
+                <h1 th:text="${offre.titre}">Titre de l'offre</h1>
+                <p class="subtitle" th:text="${offre.entreprise.nom}">Entreprise</p>
+            </div>
+            <span class="type-badge" th:text="${offre.typeOffre}">Type</span>
+        </header>
+
+        <div class="detail-layout">
+            <article class="detail-main">
+                <p class="eyebrow">Description</p>
+                <p class="description" th:text="${offre.description}"></p>
+
+                <ul class="detail-meta-list">
+                    <li th:if="${offre.datePublication != null}">
+                        <span class="label">Publiée le</span>
+                        <span th:text="${offre.datePublication}"></span>
+                    </li>
+                    <li th:if="${offre.dateExpiration != null}">
+                        <span class="label">Expire le</span>
+                        <span th:text="${offre.dateExpiration}"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.Stage)}">
+                        <span class="label">Domaine</span>
+                        <span th:text="${offre.domaine}"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.Stage)}">
+                        <span class="label">Durée</span>
+                        <span th:text="${offre.dureeEnMois} + ' mois'"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.Alternance)}">
+                        <span class="label">Rythme</span>
+                        <span th:text="${offre.rythme}"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.Alternance)}">
+                        <span class="label">Durée</span>
+                        <span th:text="${offre.dureeEnMois} + ' mois'"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.ProjetFinEtudes)}">
+                        <span class="label">Sujet</span>
+                        <span th:text="${offre.sujet}"></span>
+                    </li>
+                    <li th:if="${offre instanceof T(com.IHEC.Recruit.model.ProjetFinEtudes)}">
+                        <span class="label">Technologies</span>
+                        <span th:text="${offre.technologies}"></span>
+                    </li>
+                </ul>
+            </article>
+
+            <aside class="detail-side">
+                <div class="detail-aside-card">
+                    <p class="label">Compatibilité</p>
+                    <p class="value" th:text="${scoreCompatibilite} + '%'">0%</p>
+                    <p class="label">Entreprise</p>
+                    <p class="value" th:text="${offre.entreprise.nom}"></p>
+                    <p class="label">Secteur</p>
+                    <p class="value" th:text="${offre.entreprise.secteur} ?: '—'"></p>
+                </div>
+                <form method="post" th:action="'/candidat/offres/postuler/' + ${offre.id}">
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Postuler à cette offre</button>
+                </form>
+                <a href="/candidat/offres" class="btn btn-ghost" style="width:100%;margin-top:0.75rem;text-align:center;">Voir toutes les offres</a>
+            </aside>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

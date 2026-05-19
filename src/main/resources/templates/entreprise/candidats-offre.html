@@ -1,69 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Candidats - HecRecruit</title>
-    <link rel="stylesheet" href="/css/hec-ui.css">
-</head>
+<head th:replace="~{fragments/layout :: head('Candidats')}"></head>
 <body>
-<main class="app-shell">
-    <header class="topbar">
-        <a href="/entreprise/dashboard" class="brand">
-            <strong>HecRecruit</strong>
-            <span>Candidate review</span>
-        </a>
-        <nav class="nav-actions">
-            <a href="/entreprise/offres" class="btn btn-secondary">Offers</a>
-            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
-            <a href="/forum" class="btn btn-secondary">Forum</a>
-        </nav>
-    </header>
+<header th:replace="~{fragments/layout :: header-entreprise('offres')}"></header>
 
-    <section class="page-title">
-        <div>
-            <h1>Candidates for <span th:text="${offre.titre}"></span></h1>
-            <p>Review applicants and prioritize profiles with stronger compatibility.</p>
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1>Candidats — <span th:text="${offre.titre}"></span></h1>
+                <p class="subtitle">Évaluez les profils par score de compatibilité.</p>
+            </div>
+            <a href="/entreprise/offres" class="btn btn-ghost">Retour aux offres</a>
+        </header>
+
+        <div class="offre-grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
+            <article class="offre-card" th:each="candidature : ${candidatures}" th:with="candidat=${candidature.candidat}">
+                <span class="score" th:text="${scoresCompatibilite[candidat.id]} + '%'"></span>
+                <span class="type-badge" th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Étudiant' : 'Alumni'"></span>
+                <span class="badge badge-warning" th:if="${candidature.pending}">En attente</span>
+                <span class="badge badge-success" th:if="${candidature.contacted}">Contacté</span>
+                <span class="badge badge-warning" th:if="${candidature.refused}">Refusé</span>
+                <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
+                <p class="desc" th:text="${candidat.skills}"></p>
+                <p class="company" th:text="${candidat.email} + ' · ' + ${candidat.telephone}"></p>
+                <div class="form-actions" style="margin-top:1rem; flex-wrap:wrap;">
+                    <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/wishlist/' + ${candidat.id}">
+                        <button type="submit" class="btn btn-primary btn-sm">Wishlist</button>
+                    </form>
+                    <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/contacte/' + ${candidat.id}">
+                        <button type="submit" class="btn btn-ghost btn-sm">Contacté</button>
+                    </form>
+                    <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/refuser/' + ${candidat.id}">
+                        <button type="submit" class="btn btn-danger btn-sm">Refuser</button>
+                    </form>
+                    <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/attente/' + ${candidat.id}">
+                        <button type="submit" class="btn btn-ghost btn-sm">En attente</button>
+                    </form>
+                </div>
+            </article>
         </div>
-    </section>
 
-    <section class="grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
-        <article class="card offer-card" th:each="candidature : ${candidatures}" th:with="candidat=${candidature.candidat}">
-            <div class="candidate-meta">
-                <span class="badge badge-score">
-                    <span th:text="${scoresCompatibilite[candidat.id]}"></span>% match
-                </span>
-                <span th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Student' : 'Alumni'"></span>
-                <span class="badge badge-warning" th:if="${candidature.pending}">Pending</span>
-                <span class="badge badge-success" th:if="${candidature.contacted}">Contacted</span>
-                <span class="badge badge-warning" th:if="${candidature.refused}">Refused</span>
-            </div>
-            <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
-            <p class="description-preview" th:text="${candidat.skills}"></p>
-            <div class="candidate-meta">
-                <span th:text="${candidat.email}"></span>
-                <span th:text="${candidat.telephone}"></span>
-            </div>
-            <div class="actions">
-                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/wishlist/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-primary">Save candidate</button>
-                </form>
-                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/contacte/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-secondary">Contacted</button>
-                </form>
-                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/refuser/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-danger">Refuse</button>
-                </form>
-                <form method="post" th:action="'/entreprise/offres/' + ${offre.id} + '/candidats/attente/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-secondary">Pending</button>
-                </form>
-            </div>
-        </article>
-    </section>
-
-    <div class="empty-state" th:if="${candidatures == null || candidatures.isEmpty()}">
-        No candidates have applied to this offer yet.
+        <div class="empty" th:if="${candidatures == null || candidatures.isEmpty()}">
+            <span class="icon">0</span>
+            <h3>Aucun candidat</h3>
+            <p>Aucune candidature pour cette offre pour le moment.</p>
+        </div>
     </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

@@ -1,54 +1,42 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mes candidatures - HecRecruit</title>
-    <link rel="stylesheet" href="/css/hec-ui.css">
-</head>
+<head th:replace="~{fragments/layout :: head('Mes candidatures')}"></head>
 <body>
-<main class="app-shell">
-    <header class="topbar">
-        <a href="/candidat/dashboard" class="brand">
-            <strong>HecRecruit</strong>
-            <span>Applications</span>
-        </a>
-        <nav class="nav-actions">
-            <a href="/candidat/dashboard" class="btn btn-secondary">Dashboard</a>
-            <a href="/candidat/offres" class="btn btn-secondary">Offers</a>
-            <a href="/logout" class="btn btn-danger">Logout</a>
-        </nav>
-    </header>
+<header th:replace="~{fragments/layout :: header-candidat('candidatures')}"></header>
 
-    <section class="page-title">
-        <div>
-            <h1>My applications</h1>
-            <p>Track the opportunities you applied to and withdraw when needed.</p>
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1>Mes candidatures</h1>
+                <p class="subtitle">Suivez vos postulations et retirez-les si besoin.</p>
+            </div>
+        </header>
+
+        <div class="offre-grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
+            <article class="offre-card" th:each="candidature : ${candidatures}">
+                <span class="type-badge" th:text="${candidature.offre.typeOffre}"></span>
+                <span class="badge badge-warning" th:if="${candidature.pending}">En attente</span>
+                <span class="badge badge-success" th:if="${candidature.contacted}">Contacté</span>
+                <span class="badge badge-warning" th:if="${candidature.refused}">Refusé</span>
+                <h3 th:text="${candidature.offre.titre}"></h3>
+                <p class="company" th:text="${candidature.offre.entreprise.nom}"></p>
+                <p class="desc" th:text="${candidature.offre.description}"></p>
+                <form method="post" th:action="'/candidat/candidatures/retirer/' + ${candidature.offre.id}" style="margin-top:1rem;">
+                    <button type="submit" class="btn btn-danger btn-sm">Retirer</button>
+                </form>
+            </article>
         </div>
-    </section>
 
-    <section class="grid" th:if="${candidatures != null && !candidatures.isEmpty()}">
-        <article class="card offer-card" th:each="candidature : ${candidatures}">
-            <div class="offer-meta">
-                <span class="badge badge-score" th:text="${candidature.offre.typeOffre}"></span>
-                <span class="badge badge-warning" th:if="${candidature.pending}">Pending</span>
-                <span class="badge badge-success" th:if="${candidature.contacted}">You will be contacted</span>
-                <span class="badge badge-warning" th:if="${candidature.refused}">Refused</span>
-            </div>
-            <h3 th:text="${candidature.offre.titre}"></h3>
-            <p class="description-preview" th:text="${candidature.offre.description}"></p>
-            <div class="offer-meta">
-                <strong th:text="${candidature.offre.entreprise.nom}"></strong>
-            </div>
-            <form method="post" th:action="'/candidat/candidatures/retirer/' + ${candidature.offre.id}">
-                <button type="submit" class="btn btn-danger">Withdraw</button>
-            </form>
-        </article>
-    </section>
-
-    <div class="empty-state" th:if="${candidatures == null || candidatures.isEmpty()}">
-        You have not applied to any offer yet.
+        <div class="empty" th:if="${candidatures == null || candidatures.isEmpty()}">
+            <span class="icon">—</span>
+            <h3>Aucune candidature</h3>
+            <p>Vous n'avez pas encore postulé à une offre.</p>
+            <a href="/candidat/offres" class="btn btn-primary">Voir les offres</a>
+        </div>
     </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Connexion - HecRecruit</title>
-    <style>
-        body { font-family: Arial; margin: 50px; text-align: center; }
-        .form { width: 300px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        input, button { width: 100%; margin: 8px 0; padding: 8px; }
-        .error { color: red; }
-    </style>
-</head>
-<body>
-<h1>Connexion <span th:text="${type == 'candidat' ? 'Candidat' : 'Entreprise'}"></span></h1>
-<div class="form">
-    <form method="post" action="/login">
-        <input type="hidden" name="type" th:value="${type}" />
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Mot de passe" required />
-        <button type="submit">Se connecter</button>
-        <div th:if="${error}" class="error" th:text="${error}"></div>
-    </form>
-    <p>Pas encore inscrit ? <a th:href="'/register?type=' + ${type}">Créer un compte</a></p>
-    <a href="/">← Retour à l'accueil</a>
+<head th:replace="~{fragments/layout :: head('Connexion')}"></head>
+<body class="page-auth page-login">
+<header th:replace="~{fragments/layout :: header-public}"></header>
+
+<div class="auth-wrap">
+    <div class="auth-card auth-card--login">
+        <div class="auth-form-side auth-form-side--compact">
+            <div class="auth-form-head">
+                <h2 th:text="${type == 'candidat'} ? 'Connexion candidat' : 'Connexion entreprise'">Connexion</h2>
+                <p class="subtitle">Accédez à votre espace en un instant.</p>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <form method="post" action="/login">
+                <input type="hidden" name="type" th:value="${type}">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" placeholder="nom@ihec.ucar.tn" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input id="password" type="password" name="password" placeholder="Votre mot de passe" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="auth-side auth-side--animated">
+            <h2>Bienvenue</h2>
+            <p>Offres, candidatures et matching pour la communauté IHEC.</p>
+            <a th:href="'/register?type=' + ${type}" class="btn">Créer un compte</a>
+            <a href="/" class="btn btn-ghost-auth">Accueil</a>
+        </aside>
+    </div>
 </div>
+
 </body>
 </html>

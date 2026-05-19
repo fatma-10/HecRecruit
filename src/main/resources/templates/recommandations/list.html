@@ -1,30 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Recommandations</title>
-    <style>
-        .offre { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        .score { background: #27ae60; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; }
-        .btn { background: #3498db; color: white; padding: 5px 10px; border: none; cursor: pointer; }
-    </style>
-</head>
+<head th:replace="~{fragments/layout :: head('Recommandations')}"></head>
 <body>
-<h1>Recommandations personnalisées</h1>
-<p>Bonjour <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span></p>
-<div th:if="${recommandations.empty}">Aucune recommandation pour le moment.</div>
-<div th:each="rec : ${recommandations}">
-    <div class="offre">
-        <h3 th:text="${rec.offre.titre}"></h3>
-        <p th:text="${rec.offre.description}"></p>
-        <p><strong>Entreprise :</strong> <span th:text="${rec.offre.entreprise.nom}"></span></p>
-        <p><strong>Type :</strong> <span th:text="${rec.offre.typeOffre}"></span></p>
-        <p class="score" th:text="${rec.scoreFormate}"></p>
-        <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}">
-            <button type="submit" class="btn">Postuler</button>
-        </form>
+<header th:replace="~{fragments/layout :: header-candidat('recommandations')}"></header>
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1>Recommandations</h1>
+                <p class="subtitle">
+                    Pour <span th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></span>
+                    — offres les mieux adaptées à votre profil.
+                </p>
+            </div>
+        </header>
+
+        <div class="empty" th:if="${recommandations.empty}">
+            <span class="icon">?</span>
+            <h3>Aucune recommandation</h3>
+            <p>Complétez votre profil et vos compétences pour améliorer le matching.</p>
+            <a href="/candidat/profil" class="btn btn-primary">Mon profil</a>
+        </div>
+
+        <div class="offre-grid" th:if="${!recommandations.empty}">
+            <article class="offre-card" th:each="rec : ${recommandations}">
+                <span class="type-badge" th:text="${rec.offre.typeOffre}"></span>
+                <h3 th:text="${rec.offre.titre}"></h3>
+                <p class="company" th:text="${rec.offre.entreprise.nom}"></p>
+                <p class="desc" th:text="${rec.offre.description}"></p>
+                <div class="meta">
+                    <span>Score</span>
+                    <span class="score" th:text="${rec.scoreFormate}"></span>
+                </div>
+                <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}" style="margin-top:1rem;">
+                    <button type="submit" class="btn btn-primary btn-sm">Postuler</button>
+                </form>
+            </article>
+        </div>
     </div>
-</div>
-<a href="/candidat/dashboard">← Retour</a>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

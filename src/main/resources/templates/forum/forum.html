@@ -1,270 +1,94 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:temporals="http://www.thymeleaf.org/extras/java-time">
-<head>
-    <meta charset="UTF-8">
-    <title>Forum - HecRecruit</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f4f4f4;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        h1 {
-            color: #2c3e50;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        /* Messages du forum */
-        .message {
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #fafafa;
-            border-radius: 5px;
-        }
-        .message:hover {
-            background: #f0f0f0;
-        }
-        .author {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            margin-left: 5px;
-        }
-        .badge-etudiant {
-            background: #3498db;
-            color: white;
-        }
-        .badge-entreprise {
-            background: #e74c3c;
-            color: white;
-        }
-        .date {
-            font-size: 0.8em;
-            color: #7f8c8d;
-            margin-left: 10px;
-        }
-        .message-content {
-            margin-top: 10px;
-            color: #34495e;
-            line-height: 1.6;
-        }
-
-        /* Formulaire de recherche */
-        .search-form {
-            margin-bottom: 20px;
-        }
-        .search-form select,
-        .search-form input[type="text"] {
-            padding: 6px 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
-        }
-        .search-form button {
-            padding: 6px 14px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .search-form button:hover {
-            background: #2980b9;
-        }
-
-        /* Formulaire de publication */
-        .post-form {
-            background: #e8f4f8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
-            border: 2px solid #3498db;
-        }
-        .post-form h3 {
-            margin-top: 0;
-            color: #2c3e50;
-        }
-        .post-form .user-info {
-            margin-bottom: 10px;
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        .post-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: Arial, sans-serif;
-            box-sizing: border-box;
-        }
-        .post-form button {
-            background: #27ae60;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .post-form button:hover {
-            background: #229954;
-        }
-
-        /* Messages flash */
-        .alert {
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Navigation */
-        .nav-links {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-        .nav-links a {
-            color: #3498db;
-            text-decoration: none;
-            margin-right: 15px;
-        }
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-        .nav-links a.danger {
-            color: #e74c3c;
-        }
-    </style>
-</head>
+<head th:replace="~{fragments/layout :: head('Forum')}"></head>
 <body>
-<div class="container">
-    <h1>💬 Forum de discussion</h1>
+<header th:replace="${userType == 'entreprise'} ? ~{fragments/layout :: header-entreprise('forum')} : ~{fragments/layout :: header-candidat('forum')}"></header>
 
-    <!-- Messages flash -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+<main>
+    <div class="container">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <!--
-        Formulaire de recherche.
-        BUG 8 CORRIGÉ : le champ texte #valeurInput est masqué (et son attribut
-        required retiré) lorsque le critère sélectionné est "etudiant" ou "entreprise",
-        car ces deux filtres ne nécessitent aucune valeur textuelle.
-        La fonction toggleValeur() est appelée au changement de <select> ET au
-        chargement de la page (pour refléter le critère déjà sélectionné côté serveur).
-    -->
-    <form method="get" action="/forum/recherche" class="search-form">
-        <select name="critere" id="critereSelect" onchange="toggleValeur()">
-            <option value="auteur"
-                    th:selected="${critere == 'auteur'}">Auteur</option>
-            <option value="message"
-                    th:selected="${critere == 'message'}">Contenu</option>
-            <option value="etudiant"
-                    th:selected="${critere == 'etudiant'}">Messages étudiants</option>
-            <option value="entreprise"
-                    th:selected="${critere == 'entreprise'}">Messages entreprises</option>
-        </select>
-        <!-- BUG 8 : cet input est masqué pour les critères sans valeur textuelle -->
-        <input type="text" name="valeur" id="valeurInput"
-               th:value="${valeur}"
-               placeholder="Rechercher..." />
-        <button type="submit">Filtrer</button>
-    </form>
-
-    <!-- Liste des messages -->
-    <div th:if="${messages == null or messages.empty}"
-         style="text-align: center; color: #7f8c8d; padding: 30px;">
-        Aucun message pour le moment. Soyez le premier à poster !
-    </div>
-
-    <div th:each="msg : ${messages}">
-        <div class="message">
+        <header class="page-header">
             <div>
-                <span class="author" th:text="${msg.auteur}"></span>
-                <span class="badge"
-                      th:classappend="${msg.estEtudiant} ? 'badge-etudiant' : 'badge-entreprise'"
-                      th:text="${msg.estEtudiant} ? '👨‍🎓 Étudiant' : '🏢 Entreprise'">
-                </span>
-                <span class="date"
-                      th:text="${#temporals.format(msg.datePublication, 'dd/MM/yyyy HH:mm')}">
-                </span>
+                <h1>Forum</h1>
+                <p class="subtitle">Échanges entre étudiants, alumni et entreprises.</p>
             </div>
-            <div class="message-content" th:text="${msg.message}"></div>
-        </div>
-    </div>
+        </header>
 
-    <hr style="margin: 30px 0; border: none; border-top: 2px solid #ecf0f1;"/>
-
-    <!-- Formulaire de publication
-         BUG 1 CORRIGÉ : pas de champs auteur/emailAuteur.
-         L'identité est lue depuis la session dans ForumController.posterMessage(). -->
-    <div class="post-form">
-        <h3>✍️ Poster un nouveau message</h3>
-        <form method="post" action="/forum/poster">
-            <div class="user-info">
-                Vous postez en tant que :
-                <strong th:text="${userNom}"></strong>
-                (<span th:text="${userEmail}"></span>)
+        <form method="get" action="/forum/recherche" class="filter-bar">
+            <div class="form-group">
+                <label for="critereSelect">Rechercher par</label>
+                <select name="critere" id="critereSelect" onchange="toggleValeur()">
+                    <option value="auteur" th:selected="${critere == 'auteur'}">Auteur</option>
+                    <option value="message" th:selected="${critere == 'message'}">Contenu</option>
+                    <option value="etudiant" th:selected="${critere == 'etudiant'}">Posts étudiants</option>
+                    <option value="entreprise" th:selected="${critere == 'entreprise'}">Posts entreprises</option>
+                </select>
             </div>
-            <textarea name="message" rows="5" placeholder="Votre message..." required></textarea>
-            <button type="submit">📤 Publier</button>
+            <div class="form-group">
+                <label for="valeurInput">Mot-clé</label>
+                <input type="text" name="valeur" id="valeurInput" th:value="${valeur}" placeholder="Rechercher...">
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            <a href="/forum" class="btn btn-ghost">Réinitialiser</a>
         </form>
-    </div>
 
-    <!-- Navigation conditionnelle
-         BUG 2 CORRIGÉ : un seul lien retour selon userType. -->
-    <div class="nav-links">
-        <a th:if="${userType == 'candidat'}"   href="/candidat/dashboard">← Retour au tableau de bord candidat</a>
-        <a th:if="${userType == 'entreprise'}" href="/entreprise/dashboard">← Retour au tableau de bord entreprise</a>
-        <a href="/logout" class="danger">Déconnexion</a>
+        <div class="empty" th:if="${messages == null or messages.empty}">
+            <span class="icon">—</span>
+            <h3>Aucun message</h3>
+            <p>Soyez le premier à lancer la discussion.</p>
+        </div>
+
+        <div th:if="${messages != null and !messages.empty}">
+            <article class="forum-message"
+                     th:each="msg : ${messages}"
+                     th:classappend="${msg.estEtudiant} ? ' etudiant' : ' entreprise'">
+                <div class="meta">
+                    <span>
+                        <em class="auteur" th:text="${msg.auteur}"></em>
+                        <span class="role" th:text="${msg.estEtudiant} ? 'Étudiant' : 'Entreprise'"></span>
+                    </span>
+                    <span class="date" th:text="${#temporals.format(msg.datePublication, 'dd/MM/yyyy HH:mm')}"></span>
+                </div>
+                <p class="body" th:text="${msg.message}"></p>
+            </article>
+        </div>
+
+        <section class="forum-compose" style="margin-top:2rem;">
+            <h3>Publier un message</h3>
+            <p class="form-help">
+                En tant que <strong th:text="${userNom}"></strong>
+                (<span th:text="${userEmail}"></span>)
+            </p>
+            <form method="post" action="/forum/poster">
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5"
+                              placeholder="Partagez une question ou une actualité..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Publier</button>
+            </form>
+        </section>
     </div>
-</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
-    /**
-     * BUG 8 CORRIGÉ : masque le champ texte et retire son attribut required
-     * quand le critère sélectionné est "etudiant" ou "entreprise".
-     * Pour "auteur" et "message", le champ est affiché et required est restauré.
-     */
     function toggleValeur() {
         var critere = document.getElementById('critereSelect').value;
         var valeurInput = document.getElementById('valeurInput');
         var sansValeur = (critere === 'etudiant' || critere === 'entreprise');
-
-        valeurInput.style.display = sansValeur ? 'none' : 'inline-block';
+        valeurInput.closest('.form-group').style.display = sansValeur ? 'none' : '';
         if (sansValeur) {
             valeurInput.removeAttribute('required');
-            valeurInput.value = ''; // évite d'envoyer une valeur parasite
+            valeurInput.value = '';
         } else {
             valeurInput.setAttribute('required', 'required');
         }
     }
-
-    // Appel au chargement pour refléter le critère restitué par Thymeleaf
     document.addEventListener('DOMContentLoaded', toggleValeur);
 </script>
 </body>

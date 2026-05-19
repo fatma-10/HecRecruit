@@ -1,66 +1,43 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Wishlist - HecRecruit</title>
-    <link rel="stylesheet" href="/css/hec-ui.css">
-</head>
+<head th:replace="~{fragments/layout :: head('Wishlist')}"></head>
 <body>
-<main class="app-shell">
-    <header class="topbar">
-        <a href="/entreprise/dashboard" class="brand">
-            <strong>HecRecruit</strong>
-            <span>Wishlist</span>
-        </a>
-        <nav class="nav-actions">
-            <a href="/entreprise/offres" class="btn btn-secondary">Offres</a>
-            <a href="/entreprise/dashboard" class="btn btn-secondary">Dashboard</a>
-            <a href="/forum" class="btn btn-secondary">Forum</a>
-        </nav>
-    </header>
+<header th:replace="~{fragments/layout :: header-entreprise('wishlist')}"></header>
 
-    <!-- Messages flash -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+<main>
+    <div class="container">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <section class="page-title">
-        <div>
-            <h1>Wishlist</h1>
-            <p>Candidats sauvegardés — score basé sur leur meilleure candidature chez vous.</p>
-        </div>
-    </section>
-
-    <section class="grid" th:if="${wishlist != null && !wishlist.isEmpty()}">
-        <article class="card offer-card" th:each="candidat : ${wishlist}">
-            <div class="candidate-meta">
-                <span class="badge badge-score">
-                    <span th:text="${scoresCompatibilite[candidat.id]}"></span>% match
-                </span>
-                <span th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Étudiant' : 'Alumni'"></span>
+        <header class="page-header">
+            <div>
+                <h1>Wishlist</h1>
+                <p class="subtitle">Candidats sauvegardés — score basé sur leur meilleure candidature.</p>
             </div>
-            <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
-            <p class="description-preview" th:text="${candidat.skills}"></p>
-            <div class="candidate-meta">
-                <span th:text="${candidat.email}"></span>
-                <span th:text="${candidat.telephone}"></span>
-            </div>
-            <div class="actions">
-                <form method="post"
-                      th:action="'/entreprise/wishlist/retirer/' + ${candidat.id}">
-                    <button type="submit" class="btn btn-danger">Retirer</button>
+        </header>
+
+        <div class="offre-grid" th:if="${wishlist != null && !wishlist.isEmpty()}">
+            <article class="offre-card" th:each="candidat : ${wishlist}">
+                <span class="score" th:text="${scoresCompatibilite[candidat.id]} + '%'"></span>
+                <span class="type-badge" th:text="${candidat instanceof T(com.IHEC.Recruit.model.Etudiant)} ? 'Étudiant' : 'Alumni'"></span>
+                <h3 th:text="${candidat.prenom} + ' ' + ${candidat.nom}"></h3>
+                <p class="desc" th:text="${candidat.skills}"></p>
+                <p class="company" th:text="${candidat.email} + ' · ' + ${candidat.telephone}"></p>
+                <form method="post" th:action="'/entreprise/wishlist/retirer/' + ${candidat.id}" style="margin-top:1rem;">
+                    <button type="submit" class="btn btn-danger btn-sm">Retirer</button>
                 </form>
-            </div>
-        </article>
-    </section>
+            </article>
+        </div>
 
-    <div class="empty-state" th:if="${wishlist == null || wishlist.isEmpty()}">
-        Votre wishlist est vide. Ajoutez des candidats depuis les offres.
-    </div>
-
-    <div style="margin-top:2rem;">
-        <a href="/entreprise/dashboard">← Retour au dashboard</a>
+        <div class="empty" th:if="${wishlist == null || wishlist.isEmpty()}">
+            <span class="icon">♡</span>
+            <h3>Wishlist vide</h3>
+            <p>Ajoutez des candidats depuis vos offres.</p>
+            <a href="/entreprise/offres" class="btn btn-primary">Mes offres</a>
+        </div>
     </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

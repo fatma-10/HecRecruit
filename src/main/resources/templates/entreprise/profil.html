@@ -1,22 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Profil entreprise</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Profil entreprise')}"></head>
 <body>
-<h1>Profil de <span th:text="${entreprise.nom}"></span></h1>
-<p>Secteur : <span th:text="${entreprise.secteur}"></span></p>
-<p>Adresse : <span th:text="${entreprise.adresse}"></span></p>
-<p>Email : <span th:text="${entreprise.email}"></span></p>
-<p>Téléphone : <span th:text="${entreprise.telephone}"></span></p>
-<form method="post" action="/entreprise/profil/modifier">
-    <input type="text" name="secteur" placeholder="Secteur" th:value="${entreprise.secteur}" /><br/>
-    <input type="text" name="adresse" placeholder="Adresse" th:value="${entreprise.adresse}" /><br/>
-    <input type="tel" name="telephone" placeholder="Téléphone" th:value="${entreprise.telephone}" /><br/>
-    <button type="submit">Mettre à jour</button>
-</form>
-<a href="/entreprise/dashboard">← Retour</a> |
-<a href="/forum">Forum</a>
+<header th:replace="~{fragments/layout :: header-entreprise('profil')}"></header>
+
+<main>
+    <div class="container">
+        <header class="page-header">
+            <div>
+                <h1 th:text="${entreprise.nom}">Entreprise</h1>
+                <p class="subtitle">Informations et coordonnées de votre compte.</p>
+            </div>
+        </header>
+
+        <div class="grid two" style="margin-bottom:2rem;">
+            <article class="form-card">
+                <p><strong>Secteur :</strong> <span th:text="${entreprise.secteur}"></span></p>
+                <p><strong>Adresse :</strong> <span th:text="${entreprise.adresse}"></span></p>
+                <p><strong>Email :</strong> <span th:text="${entreprise.email}"></span></p>
+                <p><strong>Téléphone :</strong> <span th:text="${entreprise.telephone}"></span></p>
+            </article>
+        </div>
+
+        <form method="post" action="/entreprise/profil/modifier" class="form-card">
+            <h2>Mettre à jour</h2>
+            <div class="form-group">
+                <label for="secteur">Secteur</label>
+                <input type="text" id="secteur" name="secteur" th:value="${entreprise.secteur}">
+            </div>
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input type="text" id="adresse" name="adresse" th:value="${entreprise.adresse}">
+            </div>
+            <div class="form-group">
+                <label for="telephone">Téléphone</label>
+                <input type="tel" id="telephone" name="telephone" th:value="${entreprise.telephone}">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="/entreprise/dashboard" class="btn btn-ghost">Retour</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>
