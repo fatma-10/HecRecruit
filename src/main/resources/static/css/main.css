@@ -1494,3 +1494,9 @@ a, button, .btn, input, select, textarea {
     gap: 1.5rem;
 }
 .text-link { font-weight: 600; }
+
+.brand-logo {
+    height: 50px;
+    width: auto;
+    display: block;
+}

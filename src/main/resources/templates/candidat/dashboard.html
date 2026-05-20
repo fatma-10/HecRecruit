@@ -31,36 +31,6 @@
             </article>
         </section>
 
-        <header class="page-header">
-            <div>
-                <h2>Recommandations</h2>
-                <p class="subtitle">Suggestions personnalisées selon votre profil.</p>
-            </div>
-            <a href="/recommandations" class="btn btn-ghost">Tout voir</a>
-        </header>
-
-        <div class="offre-grid" th:if="${recommandations != null && !recommandations.isEmpty()}">
-            <article class="offre-card" th:each="rec : ${recommandations}">
-                <span class="type-badge" th:text="${rec.offre.typeOffre}">Type</span>
-                <h3 th:text="${rec.offre.titre}">Titre</h3>
-                <p class="company" th:text="${rec.offre.entreprise.nom}">Entreprise</p>
-                <p class="desc" th:text="${rec.offre.description}">Description</p>
-                <div class="meta">
-                    <span>Score</span>
-                    <span class="score" th:text="${rec.scoreFormate}">0</span>
-                </div>
-                <form method="post" th:action="'/candidat/offres/postuler/' + ${rec.offre.id}" style="margin-top:1rem;">
-                    <button type="submit" class="btn btn-primary btn-sm">Postuler</button>
-                </form>
-            </article>
-        </div>
-        <div class="empty" th:if="${recommandations == null || recommandations.isEmpty()}">
-            <span class="icon">?</span>
-            <h3>Aucune recommandation</h3>
-            <p>Mettez à jour vos compétences et consultez les offres disponibles.</p>
-            <a href="/candidat/profil" class="btn btn-primary">Mon profil</a>
-        </div>
-
         <header class="page-header" style="margin-top:2.5rem;">
             <div>
                 <h2>Dernières offres</h2>
